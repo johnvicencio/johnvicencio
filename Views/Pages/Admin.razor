@@ -4,7 +4,6 @@
 @inject PageController Pages
 @inject BlogController Blog
 @inject DataStore Store
-@inject IJSRuntime Js
 
 <PageTitle>Admin</PageTitle>
 
@@ -17,18 +16,6 @@
 else
 {
     <h1>Admin Dashboard</h1>
-
-    <article style="margin-bottom:2rem">
-        <h3>Netlify Content Writes</h3>
-        <p>Paste the same token configured in Netlify as <code>CONTENT_WRITE_TOKEN</code>. This browser will send it when saving to Netlify Blobs.</p>
-        <p style="font-size:0.9rem">On localhost, use <code>netlify dev</code> if you want this token to write through the local Netlify Function. Plain <code>dotnet run</code> falls back to browser storage.</p>
-        <input type="password" @bind="contentToken" placeholder="CONTENT_WRITE_TOKEN" />
-        <button @onclick="SaveContentTokenAsync"><i class="site-icon" data-lucide="key-round"></i>Save Token</button>
-        @if (tokenSaved)
-        {
-            <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
-        }
-    </article>
 
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:960px;margin:0 auto;width:100%">
 
@@ -70,8 +57,6 @@ else
     private int totalPages;
     private int totalSections;
     private int totalPosts;
-    private string contentToken = string.Empty;
-    private bool tokenSaved;
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,18 +80,4 @@ else
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-
-        contentToken = await Js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token") ?? string.Empty;
-        tokenSaved = !string.IsNullOrWhiteSpace(contentToken);
-        StateHasChanged();
-    }
-
-    private async Task SaveContentTokenAsync()
-    {
-        await Js.InvokeVoidAsync("window.localStorage.setItem", "jv_content_token", contentToken);
-        tokenSaved = !string.IsNullOrWhiteSpace(contentToken);
-    }
 }
