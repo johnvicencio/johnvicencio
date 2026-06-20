@@ -4,8 +4,7 @@ namespace johnvicencio.Controllers;
 
 public sealed class BlogController
 {
-    private const string StorageKey = "jv_posts";
-    private const string JsonUrl = "data/posts.json";
+    private const string ContentName = "posts";
 
     private readonly DataStore store;
     private List<BlogPost>? posts;
@@ -17,7 +16,7 @@ public sealed class BlogController
 
     public async Task<List<BlogPost>> GetPostsAsync()
     {
-        posts ??= await store.LoadAsync<BlogPost>(JsonUrl, StorageKey);
+        posts ??= await store.LoadAsync<BlogPost>(ContentName);
         return posts;
     }
 
@@ -31,7 +30,7 @@ public sealed class BlogController
     {
         var all = await GetPostsAsync();
         all.Add(post);
-        await store.SaveAsync(all, StorageKey);
+        await store.SaveAsync(all, ContentName);
     }
 
     public async Task UpdatePostAsync(BlogPost post)
@@ -40,13 +39,13 @@ public sealed class BlogController
         var index = all.FindIndex(p => p.Id == post.Id);
         if (index >= 0)
             all[index] = post;
-        await store.SaveAsync(all, StorageKey);
+        await store.SaveAsync(all, ContentName);
     }
 
     public async Task DeletePostAsync(string postId)
     {
         var all = await GetPostsAsync();
         all.RemoveAll(p => p.Id == postId);
-        await store.SaveAsync(all, StorageKey);
+        await store.SaveAsync(all, ContentName);
     }
 }
