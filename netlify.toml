@@ -1,10 +1,7 @@
 [build]
   command = "dotnet publish -c Release"
-  publish = "bin/Release/net9.0/publish/wwwroot"
+  publish = "bin/Release/net8.0/publish/wwwroot"
   functions = "netlify/functions"
-
-[build.environment]
-  DOTNET_VERSION = "9.0.100"
 
 [[redirects]]
   from = "/*"
