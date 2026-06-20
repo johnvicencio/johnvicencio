@@ -1,0 +1,112 @@
+@page "/admin"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject PageController Pages
+@inject BlogController Blog
+@inject DataStore Store
+@inject IJSRuntime Js
+
+<PageTitle>Admin</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+@if (loading)
+{
+    <p class="pagination-info" style="text-align:center">Loading...</p>
+}
+else
+{
+    <h1>Admin Dashboard</h1>
+
+    <article style="margin-bottom:2rem">
+        <h3>Netlify Content Writes</h3>
+        <p>Paste the same token configured in Netlify as <code>CONTENT_WRITE_TOKEN</code>. This browser will send it when saving to Netlify Blobs.</p>
+        <p style="font-size:0.9rem">On localhost, use <code>netlify dev</code> if you want this token to write through the local Netlify Function. Plain <code>dotnet run</code> falls back to browser storage.</p>
+        <input type="password" @bind="contentToken" placeholder="CONTENT_WRITE_TOKEN" />
+        <button @onclick="SaveContentTokenAsync"><i class="site-icon" data-lucide="key-round"></i>Save Token</button>
+        @if (tokenSaved)
+        {
+            <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
+        }
+    </article>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:960px;margin:0 auto;width:100%">
+
+        <article style="margin:0">
+            <h3>Pages</h3>
+            <p class="pagination-info" style="margin:0.25rem 0">
+                @totalPages page(s)
+            </p>
+            <p class="pagination-info" style="margin:0.25rem 0">
+                @totalSections section(s)
+            </p>
+            <hr />
+            <button class="outline" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="settings"></i>Manage</button>
+        </article>
+
+        <article style="margin:0">
+            <h3>Blog</h3>
+            <p class="pagination-info" style="margin:0.25rem 0">
+                @totalPosts post(s)
+            </p>
+            <hr />
+            <button class="outline" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="settings"></i>Manage</button>
+        </article>
+
+        <article style="margin:0">
+            <h3>Settings</h3>
+            <p class="pagination-info" style="margin:0.25rem 0">—</p>
+            <hr />
+            <button class="outline" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/settings")'><i class="site-icon" data-lucide="settings"></i>Manage</button>
+        </article>
+
+    </div>
+}
+
+</div>
+
+@code {
+    private bool loading = true;
+    private int totalPages;
+    private int totalSections;
+    private int totalPosts;
+    private string contentToken = string.Empty;
+    private bool tokenSaved;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        try
+        {
+            var pageList = await Pages.GetPagesAsync();
+            var postList = await Blog.GetPostsAsync();
+            totalPages = pageList.Count;
+            totalSections = pageList.Sum(p => p.Sections.Count);
+            totalPosts = postList.Count;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        contentToken = await Js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token") ?? string.Empty;
+        tokenSaved = !string.IsNullOrWhiteSpace(contentToken);
+        StateHasChanged();
+    }
+
+    private async Task SaveContentTokenAsync()
+    {
+        await Js.InvokeVoidAsync("window.localStorage.setItem", "jv_content_token", contentToken);
+        tokenSaved = !string.IsNullOrWhiteSpace(contentToken);
+    }
+}

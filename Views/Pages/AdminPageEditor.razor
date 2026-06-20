@@ -1,0 +1,156 @@
+@page "/admin/pages/add"
+@page "/admin/pages/edit/{PageId}"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject PageController Pages
+
+<PageTitle>Admin — @(PageId is null ? "Add Page" : "Edit Page")</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">@(isAddMode ? "Add Page" : "Edit Page")</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else
+        {
+            <div class="page-editor">
+                <div class="grid" style="grid-template-columns:1fr 1fr">
+                    <label>Page Title
+                        <input @bind="editTitle" @oninput="OnTitleChanged" />
+                    </label>
+                    <label>Slug
+                        <input @bind="editSlug" />
+                    </label>
+                </div>
+
+                <label>Description (SEO)
+                    <input @bind="editDescription" />
+                </label>
+
+                <label>Keywords (SEO)
+                    <textarea @bind="editKeywords" rows="2" placeholder="comma, separated"></textarea>
+                </label>
+
+                <hr />
+
+                @if (!isAddMode)
+                {
+                    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
+                        <button class="outline" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i>Add Section</button>
+                        <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="layers"></i>Manage Sections</button>
+                    </div>
+                    <p class="pagination-info">@sectionCount section(s) on this page.</p>
+                }
+
+                <hr />
+                <button @onclick="SavePage" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Page</button>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+            </div>
+        }
+    </article>
+
+</div>
+
+@code {
+    [Parameter]
+    public string? PageId { get; set; }
+
+    private bool loading = true;
+    private bool saving;
+    private bool isAddMode;
+    private int sectionCount;
+
+    private string editTitle = "";
+    private string editSlug = "";
+    private string editDescription = "";
+    private string editKeywords = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        isAddMode = PageId is null;
+
+        if (!isAddMode)
+        {
+            var page = await Pages.GetPageByIdAsync(PageId!);
+            if (page is not null)
+            {
+                editTitle = page.Title;
+                editSlug = page.Slug;
+                editDescription = page.Description;
+                editKeywords = page.Keywords;
+                sectionCount = page.Sections.Count;
+            }
+        }
+
+        loading = false;
+    }
+
+    private void OnTitleChanged(ChangeEventArgs e)
+    {
+        editTitle = e.Value?.ToString() ?? "";
+        if (isAddMode)
+        {
+            editSlug = ToSlug(editTitle);
+        }
+    }
+
+    private async Task SavePage()
+    {
+        saving = true;
+        try
+        {
+            var existingPage = isAddMode ? null : await Pages.GetPageByIdAsync(PageId!);
+            var page = new Page
+            {
+                Id = existingPage?.Id ?? Guid.NewGuid().ToString("N")[..12],
+                Title = editTitle,
+                Slug = editSlug,
+                Description = editDescription,
+                Keywords = editKeywords,
+                Sections = existingPage?.Sections ?? [],
+            };
+
+            if (existingPage is not null)
+                await Pages.UpdatePageAsync(page);
+            else
+                await Pages.AddPageAsync(page);
+
+            Nav.NavigateTo("/admin/pages");
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    static string ToSlug(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return string.Empty;
+        var slug = new System.Text.StringBuilder();
+        foreach (var c in title.ToLowerInvariant().Trim())
+        {
+            if (char.IsLetterOrDigit(c))
+                slug.Append(c);
+            else if (c is ' ' or '-')
+                slug.Append('-');
+        }
+        var result = slug.ToString().Trim('-');
+        while (result.Contains("--")) result = result.Replace("--", "-");
+        return result;
+    }
+}

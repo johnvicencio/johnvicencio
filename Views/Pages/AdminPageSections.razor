@@ -1,0 +1,80 @@
+@page "/admin/pages/{PageId}/sections"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject PageController Pages
+
+<PageTitle>Admin — Sections</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Sections</h2>
+            <div style="display:flex;gap:0.5rem">
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+                <button class="outline" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i>Add Section</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (page is null)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
+        }
+        else if (page.Sections.Count == 0)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">No sections yet.</p>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Heading</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var sec in page.Sections)
+                    {
+                        <tr>
+                            <td style="font-family:monospace;font-size:0.75rem">@sec.SectionId</td>
+                            <td>@sec.Type</td>
+                            <td><strong>@(string.IsNullOrWhiteSpace(sec.Heading) ? "(no heading)" : sec.Heading)</strong></td>
+                            <td>
+                                <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/edit/{sec.SectionId}")'><i class="site-icon" data-lucide="pencil"></i>Edit</button>
+                                <button class="outline danger" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/delete/{sec.SectionId}")'><i class="site-icon" data-lucide="trash-2"></i>Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </article>
+
+</div>
+
+@code {
+    [Parameter]
+    public string PageId { get; set; } = "";
+
+    private bool loading = true;
+    private Page? page;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        page = await Pages.GetPageByIdAsync(PageId);
+        loading = false;
+    }
+}

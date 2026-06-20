@@ -1,0 +1,82 @@
+@page "/admin/blog"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject BlogController Blog
+@inject PageController Pages
+
+<PageTitle>Admin — Blog</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Blog Posts</h2>
+            <div style="display:flex;gap:0.5rem">
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+                @if (hasBlogPage)
+                {
+                    <button class="outline" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i>Add Post</button>
+                }
+            </div>
+        </div>
+
+        @if (!hasBlogPage)
+        {
+            <p class="pagination-info" style="padding:1rem">Create a page with slug "blog" to enable blog management.</p>
+        }
+
+        @if (hasBlogPage && postList.Count == 0)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">No posts yet.</p>
+        }
+
+        @if (hasBlogPage)
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Slug</th>
+                        <th>Published</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pt in postList)
+                    {
+                        <tr>
+                            <td style="font-family:monospace;font-size:0.75rem">@pt.Id</td>
+                            <td><strong>@pt.Title</strong></td>
+                            <td>@pt.Slug</td>
+                            <td>@pt.PublishedOn.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i>Edit</button>
+                                <button class="outline danger" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i>Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </article>
+
+</div>
+
+@code {
+    private List<johnvicencio.Models.BlogPost> postList = [];
+    private bool hasBlogPage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        postList = await Blog.GetPostsAsync();
+        var pageList = await Pages.GetPagesAsync();
+        hasBlogPage = pageList.Any(p => p.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase));
+    }
+}

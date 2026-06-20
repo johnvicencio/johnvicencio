@@ -1,0 +1,15 @@
+<section class="content-section">
+    @if (!string.IsNullOrWhiteSpace(Section.Heading))
+    {
+        <h2>@Section.Heading</h2>
+    }
+    @if (!string.IsNullOrWhiteSpace(Section.Body))
+    {
+        <div class="content-body">@((MarkupString)Section.Body)</div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public PageSection Section { get; set; } = new();
+}

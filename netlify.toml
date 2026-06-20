@@ -1,0 +1,9 @@
+[build]
+  command = "dotnet publish -c Release"
+  publish = "bin/Release/net9.0/publish/wwwroot"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
