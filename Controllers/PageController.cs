@@ -4,8 +4,7 @@ namespace johnvicencio.Controllers;
 
 public sealed class PageController
 {
-    private const string StorageKey = "jv_pages";
-    private const string JsonUrl = "data/pages.json";
+    private const string ContentName = "pages";
 
     private readonly DataStore store;
     private List<Page>? pages;
@@ -17,7 +16,7 @@ public sealed class PageController
 
     public async Task<List<Page>> GetPagesAsync()
     {
-        pages ??= await store.LoadAsync<Page>(JsonUrl, StorageKey);
+        pages ??= await store.LoadAsync<Page>(ContentName);
         return pages;
     }
 
@@ -37,7 +36,7 @@ public sealed class PageController
     {
         var all = await GetPagesAsync();
         all.Add(page);
-        await store.SaveAsync(all, StorageKey);
+        await store.SaveAsync(all, ContentName);
     }
 
     public async Task UpdatePageAsync(Page page)
@@ -46,13 +45,13 @@ public sealed class PageController
         var index = all.FindIndex(p => p.Id == page.Id);
         if (index >= 0)
             all[index] = page;
-        await store.SaveAsync(all, StorageKey);
+        await store.SaveAsync(all, ContentName);
     }
 
     public async Task DeletePageAsync(string pageId)
     {
         var all = await GetPagesAsync();
         all.RemoveAll(p => p.Id == pageId);
-        await store.SaveAsync(all, StorageKey);
+        await store.SaveAsync(all, ContentName);
     }
 }

@@ -15,66 +15,46 @@ public sealed class DataStore
         this.js = js;
     }
 
-    public async Task<List<T>> LoadAsync<T>(string jsonUrl, string storageKey) where T : class
+    public async Task<List<T>> LoadAsync<T>(string contentName) where T : class
     {
         try
         {
-            var fromBlob = await http.GetFromJsonAsync<List<T>>(NetlifyContentUrl(storageKey));
+            var fromBlob = await http.GetFromJsonAsync<List<T>>(NetlifyContentUrl(contentName));
             if (fromBlob is not null) return fromBlob;
         }
         catch { }
 
-        try
-        {
-            var fromFile = await http.GetFromJsonAsync<List<T>>(jsonUrl);
-            if (fromFile is not null) return fromFile;
-        }
-        catch { }
-
-        return await FallbackReadAsync<List<T>>(storageKey) ?? [];
+        return [];
     }
 
-    public async Task<T?> LoadSingleAsync<T>(string jsonUrl, string storageKey) where T : class
+    public async Task<T?> LoadSingleAsync<T>(string contentName) where T : class
     {
         try
         {
-            var fromBlob = await http.GetFromJsonAsync<T>(NetlifyContentUrl(storageKey));
+            var fromBlob = await http.GetFromJsonAsync<T>(NetlifyContentUrl(contentName));
             if (fromBlob is not null) return fromBlob;
         }
         catch { }
 
-        try
-        {
-            var fromFile = await http.GetFromJsonAsync<T>(jsonUrl);
-            if (fromFile is not null) return fromFile;
-        }
-        catch { }
-
-        return await FallbackReadAsync<T>(storageKey);
+        return null;
     }
 
-    public async Task SaveAsync<T>(T data, string storageKey)
+    public async Task SaveAsync<T>(T data, string contentName)
     {
-        try
-        {
-            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
-            using var request = new HttpRequestMessage(HttpMethod.Put, NetlifyContentUrl(storageKey));
-            request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+        using var request = new HttpRequestMessage(HttpMethod.Put, NetlifyContentUrl(contentName));
+        request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-            var token = await GetContentTokenAsync();
-            if (!string.IsNullOrWhiteSpace(token))
-                request.Headers.Add("x-content-token", token);
+        var token = await GetContentTokenAsync();
+        if (!string.IsNullOrWhiteSpace(token))
+            request.Headers.Add("x-content-token", token);
 
-            var response = await http.SendAsync(request);
-            if (response.IsSuccessStatusCode) return;
-        }
-        catch { }
-
-        await FallbackWriteAsync(data, storageKey);
+        var response = await http.SendAsync(request);
+        response.EnsureSuccessStatusCode();
     }
 
-    private static string NetlifyContentUrl(string storageKey) =>
-        $"/.netlify/functions/content?name={storageKey.Replace("jv_", "")}";
+    private static string NetlifyContentUrl(string contentName) =>
+        $"/.netlify/functions/content?name={contentName}";
 
     private async Task<string?> GetContentTokenAsync()
     {
@@ -84,27 +64,5 @@ public sealed class DataStore
             return await js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token");
         }
         catch { return null; }
-    }
-
-    private async Task<T?> FallbackReadAsync<T>(string key) where T : class
-    {
-        if (js is null) return default;
-        try
-        {
-            var json = await js.InvokeAsync<string?>("window.localStorage.getItem", key);
-            return string.IsNullOrWhiteSpace(json) ? default : JsonSerializer.Deserialize<T>(json);
-        }
-        catch { return default; }
-    }
-
-    private async Task FallbackWriteAsync<T>(T data, string key)
-    {
-        if (js is null) return;
-        try
-        {
-            var json = JsonSerializer.Serialize(data);
-            await js.InvokeVoidAsync("window.localStorage.setItem", key, json);
-        }
-        catch { }
     }
 }

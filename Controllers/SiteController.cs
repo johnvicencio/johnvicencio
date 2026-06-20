@@ -4,8 +4,7 @@ namespace johnvicencio.Controllers;
 
 public sealed class SiteController
 {
-    private const string StorageKey = "jv_settings";
-    private const string JsonUrl = "data/settings.json";
+    private const string ContentName = "settings";
 
     private readonly DataStore store;
     private SiteSetting? cached;
@@ -17,13 +16,13 @@ public sealed class SiteController
 
     public async Task<SiteSetting> GetSettingsAsync()
     {
-        cached ??= await store.LoadSingleAsync<SiteSetting>(JsonUrl, StorageKey) ?? new SiteSetting();
+        cached ??= await store.LoadSingleAsync<SiteSetting>(ContentName) ?? new SiteSetting();
         return cached;
     }
 
     public async Task UpdateSettingsAsync(SiteSetting settings)
     {
         cached = settings;
-        await store.SaveAsync(settings, StorageKey);
+        await store.SaveAsync(settings, ContentName);
     }
 }
