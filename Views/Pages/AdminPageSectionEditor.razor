@@ -1,0 +1,270 @@
+@page "/admin/pages/{PageId}/sections/add"
+@page "/admin/pages/{PageId}/sections/edit/{SectionId}"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject PageController Pages
+
+<PageTitle>Admin — @(SectionId is null ? "Add Section" : "Edit Section")</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">@(isAddMode ? "Add Section" : "Edit Section")</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (page is null)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
+        }
+        else
+        {
+            <div class="page-editor">
+                <div class="grid" style="grid-template-columns:1fr 1fr">
+                    <label>Section ID
+                        <input readonly class="pagination-info" value="@sec.SectionId" style="cursor:not-allowed" />
+                    </label>
+                    <label>Type
+                        <select @bind="sec.Type" @bind:after="OnTypeChanged">
+                            <option value="hero">Hero</option>
+                            <option value="2-col">2 Columns</option>
+                            <option value="3-col">3 Columns</option>
+                            <option value="cards">Card Collection</option>
+                            <option value="content">Content</option>
+                            <option value="contact">Contact</option>
+                        </select>
+                    </label>
+                </div>
+
+                <label>Heading
+                    <input @bind="sec.Heading" />
+                </label>
+
+                @switch (sec.Type)
+                {
+                    case "hero":
+                        <label>Description
+                            <textarea @bind="sec.Body" rows="3"></textarea>
+                        </label>
+                        <label>Image URL
+                            <input @bind="sec.ImageUrl" />
+                        </label>
+                        <label>Image Alt Text
+                            <input @bind="sec.ImageAlt" />
+                        </label>
+                        <hr />
+                        <div class="table-toolbar">
+                            <h5 style="margin:0">Buttons</h5>
+                            @if (sec.Buttons.Count < 3)
+                            {
+                                <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="AddButton"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
+                            }
+                        </div>
+                        @for (var bi = 0; bi < sec.Buttons.Count; bi++)
+                        {
+                            var btn = sec.Buttons[bi];
+                            var localBi = bi;
+                            <div style="border:1px solid var(--md-border);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Button Text
+                                        <input @bind="btn.Text" />
+                                    </label>
+                                    <label>Button URL
+                                        <input @bind="btn.Url" />
+                                    </label>
+                                </div>
+                                <button class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveButton(localBi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
+                            </div>
+                        }
+                        break;
+
+                    case "2-col":
+                    case "3-col":
+                        var colCount = sec.Type == "2-col" ? 2 : 3;
+                        for (var ci = 0; ci < Math.Min(sec.Columns.Count, colCount); ci++)
+                        {
+                            var col = sec.Columns[ci];
+                            var localCi = ci;
+                            <div style="border:1px solid var(--md-border);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                                <h5>Column @(localCi + 1)</h5>
+                                <label>Title
+                                    <input @bind="col.Title" />
+                                </label>
+                                <label>Body
+                                    <textarea @bind="col.Body" rows="3"></textarea>
+                                </label>
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Action Text
+                                        <input @bind="col.ActionText" />
+                                    </label>
+                                    <label>Action URL
+                                        <input @bind="col.ActionUrl" />
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                        break;
+
+                    case "cards":
+                    case "cardcollection":
+                        @for (var ci = 0; ci < sec.Columns.Count; ci++)
+                        {
+                            var col = sec.Columns[ci];
+                            var localCi = ci;
+                            <div style="border:1px solid var(--md-border);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                                <h5>Item @(localCi + 1)</h5>
+                                <label>Title
+                                    <input @bind="col.Title" />
+                                </label>
+                                <label>Body
+                                    <textarea @bind="col.Body" rows="3"></textarea>
+                                </label>
+                            </div>
+                        }
+                        break;
+
+                    case "content":
+                        <label>Content</label>
+                        <RichTextEditor @bind-Value="sec.Body" MinHeight="400" />
+                        <br />
+                        break;
+
+                    case "contact":
+                        <label>Description
+                            <textarea @bind="sec.Body" rows="2"></textarea>
+                        </label>
+                        break;
+                }
+
+                <hr />
+                <button @onclick="SaveSection" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Section</button>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+            </div>
+        }
+    </article>
+
+</div>
+
+@code {
+    [Parameter]
+    public string PageId { get; set; } = "";
+
+    [Parameter]
+    public string? SectionId { get; set; }
+
+    private bool loading = true;
+    private bool saving;
+    private bool isAddMode;
+    private Page? page;
+    private PageSection sec = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        page = await Pages.GetPageByIdAsync(PageId);
+        if (page is null) { loading = false; return; }
+
+        isAddMode = SectionId is null;
+
+        if (isAddMode)
+        {
+            sec = new PageSection
+            {
+                SectionId = Guid.NewGuid().ToString("N")[..8],
+                Type = "hero",
+            };
+        }
+        else
+        {
+            var found = page.Sections.FirstOrDefault(s => s.SectionId == SectionId);
+            if (found is not null)
+            {
+                sec = new PageSection
+                {
+                    SectionId = found.SectionId,
+                    Type = found.Type,
+                    Heading = found.Heading,
+                    Body = found.Body,
+                    ActionText = found.ActionText,
+                    ActionUrl = found.ActionUrl,
+                    ImageUrl = found.ImageUrl,
+                    ImageAlt = found.ImageAlt,
+                    Buttons = [.. found.Buttons],
+                    Columns = [.. found.Columns],
+                };
+            }
+        }
+
+        EnsureDefaultColumns();
+        loading = false;
+    }
+
+    private void OnTypeChanged()
+    {
+        EnsureDefaultColumns();
+    }
+
+    private void EnsureDefaultColumns()
+    {
+        if (sec.Type is "2-col" && sec.Columns.Count < 2)
+            while (sec.Columns.Count < 2) sec.Columns.Add(new SectionColumn());
+        else if (sec.Type is "3-col" && sec.Columns.Count < 3)
+            while (sec.Columns.Count < 3) sec.Columns.Add(new SectionColumn());
+        else if (sec.Type is "cards" or "cardcollection" && sec.Columns.Count < 3)
+            while (sec.Columns.Count < 3) sec.Columns.Add(new SectionColumn());
+        else if (sec.Type is not ("2-col" or "3-col" or "cards" or "cardcollection"))
+            sec.Columns.Clear();
+    }
+
+    private void AddButton()
+    {
+        if (sec.Buttons.Count < 3)
+            sec.Buttons.Add(new SectionButton());
+    }
+
+    private void RemoveButton(int index)
+    {
+        if (index >= 0 && index < sec.Buttons.Count)
+            sec.Buttons.RemoveAt(index);
+    }
+
+    private async Task SaveSection()
+    {
+        saving = true;
+        try
+        {
+            page = await Pages.GetPageByIdAsync(PageId);
+            if (page is null) return;
+
+            if (isAddMode)
+            {
+                page.Sections.Add(sec);
+            }
+            else
+            {
+                var idx = page.Sections.FindIndex(s => s.SectionId == SectionId);
+                if (idx >= 0)
+                    page.Sections[idx] = sec;
+            }
+
+            await Pages.UpdatePageAsync(page);
+            Nav.NavigateTo($"/admin/pages/{PageId}/sections");
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

@@ -1,0 +1,33 @@
+@page "/blog"
+@inject BlogController BlogController
+@inject RouterController Router
+
+<PageTitle>Blog</PageTitle>
+
+<h1>Blog</h1>
+
+@if (posts.Count == 0)
+{
+    <p>No posts published yet.</p>
+}
+else
+{
+    <section class="post-list">
+        @foreach (var post in posts)
+        {
+            <article>
+                <h2><a href="@Router.BlogPostPath(post.Slug)">@post.Title</a></h2>
+                <p>@post.Summary</p>
+            </article>
+        }
+    </section>
+}
+
+@code {
+    private IReadOnlyList<johnvicencio.Models.BlogPost> posts = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await BlogController.GetPostsAsync();
+    }
+}

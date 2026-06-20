@@ -1,0 +1,29 @@
+@page "/blog/{Slug}"
+@inject BlogController Blog
+
+@if (post is null)
+{
+    <PageTitle>Post not found</PageTitle>
+    <p>Post not found.</p>
+}
+else
+{
+    <PageTitle>@post.Title</PageTitle>
+    <article>
+        <h1>@post.Title</h1>
+        <p><time>@post.PublishedOn.ToString("MMMM d, yyyy")</time></p>
+        <p>@post.Content</p>
+    </article>
+}
+
+@code {
+    [Parameter]
+    public string Slug { get; set; } = string.Empty;
+
+    private johnvicencio.Models.BlogPost? post;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        post = await Blog.GetPostAsync(Slug);
+    }
+}

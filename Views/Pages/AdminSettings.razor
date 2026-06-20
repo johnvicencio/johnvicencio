@@ -1,0 +1,123 @@
+@page "/admin/settings"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject SiteController Site
+
+<PageTitle>Admin — Settings</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Settings</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else
+        {
+            <h3>General</h3>
+
+            <div class="grid" style="grid-template-columns:1fr 1fr">
+                <label>Site Name
+                    <input @bind="settings.SiteName" />
+                </label>
+                <label>Tagline
+                    <input @bind="settings.Tagline" />
+                </label>
+            </div>
+
+            <div class="grid" style="grid-template-columns:1fr 1fr">
+                <label>Author Name
+                    <input @bind="settings.AuthorName" />
+                </label>
+                <label>Contact Email
+                    <input type="email" @bind="settings.ContactEmail" />
+                </label>
+            </div>
+
+            <hr />
+
+            <h3>Email / SMTP</h3>
+
+            <div class="grid" style="grid-template-columns:1fr 1fr">
+                <label>SMTP Host
+                    <input @bind="settings.SmtpHost" placeholder="smtp.example.com" />
+                </label>
+                <label>SMTP Port
+                    <input type="number" @bind="settings.SmtpPort" />
+                </label>
+            </div>
+
+            <div class="grid" style="grid-template-columns:1fr 1fr">
+                <label>SMTP Username
+                    <input @bind="settings.SmtpUsername" />
+                </label>
+                <label>SMTP Password
+                    <input type="password" @bind="settings.SmtpPassword" />
+                </label>
+            </div>
+
+            <div class="grid" style="grid-template-columns:1fr 1fr">
+                <label>From Email
+                    <input type="email" @bind="settings.FromEmail" placeholder="noreply@example.com" />
+                </label>
+                <label>From Name
+                    <input @bind="settings.FromName" placeholder="John Vicencio" />
+                </label>
+            </div>
+
+            <label>To Email (where contact form submissions go)
+                <input type="email" @bind="settings.ToEmail" placeholder="you@example.com" />
+            </label>
+
+            <hr />
+            <button @onclick="SaveSettings" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Settings</button>
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <p class="pagination-info" style="margin-top:0.5rem">@message</p>
+            }
+        }
+    </article>
+
+</div>
+
+@code {
+    private bool loading = true;
+    private bool saving;
+    private string message = "";
+    private SiteSetting settings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        settings = await Site.GetSettingsAsync();
+        loading = false;
+    }
+
+    private async Task SaveSettings()
+    {
+        saving = true;
+        message = "";
+        try
+        {
+            await Site.UpdateSettingsAsync(settings);
+            message = "Settings saved.";
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

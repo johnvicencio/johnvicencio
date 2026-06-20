@@ -1,0 +1,88 @@
+@page "/admin/pages/{PageId}/sections/delete/{SectionId}"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject PageController Pages
+
+<PageTitle>Admin — Delete Section</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Delete Section</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (page is null)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
+        }
+        else if (sec is null)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">Section not found.</p>
+        }
+        else
+        {
+            <p style="padding:1rem 0">
+                Are you sure you want to delete the <strong>@sec.Type</strong> section
+                "@(string.IsNullOrWhiteSpace(sec.Heading) ? "(no heading)" : sec.Heading)"?
+            </p>
+            <p class="pagination-info">This will permanently remove this section from the page.</p>
+            <hr />
+            <button class="outline danger" @onclick="ConfirmDelete" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Yes, Delete</button>
+            <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+        }
+    </article>
+
+</div>
+
+@code {
+    [Parameter]
+    public string PageId { get; set; } = "";
+
+    [Parameter]
+    public string SectionId { get; set; } = "";
+
+    private bool loading = true;
+    private bool deleting;
+    private Page? page;
+    private PageSection? sec;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        page = await Pages.GetPageByIdAsync(PageId);
+        sec = page?.Sections.FirstOrDefault(s => s.SectionId == SectionId);
+        loading = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        deleting = true;
+        try
+        {
+            page = await Pages.GetPageByIdAsync(PageId);
+            if (page is not null)
+            {
+                page.Sections.RemoveAll(s => s.SectionId == SectionId);
+                await Pages.UpdatePageAsync(page);
+            }
+        }
+        finally
+        {
+            deleting = false;
+            Nav.NavigateTo($"/admin/pages/{PageId}/sections");
+        }
+    }
+}

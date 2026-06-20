@@ -1,0 +1,183 @@
+@page "/admin/blog/add"
+@page "/admin/blog/edit/{PostId}"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject BlogController Blog
+@inject PageController Pages
+
+<PageTitle>Admin — @(PostId is null ? "Add Post" : "Edit Post")</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">@(isAddMode ? "Add Post" : "Edit Post")</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (!hasBlogPage)
+        {
+            <p class="pagination-info" style="padding:1rem">Create a page with slug "blog" to enable blog management.</p>
+        }
+        else
+        {
+            <div class="page-editor">
+                <div class="grid" style="grid-template-columns:1fr 1fr">
+                    <label>Title
+                        <input @bind="editPostTitle" @oninput="OnPostTitleChanged" />
+                    </label>
+                    <label>Slug
+                        <input @bind="editPostSlug" />
+                    </label>
+                </div>
+
+                <div class="grid" style="grid-template-columns:1fr 1fr">
+                    <label>Description (SEO)
+                        <input @bind="editPostDescription" />
+                    </label>
+                    <label>Keywords (SEO)
+                        <textarea @bind="editPostKeywords" rows="2" placeholder="comma, separated"></textarea>
+                    </label>
+                </div>
+
+                <label>Content
+                    <textarea @bind="editPostContent" rows="6"></textarea>
+                </label>
+
+                <label>Summary
+                    <textarea @bind="editPostSummary" rows="2"></textarea>
+                </label>
+
+                <label>Published Date
+                    <input type="date" value="@editPostDate" @onchange="OnPostDateChanged" />
+                </label>
+
+                <hr />
+                <button @onclick="SavePost" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Post</button>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+            </div>
+        }
+    </article>
+
+</div>
+
+@code {
+    [Parameter]
+    public string? PostId { get; set; }
+
+    private bool loading = true;
+    private bool saving;
+    private bool isAddMode;
+    private bool hasBlogPage;
+
+    private string editPostTitle = "";
+    private string editPostSlug = "";
+    private string editPostDescription = "";
+    private string editPostKeywords = "";
+    private string editPostContent = "";
+    private string editPostSummary = "";
+    private string editPostDate = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        isAddMode = PostId is null;
+        var pageList = await Pages.GetPagesAsync();
+        hasBlogPage = pageList.Any(p => p.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase));
+
+        if (!isAddMode && hasBlogPage)
+        {
+            var posts = await Blog.GetPostsAsync();
+            var post = posts.FirstOrDefault(p => p.Id == PostId);
+            if (post is not null)
+            {
+                editPostTitle = post.Title;
+                editPostSlug = post.Slug;
+                editPostDescription = post.Description;
+                editPostKeywords = post.Keywords;
+                editPostContent = post.Content;
+                editPostSummary = post.Summary;
+                editPostDate = post.PublishedOn.ToString("yyyy-MM-dd");
+            }
+        }
+
+        if (isAddMode)
+        {
+            editPostDate = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
+        }
+
+        loading = false;
+    }
+
+    private void OnPostTitleChanged(ChangeEventArgs e)
+    {
+        editPostTitle = e.Value?.ToString() ?? "";
+        if (isAddMode)
+        {
+            editPostSlug = ToSlug(editPostTitle);
+        }
+    }
+
+    private void OnPostDateChanged(ChangeEventArgs e)
+    {
+        editPostDate = e.Value?.ToString() ?? "";
+    }
+
+    private async Task SavePost()
+    {
+        saving = true;
+        try
+        {
+            var existingPost = isAddMode ? null : (await Blog.GetPostsAsync()).FirstOrDefault(p => p.Id == PostId);
+            var post = new johnvicencio.Models.BlogPost
+            {
+                Id = existingPost?.Id ?? Guid.NewGuid().ToString("N")[..12],
+                Title = editPostTitle,
+                Slug = editPostSlug,
+                Description = editPostDescription,
+                Keywords = editPostKeywords,
+                Content = editPostContent,
+                Summary = editPostSummary,
+                PublishedOn = DateOnly.TryParse(editPostDate, out var d) ? d : DateOnly.FromDateTime(DateTime.UtcNow),
+            };
+
+            if (existingPost is not null)
+                await Blog.UpdatePostAsync(post);
+            else
+                await Blog.AddPostAsync(post);
+
+            Nav.NavigateTo("/admin/blog");
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    static string ToSlug(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return string.Empty;
+        var slug = new System.Text.StringBuilder();
+        foreach (var c in title.ToLowerInvariant().Trim())
+        {
+            if (char.IsLetterOrDigit(c))
+                slug.Append(c);
+            else if (c is ' ' or '-')
+                slug.Append('-');
+        }
+        var result = slug.ToString().Trim('-');
+        while (result.Contains("--")) result = result.Replace("--", "-");
+        return result;
+    }
+}

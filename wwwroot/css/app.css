@@ -1,0 +1,506 @@
+@font-face {
+    font-family: 'Adamina';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/adamina-400.ttf') format('truetype');
+}
+
+:root {
+    --pico-font-family: 'Adamina', Georgia, serif;
+}
+
+body {
+    font-family: 'Adamina', Georgia, serif;
+}
+
+.site-main {
+    padding-block: 2rem 4rem;
+}
+
+.site-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.site-icon {
+    width: 1rem;
+    height: 1rem;
+    stroke-width: 2;
+}
+
+input, textarea, select {
+    max-width: 340px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.login-form {
+    max-width: 360px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.login-form input {
+    max-width: 100%;
+    width: 100%;
+}
+
+.login-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 8rem);
+}
+
+h1:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+.blazor-error-boundary {
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+}
+
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }
+
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin: 20vh auto 1rem auto;
+}
+
+    .loading-progress circle {
+        fill: none;
+        stroke: #e0e0e0;
+        stroke-width: 0.6rem;
+        transform-origin: 50% 50%;
+        transform: rotate(-90deg);
+    }
+
+        .loading-progress circle:last-child {
+            stroke: #1b6ec2;
+            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+            transition: stroke-dasharray 0.05s ease-in-out;
+        }
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+}
+
+    .loading-progress-text:after {
+        content: var(--blazor-load-percentage-text, "Loading");
+    }
+
+code {
+    color: #c02d76;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
+}
+
+/* ─── Material Design Theme Layer (overrides Pico) ─── */
+
+:root {
+    --md-primary: #1976d2;
+    --md-primary-light: #63a4ff;
+    --md-primary-dark: #004ba0;
+    --md-secondary: #ff6f00;
+    --md-surface: #ffffff;
+    --md-background: #f5f5f5;
+    --md-error: #d32f2f;
+    --md-on-primary: #ffffff;
+    --md-on-surface: #212121;
+    --md-on-background: #616161;
+    --md-border: #e0e0e0;
+    --md-divider: #eeeeee;
+
+    --pico-font-family: 'Adamina', Georgia, serif;
+    --pico-line-height: 1.6;
+    --pico-text-underline-offset: 0.1rem;
+    --pico-border-radius: 0.25rem;
+    --pico-border-width: 1px;
+    --pico-outline-width: 0.125rem;
+    --pico-transition: 0.2s ease-in-out;
+    --pico-spacing: 0.75rem;
+    --pico-typography-spacing-vertical: 0.75rem;
+    --pico-block-spacing-vertical: 0.75rem;
+    --pico-block-spacing-horizontal: 1rem;
+    --pico-form-element-spacing-vertical: 0.5rem;
+    --pico-form-element-spacing-horizontal: 0.75rem;
+    --pico-group-box-shadow: none;
+    --pico-nav-element-spacing-vertical: 0.75rem;
+    --pico-nav-element-spacing-horizontal: 0.5rem;
+    --pico-nav-link-spacing-vertical: 0.5rem;
+    --pico-nav-link-spacing-horizontal: 0.5rem;
+
+    --pico-primary: var(--md-primary);
+    --pico-primary-background: var(--md-primary);
+    --pico-primary-hover: var(--md-primary-dark);
+    --pico-primary-hover-background: var(--md-primary-dark);
+    --pico-primary-focus: rgba(25, 118, 210, 0.25);
+    --pico-primary-inverse: var(--md-on-primary);
+    --pico-secondary: var(--md-secondary);
+    --pico-background-color: var(--md-background);
+    --pico-card-background-color: var(--md-surface);
+    --pico-card-border-color: var(--md-border);
+    --pico-card-box-shadow: none;
+    --pico-card-sectioning-background-color: var(--md-surface);
+    --pico-dropdown-background-color: var(--md-surface);
+    --pico-dropdown-border-color: var(--md-border);
+    --pico-dropdown-box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+    --pico-dropdown-hover-background-color: #f5f5f5;
+    --pico-form-element-background-color: var(--md-surface);
+    --pico-form-element-selected-background-color: #e3f2fd;
+    --pico-form-element-border-color: var(--md-border);
+    --pico-form-element-color: var(--md-on-surface);
+    --pico-form-element-placeholder-color: var(--md-on-background);
+    --pico-form-element-active-background-color: var(--md-surface);
+    --pico-form-element-active-border-color: var(--md-primary);
+    --pico-form-element-focus-color: var(--md-primary);
+    --pico-form-element-disabled-background-color: #fafafa;
+    --pico-form-element-disabled-border-color: #e0e0e0;
+    --pico-form-element-disabled-color: #9e9e9e;
+    --pico-form-element-invalid-active-border-color: var(--md-error);
+    --pico-form-element-invalid-border-color: var(--md-error);
+    --pico-form-element-valid-active-border-color: #2e7d32;
+    --pico-form-element-valid-border-color: #2e7d32;
+    --pico-mark-background-color: #fff9c4;
+    --pico-mark-color: var(--md-on-surface);
+    --pico-muted-color: var(--md-on-background);
+    --pico-group-box-shadow-focus-with-button: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
+    --pico-group-box-shadow-focus-with-input: 0 0 0 0.0625rem var(--pico-form-element-active-border-color);
+    --pico-h1-color: var(--md-on-surface);
+    --pico-h2-color: var(--md-on-surface);
+    --pico-h3-color: var(--md-on-surface);
+    --pico-h4-color: var(--md-on-surface);
+    --pico-h5-color: var(--md-on-surface);
+    --pico-h6-color: var(--md-on-surface);
+    --pico-heading-color: var(--md-on-surface);
+    --pico-ins-color: #2e7d32;
+    --pico-del-color: var(--md-error);
+    --pico-table-border-color: var(--md-border);
+    --pico-table-stripped-row-background-color: #fafafa;
+    --pico-code-background-color: #f5f5f5;
+    --pico-code-color: var(--md-on-surface);
+    --pico-code-kbd-background-color: var(--md-on-surface);
+    --pico-code-kbd-color: var(--md-surface);
+    --pico-tag-background-color: #e0e0e0;
+    --pico-tag-color: var(--md-on-surface);
+}
+
+/* ─── Material Elevation (classless on articles, sections, etc.) ─── */
+
+article {
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+    border: none;
+    transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+article:hover {
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,0.2), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+}
+
+/* ─── Material Cards (keep article as elevated card) ─── */
+article {
+    background: var(--md-surface);
+    border-radius: var(--pico-border-radius);
+    padding: 1rem;
+}
+
+/* ─── Material Buttons ─── */
+button, [role=button], input[type=submit], input[type=reset], input[type=button] {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.0892857143em;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
+}
+
+button:not(.outline):not(.secondary), [role=button]:not(.outline):not(.secondary) {
+    box-shadow: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+}
+
+button:not(.outline):not(.secondary):hover, [role=button]:not(.outline):not(.secondary):hover {
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+}
+
+button.outline, [role=button].outline {
+    border-color: var(--md-border);
+    color: var(--md-primary);
+}
+
+button.outline:hover, [role=button].outline:hover {
+    background: rgba(25, 118, 210, 0.04);
+    border-color: var(--md-primary);
+}
+
+button.danger.outline, [role=button].danger.outline {
+    border-color: var(--md-error);
+    color: var(--md-error);
+}
+
+button.danger.outline:hover, [role=button].danger.outline:hover {
+    background: rgba(211, 47, 47, 0.04);
+    border-color: var(--md-error);
+}
+
+/* ─── Material Input Fields ─── */
+input, textarea, select {
+    max-width: 280px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--md-border);
+    background: var(--md-surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--md-primary);
+    box-shadow: none;
+}
+
+input.filled, textarea.filled, select.filled {
+    background: #f5f5f5;
+    border: none;
+    border-bottom: 2px solid var(--md-border);
+    border-radius: 0.25rem 0.25rem 0 0;
+    padding: 0.75rem 0.75rem 0.5rem;
+}
+
+input.filled:focus, textarea.filled:focus {
+    border-bottom-color: var(--md-primary);
+    background: #e8e8e8;
+}
+
+/* ─── Material Table ─── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--md-border);
+    border-radius: var(--pico-border-radius);
+    overflow: hidden;
+}
+
+table th {
+    background: #fafafa;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-on-background);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--md-divider);
+}
+
+table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--md-divider);
+    font-size: 0.875rem;
+}
+
+table tr:last-child td {
+    border-bottom: none;
+}
+
+table tr:hover td {
+    background: #f5f5f5;
+}
+
+table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 1.5rem;
+}
+
+th.sortable::after {
+    content: "";
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 5px solid #bdbdbd;
+    opacity: 0.4;
+}
+
+th.sortable.asc::after {
+    border-bottom: none;
+    border-top: 5px solid var(--md-primary);
+    opacity: 1;
+}
+
+th.sortable.desc::after {
+    border-top: none;
+    border-bottom: 5px solid var(--md-primary);
+    opacity: 1;
+}
+
+.table-wrap {
+    background: var(--md-surface);
+    border-radius: var(--pico-border-radius);
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+.table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--md-divider);
+}
+
+.table-toolbar-left, .table-toolbar-right {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.table-search input {
+    max-width: 240px;
+}
+
+.table-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--md-divider);
+}
+
+.pagination-btn {
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-info {
+    font-size: 0.8125rem;
+    color: var(--md-on-background);
+    margin: 0 0.5rem;
+}
+
+.table-fixed-header {
+    max-height: 500px;
+    overflow: auto;
+}
+
+.table-fixed-header thead th {
+    position: sticky;
+    top: 0;
+    background: #fafafa;
+    z-index: 1;
+}
+
+/* ─── Material Navigation (Pico nav override) ─── */
+nav {
+    border-bottom: 1px solid var(--md-divider);
+    padding: 0.5rem 0;
+    margin-bottom: 0;
+}
+
+nav ul li a {
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    transition: background 0.2s;
+}
+
+nav ul li a:hover {
+    background: rgba(0,0,0,0.04);
+}
+
+/* ─── Material Typography ─── */
+h1 { font-size: 2rem; font-weight: 400; letter-spacing: -0.0125em; }
+h2 { font-size: 1.5rem; font-weight: 400; letter-spacing: -0.0083em; }
+h3 { font-size: 1.25rem; font-weight: 500; letter-spacing: normal; }
+h4 { font-size: 1rem; font-weight: 500; letter-spacing: 0.00735em; }
+h5 { font-size: 0.875rem; font-weight: 500; letter-spacing: normal; }
+h6 { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.0125em; }
+
+/* ─── Material Chip (classless on small elements) ─── */
+small, .chip {
+    display: inline-block;
+    background: #e0e0e0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--md-on-surface);
+}
+
+small a, .chip a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ─── Material Divider ─── */
+hr {
+    border: none;
+    height: 1px;
+    background: var(--md-divider);
+    margin: 1rem 0;
+}

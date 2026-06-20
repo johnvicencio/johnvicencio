@@ -1,0 +1,35 @@
+<section class="hero">
+    @if (!string.IsNullOrWhiteSpace(Section.ImageUrl))
+    {
+        <img src="@Section.ImageUrl" alt="@Section.ImageAlt" class="hero-image" />
+    }
+    @if (!string.IsNullOrWhiteSpace(Section.Heading))
+    {
+        <h1>@Section.Heading</h1>
+    }
+    @if (!string.IsNullOrWhiteSpace(Section.Body))
+    {
+        <p>@((MarkupString)Section.Body)</p>
+    }
+    @if (Section.Buttons.Count > 0)
+    {
+        <div class="hero-buttons">
+            @foreach (var btn in Section.Buttons)
+            {
+                if (!string.IsNullOrWhiteSpace(btn.Text) && !string.IsNullOrWhiteSpace(btn.Url))
+                {
+                    <a href="@btn.Url" role="button">@btn.Text</a>
+                }
+            }
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(Section.ActionText) && !string.IsNullOrWhiteSpace(Section.ActionUrl))
+    {
+        <a href="@Section.ActionUrl" role="button">@Section.ActionText</a>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public PageSection Section { get; set; } = new();
+}

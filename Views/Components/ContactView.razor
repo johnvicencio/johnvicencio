@@ -1,0 +1,51 @@
+<section class="contact-section">
+    @if (!string.IsNullOrWhiteSpace(Section.Heading))
+    {
+        <h2>@Section.Heading</h2>
+    }
+    @if (!string.IsNullOrWhiteSpace(Section.Body))
+    {
+        <p>@((MarkupString)Section.Body)</p>
+    }
+
+    <form class="contact-form" @onsubmit="HandleSubmit">
+        <label>Name
+            <input @bind="contactName" placeholder="Your name" />
+        </label>
+        <label>Email
+            <input type="email" @bind="contactEmail" placeholder="your@email.com" />
+        </label>
+        <label>Message
+            <textarea @bind="contactMessage" rows="4" placeholder="Your message..."></textarea>
+        </label>
+        <button type="submit" aria-busy="@sending">Send Message</button>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <p class="pagination-info">@statusMessage</p>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public PageSection Section { get; set; } = new();
+
+    private string contactName = "";
+    private string contactEmail = "";
+    private string contactMessage = "";
+    private bool sending;
+    private string statusMessage = "";
+
+    private async Task HandleSubmit()
+    {
+        sending = true;
+        statusMessage = "";
+        await Task.Delay(500);
+        statusMessage = "Message sent (demo).";
+        contactName = "";
+        contactEmail = "";
+        contactMessage = "";
+        sending = false;
+    }
+}

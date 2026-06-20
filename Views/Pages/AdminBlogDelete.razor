@@ -1,0 +1,75 @@
+@page "/admin/blog/delete/{PostId}"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject BlogController Blog
+
+<PageTitle>Admin — Delete Post</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Delete Post</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (post is null)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">Post not found.</p>
+        }
+        else
+        {
+            <p style="padding:1rem 0">Are you sure you want to delete the post <strong>@post.Title</strong> (slug: @post.Slug)?</p>
+
+            <p class="pagination-info">This will permanently remove this blog post.</p>
+
+            <hr />
+
+            <button class="outline danger" @onclick="ConfirmDelete" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Yes, Delete</button>
+            <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+        }
+    </article>
+
+</div>
+
+@code {
+    [Parameter]
+    public string PostId { get; set; } = "";
+
+    private bool loading = true;
+    private bool deleting;
+    private johnvicencio.Models.BlogPost? post;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        var posts = await Blog.GetPostsAsync();
+        post = posts.FirstOrDefault(p => p.Id == PostId);
+        loading = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        deleting = true;
+        try
+        {
+            await Blog.DeletePostAsync(PostId);
+        }
+        finally
+        {
+            deleting = false;
+            Nav.NavigateTo("/admin/blog");
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "username": "admin",
+  "displayName": "Admin",
+  "algorithm": "AES-GCM",
+  "kdf": "PBKDF2-HMAC-SHA256",
+  "iterations": 600000,
+  "salt": "v4PlrVRxIBOn09Oa5FbqiA==",
+  "iv": "/INEa2BLok0UhEtv",
+  "cipherText": "HTbg2VMdb79dPcKcKqekKLBSYZ7+pe+ZVITAji9eK+wm8s9/93jCeUDmbyIeeGr2pkjGK6SsJPePbM2bJDwTprjdAxD4u/mrwTXlx+gEiVObXr8mo22iBFxIR15Gk2J/H5g=",
+  "tag": "82zWWdVsb6Vq50AGRbpJnQ==",
+  "requiresSecondFactor": false,
+  "createdUtc": "2026-06-18T00:00:00+00:00"
+}

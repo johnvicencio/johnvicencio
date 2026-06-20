@@ -1,0 +1,116 @@
+@inject IJSRuntime Js
+
+<div class="rich-editor" style="border:1px solid var(--md-border);border-radius:0.25rem;overflow:hidden">
+    <div class="rich-toolbar" style="display:flex;gap:0.15rem;flex-wrap:wrap;padding:0.35rem 0.5rem;background:var(--md-syntax-bg, #f5f5f5);border-bottom:1px solid var(--md-border);align-items:center">
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("bold")' title="Bold"><strong>B</strong></button>
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("italic")' title="Italic"><em>I</em></button>
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("underline")' title="Underline"><u>U</u></button>
+
+        <span style="width:1px;height:1.2rem;background:var(--md-border);margin:0 0.25rem"></span>
+
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.65rem;line-height:1" @onclick='() => Format("formatBlock", "h2")' title="Heading 2">H2</button>
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.65rem;line-height:1" @onclick='() => Format("formatBlock", "h3")' title="Heading 3">H3</button>
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.65rem;line-height:1" @onclick='() => Format("formatBlock", "p")' title="Paragraph">P</button>
+
+        <span style="width:1px;height:1.2rem;background:var(--md-border);margin:0 0.25rem"></span>
+
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("insertUnorderedList")' title="Bullet list">
+            <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="3" cy="3" r="1.2" fill="currentColor"/><line x1="6" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="9" r="1.2" fill="currentColor"/><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1"/></svg>
+        </button>
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("insertOrderedList")' title="Ordered list">
+            <svg width="12" height="12" viewBox="0 0 12 12"><text x="0" y="4" font-size="4" fill="currentColor" font-weight="bold">1.</text><line x1="6" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1"/><text x="0" y="9" font-size="4" fill="currentColor" font-weight="bold">2.</text><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1"/></svg>
+        </button>
+
+        <span style="width:1px;height:1.2rem;background:var(--md-border);margin:0 0.25rem"></span>
+
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("createLink")' title="Insert link">Link</button>
+
+        <span style="flex:1"></span>
+
+        <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.65rem;line-height:1" @onclick="ToggleSource">@(showingSource ? "WYSIWYG" : "Source")</button>
+    </div>
+
+    <div id="@editorId" class="rich-editor-body" contenteditable="@(!showingSource)" style="min-height:@(MinHeight)px;padding:0.75rem;font-size:0.9rem;line-height:1.6;outline:none;@(showingSource ? "display:none;" : "")"
+         @oninput="OnWysiwygInput">
+    </div>
+
+    <textarea id="@textareaId" class="rich-editor-source"
+              style="display:@(showingSource ? "block" : "none");width:100%;min-height:@(MinHeight)px;padding:0.75rem;border:none;resize:vertical;font-family:monospace;font-size:0.85rem;line-height:1.5;background:transparent"
+              @bind="Value" @bind:after="OnSourceChanged">
+    </textarea>
+</div>
+
+@code {
+    private string editorId = "re_" + Guid.NewGuid().ToString("N")[..6];
+    private string textareaId = "re_ta_" + Guid.NewGuid().ToString("N")[..6];
+    private bool showingSource;
+    private bool rendered;
+
+    private string _value = "";
+
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public int MinHeight { get; set; } = 300;
+
+    [Parameter]
+    public string Placeholder { get; set; } = "Write your content...";
+
+    private async Task Format(string command, string? value = null)
+    {
+        if (showingSource) return;
+        await Js.InvokeVoidAsync("richEditor.format", editorId, command, value);
+        await SyncHtml();
+    }
+
+    private async Task SyncHtml()
+    {
+        if (showingSource) return;
+        _value = await Js.InvokeAsync<string>("richEditor.getHtml", editorId);
+        await ValueChanged.InvokeAsync(_value);
+    }
+
+    private async Task OnWysiwygInput()
+    {
+        await SyncHtml();
+    }
+
+    private async Task ToggleSource()
+    {
+        var nowShowingSource = await Js.InvokeAsync<bool>("richEditor.toggleSource", editorId, textareaId);
+        showingSource = nowShowingSource;
+    }
+
+    private async Task OnSourceChanged()
+    {
+        _value = Value;
+        await ValueChanged.InvokeAsync(_value);
+        if (showingSource)
+        {
+            await Js.InvokeVoidAsync("richEditor.setHtml", editorId, _value);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (_value != Value)
+        {
+            _value = Value ?? "";
+            if (rendered && !showingSource)
+                _ = Js.InvokeVoidAsync("richEditor.setHtml", editorId, _value);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            rendered = true;
+            await Js.InvokeVoidAsync("richEditor.setHtml", editorId, Value);
+        }
+    }
+}

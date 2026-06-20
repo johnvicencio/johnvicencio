@@ -1,0 +1,46 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime Js
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+
+<div class="site-shell">
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong><a class="site-nav-link" href="/"><i class="site-icon" data-lucide="home"></i>johnvicencio</a></strong></li>
+            </ul>
+            <ul>
+                <li><a class="site-nav-link" href="/about"><i class="site-icon" data-lucide="user"></i>About</a></li>
+                <li><a class="site-nav-link" href="/blog"><i class="site-icon" data-lucide="book-open"></i>Blog</a></li>
+                <li><a class="site-nav-link" href="/contact"><i class="site-icon" data-lucide="mail"></i>Contact</a></li>
+                @if (Session.IsLoggedIn)
+                {
+                    <li><a class="site-nav-link" href="/admin"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
+                    <li><a class="site-nav-link" href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
+                }
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container site-main">
+        @Body
+    </main>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.TryRestoreAsync(Js);
+    }
+
+    private async Task LogOut()
+    {
+        await Session.SignOutAsync(Js);
+        Nav.NavigateTo("/", replace: true);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+}

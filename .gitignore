@@ -1,0 +1,11 @@
+bin/
+obj/
+node_modules/
+*.user
+*.suo
+.DS_Store
+.vs/
+.vscode/.User/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

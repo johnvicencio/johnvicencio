@@ -1,0 +1,73 @@
+@page "/login"
+@inject VaultController Vaults
+@inject VaultSessionService Session
+@inject NavigationManager Navigation
+@inject IJSRuntime Js
+
+<PageTitle>Login</PageTitle>
+
+<div class="login-page">
+<h1>Login</h1>
+<p>Type your username and password:</p>
+
+<EditForm Model="loginForm" OnValidSubmit="UnlockVaultAsync" class="login-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="loginForm.Username" placeholder="Username" autocomplete="username" />
+    <InputText type="password" @bind-Value="loginForm.Passphrase" placeholder="Password" autocomplete="current-password" />
+
+    <button type="submit" aria-busy="@isBusy">Submit</button>
+</EditForm>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private readonly LoginForm loginForm = new();
+    private bool isBusy;
+    private string message = string.Empty;
+    private VaultLoginResult? result;
+
+    protected override void OnInitialized()
+    {
+        if (Session.IsLoggedIn)
+            Navigation.NavigateTo("/admin", replace: true);
+    }
+
+    private async Task UnlockVaultAsync()
+    {
+        isBusy = true;
+        message = string.Empty;
+        result = null;
+
+        try
+        {
+            result = await Vaults.LoginAsync(loginForm.Username, loginForm.Passphrase);
+
+            if (result.Unlocked && result.Vault is not null && result.Payload is not null)
+            {
+                Session.SignIn(result.Vault, result.Payload);
+                await Session.PersistAsync(Js);
+                Navigation.NavigateTo("/admin", replace: true);
+                return;
+            }
+
+            message = result.Message;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private sealed class LoginForm
+    {
+        public string Username { get; set; } = string.Empty;
+
+        public string Passphrase { get; set; } = string.Empty;
+    }
+}

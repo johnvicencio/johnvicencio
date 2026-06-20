@@ -1,0 +1,33 @@
+<section class="card-collection">
+    @if (!string.IsNullOrWhiteSpace(Section.Heading))
+    {
+        <h2>@Section.Heading</h2>
+    }
+    @if (Section.Columns.Count > 0)
+    {
+        <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
+            @foreach (var item in Section.Columns)
+            {
+                <article>
+                    @if (!string.IsNullOrWhiteSpace(item.Title))
+                    {
+                        <h3>@item.Title</h3>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(item.Body))
+                    {
+                        <div>@((MarkupString)item.Body)</div>
+                    }
+                </article>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(Section.Body))
+    {
+        <p>@((MarkupString)Section.Body)</p>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public PageSection Section { get; set; } = new();
+}

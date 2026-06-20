@@ -1,0 +1,31 @@
+<section class="grid-section">
+    @if (!string.IsNullOrWhiteSpace(Section.Heading))
+    {
+        <h2>@Section.Heading</h2>
+    }
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:1.5rem">
+        @for (var ci = 0; ci < Math.Min(Section.Columns.Count, 3); ci++)
+        {
+            var col = Section.Columns[ci];
+            <div class="grid-col">
+                @if (!string.IsNullOrWhiteSpace(col.Title))
+                {
+                    <h3>@col.Title</h3>
+                }
+                @if (!string.IsNullOrWhiteSpace(col.Body))
+                {
+                    <div>@((MarkupString)col.Body)</div>
+                }
+                @if (!string.IsNullOrWhiteSpace(col.ActionText) && !string.IsNullOrWhiteSpace(col.ActionUrl))
+                {
+                    <a href="@col.ActionUrl" role="button" class="outline">@col.ActionText</a>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public PageSection Section { get; set; } = new();
+}
