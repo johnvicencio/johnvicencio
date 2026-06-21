@@ -30,7 +30,7 @@
             <p class="pagination-info" style="margin:0.25rem 0">From</p>
             <h3 style="margin-top:0">@message.Name</h3>
             <p><a href="mailto:@message.Email">@message.Email</a></p>
-            <p class="pagination-info">@message.SubmittedUtc.ToLocalTime().ToString("yyyy-MM-dd h:mm tt")</p>
+            <p class="pagination-info">@FormatDate(message.SubmittedUtc)</p>
             <p style="font-size:0.85rem;color:var(--app-muted)">Ticket #@ticketNumber</p>
             <hr />
             <div style="white-space:pre-wrap">@message.Message</div>
@@ -103,5 +103,11 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private static string FormatDate(DateTimeOffset dto)
+    {
+        var local = dto.ToLocalTime();
+        return local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt").ToLowerInvariant();
     }
 }
