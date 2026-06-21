@@ -1,16 +1,17 @@
 @page "/admin/pages/{PageId}/sections/add"
+@page "/admin/pages/{PageId}/sections/add/{Type}"
 @page "/admin/pages/{PageId}/sections/edit/{SectionId}"
 @inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject PageController Pages
 
-<PageTitle>Admin — @(SectionId is null ? "Add Section" : "Edit Section")</PageTitle>
+<PageTitle>Admin — @title</PageTitle>
 
 <div class="login-page" style="width:100%">
 
     <article style="width:100%;max-width:960px;margin:0 auto">
         <div class="table-toolbar">
-            <h2 style="margin:0">@(isAddMode ? "Add Section" : "Edit Section")</h2>
+            <h2 style="margin:0">@title</h2>
             <div>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
             </div>
@@ -23,6 +24,35 @@
         else if (page is null)
         {
             <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
+        }
+        else if (showTypeSelector)
+        {
+            <div class="section-type-grid">
+                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/hero")'>
+                    <i class="site-icon" data-lucide="image" style="font-size:1.5rem"></i>
+                    <span>Hero</span>
+                </button>
+                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/2-col")'>
+                    <i class="site-icon" data-lucide="columns-2" style="font-size:1.5rem"></i>
+                    <span>2 Columns</span>
+                </button>
+                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/3-col")'>
+                    <i class="site-icon" data-lucide="columns-3" style="font-size:1.5rem"></i>
+                    <span>3 Columns</span>
+                </button>
+                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/cards")'>
+                    <i class="site-icon" data-lucide="grid-3x3" style="font-size:1.5rem"></i>
+                    <span>Card Collection</span>
+                </button>
+                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/content")'>
+                    <i class="site-icon" data-lucide="file-text" style="font-size:1.5rem"></i>
+                    <span>Content</span>
+                </button>
+                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/contact")'>
+                    <i class="site-icon" data-lucide="mail" style="font-size:1.5rem"></i>
+                    <span>Contact</span>
+                </button>
+            </div>
         }
         else
         {
@@ -181,9 +211,15 @@
     [Parameter]
     public string? SectionId { get; set; }
 
+    [Parameter]
+    public string? Type { get; set; }
+
+    private string title => (SectionId is not null) ? "Edit Section" : "Add Section";
+
     private bool loading = true;
     private bool saving;
     private bool isAddMode;
+    private bool showTypeSelector;
     private string message = "";
     private Page? page;
     private PageSection sec = new();
@@ -206,18 +242,9 @@
             return;
         }
 
-        isAddMode = SectionId is null;
-
-        if (isAddMode)
+        if (SectionId is not null)
         {
-            sec = new PageSection
-            {
-                SectionId = Guid.NewGuid().ToString("N")[..8],
-                Type = "hero",
-            };
-        }
-        else
-        {
+            isAddMode = false;
             var found = page.Sections.FirstOrDefault(s => s.SectionId == SectionId);
             if (found is not null)
             {
@@ -235,9 +262,23 @@
                     Columns = [.. found.Columns],
                 };
             }
+            EnsureDefaultColumns();
+        }
+        else if (!string.IsNullOrWhiteSpace(Type))
+        {
+            isAddMode = true;
+            sec = new PageSection
+            {
+                SectionId = Guid.NewGuid().ToString("N")[..8],
+                Type = Type,
+            };
+            EnsureDefaultColumns();
+        }
+        else
+        {
+            showTypeSelector = true;
         }
 
-        EnsureDefaultColumns();
         loading = false;
     }
 
