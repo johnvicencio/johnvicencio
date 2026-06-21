@@ -16,7 +16,7 @@
         </div>
 
         <div style="margin-bottom:0.75rem">
-            <input @bind="search" @bind:after="OnSearchChanged" placeholder="Search name, email, or message..." />
+            <input value="@search" @oninput="OnSearchInput" placeholder="Search name, email, or message..." />
         </div>
 
         @if (loading)
@@ -33,7 +33,7 @@
         }
         else
         {
-            <table>
+            <div class="table-wrap"><table>
                 <thead>
                     <tr>
                         <th>Status</th>
@@ -60,7 +60,7 @@
                         </tr>
                     }
                 </tbody>
-            </table>
+            </table></div>
         }
     </article>
 </div>
@@ -101,8 +101,9 @@
         await Js.InvokeVoidAsync("lucide.createIcons");
     }
 
-    private void OnSearchChanged()
+    private void OnSearchInput(ChangeEventArgs e)
     {
+        search = e.Value?.ToString() ?? "";
         ApplyFilter();
     }
 
