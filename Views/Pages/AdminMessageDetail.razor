@@ -31,6 +31,7 @@
             <h3 style="margin-top:0">@message.Name</h3>
             <p><a href="mailto:@message.Email">@message.Email</a></p>
             <p class="pagination-info">@message.SubmittedUtc.ToLocalTime().ToString("yyyy-MM-dd h:mm tt")</p>
+            <p style="font-size:0.85rem;color:var(--app-muted)">Ticket #@ticketNumber</p>
             <hr />
             <div style="white-space:pre-wrap">@message.Message</div>
             <hr />
@@ -47,6 +48,7 @@
     private bool deleting;
     private string errorMessage = "";
     private ContactMessage? message;
+    private long ticketNumber;
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,6 +61,10 @@
         try
         {
             message = await Messages.GetMessageAsync(MessageId);
+            if (message is not null)
+            {
+                ticketNumber = message.SubmittedUtc.ToUnixTimeMilliseconds();
+            }
             if (message is not null && !message.IsRead)
             {
                 await Messages.MarkReadAsync(MessageId);

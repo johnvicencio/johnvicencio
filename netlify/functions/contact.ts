@@ -162,7 +162,7 @@ async function sendEmailNotification(store: ReturnType<typeof getStore>, message
       from: `"${escapeHeader(fromName)}" <${fromEmail}>`,
       to: settings.ToEmail,
       replyTo: message.email,
-      subject: `New contact message from ${message.name}`,
+      subject: `New contact from johnvicencio.com ticket number: ${Date.parse(message.submittedUtc)}`,
       text: `Name: ${message.name}\nEmail: ${message.email}\nSubmitted: ${message.submittedUtc}\n\n${message.message}`,
       html: `<p><strong>Name:</strong> ${escapeHtml(message.name)}</p><p><strong>Email:</strong> ${escapeHtml(message.email)}</p><p><strong>Submitted:</strong> ${escapeHtml(message.submittedUtc)}</p><hr><p>${escapeHtml(message.message).replaceAll("\n", "<br>")}</p>`,
     });
