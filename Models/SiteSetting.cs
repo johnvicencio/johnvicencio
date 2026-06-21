@@ -32,6 +32,5 @@ public sealed class SiteSetting
     public List<CustomNavLink> NavLinks { get; set; } = [];
     public string FooterAboutHeader { get; set; } = "";
     public string FooterAbout { get; set; } = "";
-    public List<CustomNavLink> FooterSections { get; set; } = [];
     public List<FooterConnect> FooterConnects { get; set; } = [];
 }

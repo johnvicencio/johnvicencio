@@ -8,7 +8,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddScoped<AppEnvironment>();
 builder.Services.AddScoped<DataStore>();
 builder.Services.AddScoped<PageController>();
 builder.Services.AddScoped<BlogController>();
@@ -20,6 +19,6 @@ builder.Services.AddScoped<JsonContentService>();
 builder.Services.AddScoped<VaultCryptoService>();
 builder.Services.AddScoped<VaultController>();
 builder.Services.AddSingleton<VaultSessionService>();
-builder.Services.AddScoped<RouteService>();
+
 
 await builder.Build().RunAsync();

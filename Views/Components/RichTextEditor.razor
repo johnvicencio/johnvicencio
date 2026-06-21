@@ -1,18 +1,18 @@
 @inject IJSRuntime Js
 
-<div class="rich-editor" style="border:1px solid var(--md-border);border-radius:0.25rem;overflow:hidden">
-    <div class="rich-toolbar" style="display:flex;gap:0.15rem;flex-wrap:wrap;padding:0.35rem 0.5rem;background:var(--md-syntax-bg, #f5f5f5);border-bottom:1px solid var(--md-border);align-items:center">
+<div class="rich-editor" style="border:1px solid var(--pico-form-element-border-color);border-radius:0.25rem;overflow:hidden">
+    <div class="rich-toolbar" style="display:flex;gap:0.15rem;flex-wrap:wrap;padding:0.35rem 0.5rem;background:#f5f5f5;border-bottom:1px solid var(--pico-form-element-border-color);align-items:center">
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("bold")' title="Bold"><strong>B</strong></button>
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("italic")' title="Italic"><em>I</em></button>
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("underline")' title="Underline"><u>U</u></button>
 
-        <span style="width:1px;height:1.2rem;background:var(--md-border);margin:0 0.25rem"></span>
+        <span style="width:1px;height:1.2rem;background:var(--pico-form-element-border-color);margin:0 0.25rem"></span>
 
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.65rem;line-height:1" @onclick='() => Format("formatBlock", "h2")' title="Heading 2">H2</button>
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.65rem;line-height:1" @onclick='() => Format("formatBlock", "h3")' title="Heading 3">H3</button>
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.65rem;line-height:1" @onclick='() => Format("formatBlock", "p")' title="Paragraph">P</button>
 
-        <span style="width:1px;height:1.2rem;background:var(--md-border);margin:0 0.25rem"></span>
+        <span style="width:1px;height:1.2rem;background:var(--pico-form-element-border-color);margin:0 0.25rem"></span>
 
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("insertUnorderedList")' title="Bullet list">
             <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="3" cy="3" r="1.2" fill="currentColor"/><line x1="6" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="9" r="1.2" fill="currentColor"/><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1"/></svg>
@@ -21,7 +21,7 @@
             <svg width="12" height="12" viewBox="0 0 12 12"><text x="0" y="4" font-size="4" fill="currentColor" font-weight="bold">1.</text><line x1="6" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1"/><text x="0" y="9" font-size="4" fill="currentColor" font-weight="bold">2.</text><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1"/></svg>
         </button>
 
-        <span style="width:1px;height:1.2rem;background:var(--md-border);margin:0 0.25rem"></span>
+        <span style="width:1px;height:1.2rem;background:var(--pico-form-element-border-color);margin:0 0.25rem"></span>
 
         <button type="button" class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.75rem;line-height:1" @onclick='() => Format("createLink")' title="Insert link">Link</button>
 

@@ -3,7 +3,6 @@
 @inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject PageController Pages
-@inject ImageAssetController Images
 
 <PageTitle>Admin — @(SectionId is null ? "Add Section" : "Edit Section")</PageTitle>
 
@@ -77,7 +76,7 @@
                         {
                             var btn = sec.Buttons[bi];
                             var localBi = bi;
-                            <div style="border:1px solid var(--md-border);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <div class="grid" style="grid-template-columns:1fr 1fr">
                                     <label>Button Icon
                                         <select @bind="btn.Icon">
@@ -110,7 +109,7 @@
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div style="border:1px solid var(--md-border);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <h5>Column @(localCi + 1)</h5>
                                 <label>Title
                                     <input @bind="col.Title" />
@@ -136,7 +135,7 @@
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div style="border:1px solid var(--md-border);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <h5>Item @(localCi + 1)</h5>
                                 <label>Title
                                     <input @bind="col.Title" />
