@@ -50,7 +50,10 @@ public sealed class DataStore
             request.Headers.Add("x-content-token", token);
 
         var response = await http.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        if (response.IsSuccessStatusCode) return;
+
+        var error = await response.Content.ReadAsStringAsync();
+        throw new InvalidOperationException($"Could not save {contentName}: {(int)response.StatusCode} {response.ReasonPhrase}. {error}");
     }
 
     private static string NetlifyContentUrl(string contentName) =>

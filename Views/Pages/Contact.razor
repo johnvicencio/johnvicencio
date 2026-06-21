@@ -3,9 +3,13 @@
 
 <PageTitle>Contact</PageTitle>
 
-@if (currentPage is null)
+@if (loading)
 {
     <p>Loading contact page...</p>
+}
+else if (currentPage is null)
+{
+    <p>Contact page content was not found.</p>
 }
 else
 {
@@ -16,36 +20,38 @@ else
     {
         if (section.Type.Equals("hero", StringComparison.OrdinalIgnoreCase))
         {
-            <HeroView Section="section" />
+            <HeroView Section="section" HeadingLevel="2" />
         }
         else if (section.Type.Equals("2-col", StringComparison.OrdinalIgnoreCase))
         {
-            <TwoColView Section="section" />
+            <TwoColView Section="section" HeadingLevel="2" />
         }
         else if (section.Type.Equals("3-col", StringComparison.OrdinalIgnoreCase))
         {
-            <ThreeColView Section="section" />
+            <ThreeColView Section="section" HeadingLevel="2" />
         }
         else if (section.Type.Equals("cards", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("cardcollection", StringComparison.OrdinalIgnoreCase))
         {
-            <CardCollectionView Section="section" />
+            <CardCollectionView Section="section" HeadingLevel="2" />
         }
         else if (section.Type.Equals("contact", StringComparison.OrdinalIgnoreCase))
         {
-            <ContactView Section="section" />
+            <ContactView Section="section" HeadingLevel="2" />
         }
         else
         {
-            <ContentView Section="section" />
+            <ContentView Section="section" HeadingLevel="2" />
         }
     }
 }
 
 @code {
     private Page? currentPage;
+    private bool loading = true;
 
     protected override async Task OnInitializedAsync()
     {
         currentPage = await Pages.GetPageAsync("contact");
+        loading = false;
     }
 }

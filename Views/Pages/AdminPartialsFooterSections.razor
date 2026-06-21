@@ -1,0 +1,71 @@
+@page "/admin/partials/footersections"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject SiteController Site
+@inject IJSRuntime Js
+
+<PageTitle>Admin — Footer Sections</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Footer Sections</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        <p style="font-size:0.9rem;color:var(--app-muted)">
+            Footer sections follow the Nav Bar menu order. Edit links in
+            <a href="/admin/partials/navmenu">Nav Bar</a> to update footer sections.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:5%">#</th>
+                        <th style="width:35%">Label</th>
+                        <th style="width:35%">URL</th>
+                        <th style="width:25%">Icon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < footerSections.Count; i++)
+                    {
+                        var idx = i;
+                        <tr>
+                            <td style="text-align:center;color:var(--app-muted)">@(idx + 1)</td>
+                            <td><span style="font-weight:600">@footerSections[idx].Label</span></td>
+                            <td><code style="font-size:0.85rem">@footerSections[idx].Url</code></td>
+                            <td><code style="font-size:0.85rem;color:var(--app-muted)">@footerSections[idx].Icon</code></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+</div>
+
+@code {
+    private List<CustomNavLink> footerSections = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        var settings = await Site.GetSettingsAsync();
+        footerSections = [..(settings.NavLinks ?? [])];
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+}

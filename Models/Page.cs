@@ -12,5 +12,7 @@ public sealed class Page
 
     public string Keywords { get; set; } = string.Empty;
 
+    public int SortOrder { get; set; }
+
     public List<PageSection> Sections { get; set; } = [];
 }

@@ -3,6 +3,7 @@
 @inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject PageController Pages
+@inject ImageAssetController Images
 
 <PageTitle>Admin — @(SectionId is null ? "Add Section" : "Edit Section")</PageTitle>
 
@@ -56,6 +57,11 @@
                         <label>Image URL
                             <input @bind="sec.ImageUrl" />
                         </label>
+                        <button type="button" class="outline" @onclick="() => showImagePicker = true"><i class="site-icon" data-lucide="image"></i>Select Image</button>
+                        @if (!string.IsNullOrWhiteSpace(sec.ImageUrl))
+                        {
+                            <p class="pagination-info">Selected: <code>@sec.ImageUrl</code></p>
+                        }
                         <label>Image Alt Text
                             <input @bind="sec.ImageAlt" />
                         </label>
@@ -73,12 +79,24 @@
                             var localBi = bi;
                             <div style="border:1px solid var(--md-border);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Button Icon
+                                        <select @bind="btn.Icon">
+                                            <option value="">None</option>
+                                            @foreach (var icon in AvailableIcons)
+                                            {
+                                                <option value="@icon">@icon</option>
+                                            }
+                                        </select>
+                                    </label>
                                     <label>Button Text
                                         <input @bind="btn.Text" />
                                     </label>
+                                </div>
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
                                     <label>Button URL
                                         <input @bind="btn.Url" />
                                     </label>
+                                    <p class="pagination-info" style="align-self:end">@if (!string.IsNullOrWhiteSpace(btn.Icon)) { <i class="site-icon" data-lucide="@btn.Icon"></i> } Current icon</p>
                                 </div>
                                 <button class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveButton(localBi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
                             </div>
@@ -146,6 +164,11 @@
                 <hr />
                 <button @onclick="SaveSection" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Section</button>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <p class="pagination-info" style="margin-top:0.5rem">@message</p>
+                }
             </div>
         }
     </article>
@@ -162,8 +185,11 @@
     private bool loading = true;
     private bool saving;
     private bool isAddMode;
+    private string message = "";
     private Page? page;
     private PageSection sec = new();
+    private bool showImagePicker;
+    private static readonly string[] AvailableIcons = ["arrow-right", "external-link", "mail", "download", "book-open", "calendar", "github", "linkedin", "send", "sparkles"];
 
     protected override async Task OnInitializedAsync()
     {
@@ -175,6 +201,11 @@
 
         page = await Pages.GetPageByIdAsync(PageId);
         if (page is null) { loading = false; return; }
+        if (page.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase))
+        {
+            Nav.NavigateTo($"/admin/pages/edit/{PageId}", replace: true);
+            return;
+        }
 
         isAddMode = SectionId is null;
 
@@ -243,28 +274,67 @@
     private async Task SaveSection()
     {
         saving = true;
+        message = "";
         try
         {
             page = await Pages.GetPageByIdAsync(PageId);
             if (page is null) return;
 
+            var updatedSections = page.Sections.Select(existing => new PageSection
+            {
+                SectionId = existing.SectionId,
+                Type = existing.Type,
+                Heading = existing.Heading,
+                Body = existing.Body,
+                ActionText = existing.ActionText,
+                ActionUrl = existing.ActionUrl,
+                ImageUrl = existing.ImageUrl,
+                ImageAlt = existing.ImageAlt,
+                Buttons = [.. existing.Buttons],
+                Columns = [.. existing.Columns],
+            }).ToList();
+
             if (isAddMode)
             {
-                page.Sections.Add(sec);
+                updatedSections.Add(sec);
             }
             else
             {
-                var idx = page.Sections.FindIndex(s => s.SectionId == SectionId);
+                var idx = updatedSections.FindIndex(s => s.SectionId == SectionId);
                 if (idx >= 0)
-                    page.Sections[idx] = sec;
+                    updatedSections[idx] = sec;
             }
 
-            await Pages.UpdatePageAsync(page);
+            var updatedPage = new Page
+            {
+                Id = page.Id,
+                Slug = page.Slug,
+                Title = page.Title,
+                Description = page.Description,
+                Keywords = page.Keywords,
+                SortOrder = page.SortOrder,
+                Sections = updatedSections,
+            };
+
+            await Pages.UpdatePageAsync(updatedPage);
             Nav.NavigateTo($"/admin/pages/{PageId}/sections");
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
         }
         finally
         {
             saving = false;
         }
     }
+
+    private Task SetImagePath(string path)
+    {
+        sec.ImageUrl = path;
+        return Task.CompletedTask;
+    }
+
 }
+
+<ImagePicker Open="showImagePicker" Value="sec.ImageUrl" ValueChanged="SetImagePath" OnClose="() => showImagePicker = false" />

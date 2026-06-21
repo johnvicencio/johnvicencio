@@ -1,0 +1,241 @@
+@page "/admin/partials/navmenu"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject SiteController Site
+@inject PageController Pages
+@inject IJSRuntime Js
+
+<PageTitle>Admin — Nav Bar</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Nav Bar</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        <p style="font-size:0.9rem;color:var(--app-muted)">
+            Manage all nav bar links. Reorder with arrows, edit inline, delete, or add new links.
+            Page links are pre-loaded from <a href="/admin/pages">Pages</a>.
+            Use <code>#block</code> URLs for same-page anchor links.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:5%">#</th>
+                        <th style="width:23%">Label</th>
+                        <th style="width:25%">URL</th>
+                        <th style="width:17%">Icon</th>
+                        <th style="width:30%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < navLinks.Count; i++)
+                    {
+                        var idx = i;
+                        var isEditing = editingNav.Contains(idx);
+                        <tr>
+                            <td style="text-align:center;color:var(--app-muted)">@(idx + 1)</td>
+                            @if (isEditing)
+                            {
+                                <td><input @bind="navLinks[idx].Label" placeholder="e.g. About" /></td>
+                                <td><input @bind="navLinks[idx].Url" placeholder="e.g. /about or #block" /></td>
+                                <td><input @bind="navLinks[idx].Icon" placeholder="e.g. user" /></td>
+                            }
+                            else
+                            {
+                                <td><span style="font-weight:600">@navLinks[idx].Label</span></td>
+                                <td><code style="font-size:0.85rem">@navLinks[idx].Url</code></td>
+                                <td><code style="font-size:0.85rem;color:var(--app-muted)">@navLinks[idx].Icon</code></td>
+                            }
+                            <td style="white-space:nowrap">
+                                <button class="outline secondary" title="Move up" aria-label="Move up" @onclick="() => MoveNavLink(idx, -1)" disabled="@(idx == 0)" style="padding:0.25rem 0.45rem;min-height:auto">
+                                    <i class="site-icon" data-lucide="chevron-up"></i>
+                                </button>
+                                <button class="outline secondary" title="Move down" aria-label="Move down" @onclick="() => MoveNavLink(idx, 1)" disabled="@(idx == navLinks.Count - 1)" style="padding:0.25rem 0.45rem;min-height:auto">
+                                    <i class="site-icon" data-lucide="chevron-down"></i>
+                                </button>
+                                @if (isEditing)
+                                {
+                                    <button class="outline" title="Save" aria-label="Save nav link" @onclick="() => SaveNavLink(idx)" style="padding:0.25rem 0.45rem;min-height:auto">
+                                        <i class="site-icon" data-lucide="check"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="outline secondary" title="Edit" aria-label="Edit nav link" @onclick="() => EditNavLink(idx)" style="padding:0.25rem 0.45rem;min-height:auto">
+                                        <i class="site-icon" data-lucide="pencil"></i>
+                                    </button>
+                                }
+                                @if (isEditing)
+                                {
+                                    <button class="outline secondary" title="Cancel" aria-label="Cancel editing" @onclick="() => CancelNavLink(idx)" style="padding:0.25rem 0.45rem;min-height:auto">
+                                        <i class="site-icon" data-lucide="x"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="outline secondary" title="Remove" aria-label="Remove nav link" @onclick="() => RemoveNavLink(idx)" style="padding:0.25rem 0.45rem;min-height:auto">
+                                        <i class="site-icon" data-lucide="trash-2"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div style="padding:0.75rem 1rem;border-top:1px solid var(--app-border-soft);display:flex;gap:0.5rem;flex-wrap:wrap">
+                <button class="outline" @onclick="AddNavLink"><i class="site-icon" data-lucide="plus"></i>Add Nav Link</button>
+                <button class="outline secondary" @onclick="SyncNavFromPages"><i class="site-icon" data-lucide="refresh-cw"></i>Sync from Pages</button>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+            <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <p class="pagination-info" style="margin-top:0.5rem">@message</p>
+        }
+    </article>
+
+</div>
+
+@code {
+    private bool saving;
+    private string message = "";
+
+    private List<CustomNavLink> navLinks = [];
+    private HashSet<int> editingNav = [];
+    private Dictionary<int, CustomNavLink> editingBackup = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        var settings = await Site.GetSettingsAsync();
+        navLinks = [..(settings.NavLinks ?? [])];
+        if (navLinks.Count == 0)
+        {
+            await SyncNavFromPages();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private async Task SyncNavFromPages()
+    {
+        var pages = await Pages.GetPagesAsync();
+        navLinks = pages
+            .Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(p => p.SortOrder)
+            .ThenBy(p => p.Title)
+            .Select(p => new CustomNavLink
+            {
+                Label = p.Title,
+                Url = $"/{p.Slug}",
+                Icon = p.Slug.ToLowerInvariant() switch
+                {
+                    "about" => "user",
+                    "blog" => "book-open",
+                    "contact" => "mail",
+                    _ => "file-text",
+                }
+            })
+            .ToList();
+        editingNav.Clear();
+        editingBackup.Clear();
+    }
+
+    private async Task SaveToBackend()
+    {
+        var settings = await Site.GetSettingsAsync();
+        settings.NavLinks = navLinks;
+        await Site.UpdateSettingsAsync(settings);
+    }
+
+    private async Task MoveNavLink(int index, int direction)
+    {
+        var newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= navLinks.Count) return;
+        (navLinks[index], navLinks[newIndex]) = (navLinks[newIndex], navLinks[index]);
+        editingNav.Clear();
+        editingBackup.Clear();
+        await SaveToBackend();
+    }
+
+    private void EditNavLink(int index)
+    {
+        editingBackup[index] = new CustomNavLink
+        {
+            Label = navLinks[index].Label,
+            Url = navLinks[index].Url,
+            Icon = navLinks[index].Icon
+        };
+        editingNav.Add(index);
+    }
+
+    private void CancelNavLink(int index)
+    {
+        if (editingBackup.TryGetValue(index, out var backup))
+            navLinks[index] = backup;
+        editingNav.Remove(index);
+        editingBackup.Remove(index);
+    }
+
+    private async Task SaveNavLink(int index)
+    {
+        editingNav.Remove(index);
+        editingBackup.Remove(index);
+        await SaveToBackend();
+    }
+
+    private void AddNavLink()
+    {
+        navLinks.Add(new CustomNavLink());
+        editingNav.Add(navLinks.Count - 1);
+    }
+
+    private async Task RemoveNavLink(int index)
+    {
+        if (index >= 0 && index < navLinks.Count)
+        {
+            navLinks.RemoveAt(index);
+            editingNav.Clear();
+            editingBackup.Clear();
+            await SaveToBackend();
+        }
+    }
+
+    private async Task Save()
+    {
+        saving = true;
+        message = "";
+        try
+        {
+            await SaveToBackend();
+            message = "Nav bar saved.";
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

@@ -5,7 +5,14 @@
     }
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
-        <h1>@Section.Heading</h1>
+        @if (HeadingLevel == 1)
+        {
+            <h1>@Section.Heading</h1>
+        }
+        else
+        {
+            <h2>@Section.Heading</h2>
+        }
     }
     @if (!string.IsNullOrWhiteSpace(Section.Body))
     {
@@ -18,7 +25,7 @@
             {
                 if (!string.IsNullOrWhiteSpace(btn.Text) && !string.IsNullOrWhiteSpace(btn.Url))
                 {
-                    <a href="@btn.Url" role="button">@btn.Text</a>
+                    <a href="@btn.Url" role="button">@if (!string.IsNullOrWhiteSpace(btn.Icon)) { <i class="site-icon" data-lucide="@btn.Icon"></i> }@btn.Text</a>
                 }
             }
         </div>
@@ -32,4 +39,7 @@
 @code {
     [Parameter]
     public PageSection Section { get; set; } = new();
+
+    [Parameter]
+    public int HeadingLevel { get; set; } = 2;
 }

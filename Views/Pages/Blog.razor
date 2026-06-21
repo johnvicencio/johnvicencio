@@ -16,6 +16,10 @@ else
         @foreach (var post in posts)
         {
             <article>
+                @if (!string.IsNullOrWhiteSpace(post.ImageUrl))
+                {
+                    <img src="@post.ImageUrl" alt="@post.Title" style="width:100%;max-height:240px;object-fit:cover;border-radius:0.5rem" />
+                }
                 <h2><a href="@Router.BlogPostPath(post.Slug)">@post.Title</a></h2>
                 <p>@post.Summary</p>
             </article>

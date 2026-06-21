@@ -1,0 +1,90 @@
+@page "/admin/messages"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject ContactMessageController Messages
+@inject IJSRuntime Js
+
+<PageTitle>Admin — Messages</PageTitle>
+
+<div class="login-page" style="width:100%">
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Messages</h2>
+            <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <p class="pagination-info" style="padding:1rem;color:var(--pico-del-color)">@errorMessage</p>
+        }
+        else if (messageList.Count == 0)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">No messages yet.</p>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var message in messageList)
+                    {
+                        <tr>
+                            <td>@(message.IsRead ? "Read" : "New")</td>
+                            <td><strong>@message.Name</strong></td>
+                            <td>@message.Email</td>
+                            <td>@message.SubmittedUtc.ToLocalTime().ToString("yyyy-MM-dd h:mm tt")</td>
+                            <td>
+                                <button class="outline" title="Open Message" aria-label="Open Message" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/messages/{message.Id}")'><i class="site-icon" data-lucide="@(message.IsRead ? "mail-open" : "mail")"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </article>
+</div>
+
+@code {
+    private bool loading = true;
+    private string errorMessage = "";
+    private List<ContactMessage> messageList = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        try
+        {
+            messageList = await Messages.GetMessagesAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+}

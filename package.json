@@ -1,7 +1,13 @@
 {
   "private": true,
   "type": "module",
+  "scripts": {
+    "generate:image-index": "node scripts/generate-image-index.mjs",
+    "dev": "netlify dev -c \"dotnet run --launch-profile wasm\" --target-port 5196 -p 8888"
+  },
   "dependencies": {
-    "@netlify/blobs": "^8.2.0"
+    "@netlify/blobs": "^8.2.0",
+    "@types/nodemailer": "^8.0.1",
+    "nodemailer": "^9.0.1"
   }
 }

@@ -9,6 +9,8 @@ public sealed class SiteController
     private readonly DataStore store;
     private SiteSetting? cached;
 
+    public event Action? SettingsChanged;
+
     public SiteController(DataStore store)
     {
         this.store = store;
@@ -22,7 +24,8 @@ public sealed class SiteController
 
     public async Task UpdateSettingsAsync(SiteSetting settings)
     {
-        cached = settings;
         await store.SaveAsync(settings, ContentName);
+        cached = settings;
+        SettingsChanged?.Invoke();
     }
 }

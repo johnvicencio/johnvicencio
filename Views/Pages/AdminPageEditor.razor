@@ -23,6 +23,19 @@
         else
         {
             <div class="page-editor">
+                @if (isAddMode)
+                {
+                    <label>Page Type
+                        <select @bind="pageKind" @bind:after="OnPageKindChanged">
+                            <option value="home">Home Page</option>
+                            <option value="content">Content Page</option>
+                            <option value="sections">Section Page</option>
+                            <option value="blog">Blog Page</option>
+                            <option value="contact">Contact Page</option>
+                        </select>
+                    </label>
+                }
+
                 <div class="grid" style="grid-template-columns:1fr 1fr">
                     <label>Page Title
                         <input @bind="editTitle" @oninput="OnTitleChanged" />
@@ -44,16 +57,29 @@
 
                 @if (!isAddMode)
                 {
-                    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
-                        <button class="outline" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i>Add Section</button>
-                        <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="layers"></i>Manage Sections</button>
-                    </div>
-                    <p class="pagination-info">@sectionCount section(s) on this page.</p>
+                    @if (IsBlogPage)
+                    {
+                        <p class="pagination-info">Blog pages use the blog post editor and do not support extra page sections.</p>
+                        <button class="outline" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="book-open"></i>Manage Blog</button>
+                    }
+                    else
+                    {
+                        <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
+                            <button class="outline" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i>Add Section</button>
+                            <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="layers"></i>Manage Sections</button>
+                        </div>
+                        <p class="pagination-info">@sectionCount section(s) on this page.</p>
+                    }
                 }
 
                 <hr />
                 <button @onclick="SavePage" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Page</button>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <p class="pagination-info" style="margin-top:0.5rem">@message</p>
+                }
             </div>
         }
     </article>
@@ -68,11 +94,15 @@
     private bool saving;
     private bool isAddMode;
     private int sectionCount;
+    private string message = "";
 
     private string editTitle = "";
     private string editSlug = "";
     private string editDescription = "";
     private string editKeywords = "";
+    private string pageKind = "content";
+
+    private bool IsBlogPage => editSlug.Equals("blog", StringComparison.OrdinalIgnoreCase);
 
     protected override async Task OnInitializedAsync()
     {
@@ -83,6 +113,11 @@
         }
 
         isAddMode = PageId is null;
+
+        if (isAddMode)
+        {
+            OnPageKindChanged();
+        }
 
         if (!isAddMode)
         {
@@ -109,12 +144,56 @@
         }
     }
 
+    private void OnPageKindChanged()
+    {
+        if (!isAddMode) return;
+
+        switch (pageKind)
+        {
+            case "home":
+                editTitle = "Home";
+                editSlug = "home";
+                editDescription = "Personal site home page.";
+                editKeywords = "home, personal, john vicencio";
+                break;
+            case "blog":
+                editTitle = "Blog";
+                editSlug = "blog";
+                editDescription = "Blog page listing all published posts.";
+                editKeywords = "blog, posts, articles";
+                break;
+            case "contact":
+                editTitle = "Contact";
+                editSlug = "contact";
+                editDescription = "Reach out about projects, collaboration, or research ideas.";
+                editKeywords = "contact, email, collaboration";
+                break;
+            case "content":
+                editTitle = string.IsNullOrWhiteSpace(editTitle) ? "Content Page" : editTitle;
+                editSlug = string.IsNullOrWhiteSpace(editSlug) ? ToSlug(editTitle) : editSlug;
+                break;
+            case "sections":
+                editTitle = string.IsNullOrWhiteSpace(editTitle) ? "Section Page" : editTitle;
+                editSlug = string.IsNullOrWhiteSpace(editSlug) ? ToSlug(editTitle) : editSlug;
+                break;
+        }
+    }
+
     private async Task SavePage()
     {
         saving = true;
+        message = "";
         try
         {
             var existingPage = isAddMode ? null : await Pages.GetPageByIdAsync(PageId!);
+            var allPages = await Pages.GetPagesAsync();
+
+            if (isAddMode && allPages.Any(p => p.Slug.Equals(editSlug, StringComparison.OrdinalIgnoreCase)))
+            {
+                message = $"A page with slug '{editSlug}' already exists.";
+                return;
+            }
+
             var page = new Page
             {
                 Id = existingPage?.Id ?? Guid.NewGuid().ToString("N")[..12],
@@ -122,7 +201,8 @@
                 Slug = editSlug,
                 Description = editDescription,
                 Keywords = editKeywords,
-                Sections = existingPage?.Sections ?? [],
+                SortOrder = existingPage?.SortOrder ?? 0,
+                Sections = existingPage?.Sections ?? CreateInitialSections(),
             };
 
             if (existingPage is not null)
@@ -131,6 +211,10 @@
                 await Pages.AddPageAsync(page);
 
             Nav.NavigateTo("/admin/pages");
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
         }
         finally
         {
@@ -153,4 +237,21 @@
         while (result.Contains("--")) result = result.Replace("--", "-");
         return result;
     }
+
+    private List<PageSection> CreateInitialSections() => pageKind switch
+    {
+        "home" => [NewSection("content", editTitle, "")],
+        "content" => [NewSection("content", editTitle, "")],
+        "blog" => [NewSection("content", "Blog", "Read the latest posts and articles.")],
+        "contact" => [NewSection("contact", "Get in touch", "Send a note and I will follow up when I can.")],
+        _ => [],
+    };
+
+    private static PageSection NewSection(string type, string heading, string body) => new()
+    {
+        SectionId = Guid.NewGuid().ToString("N")[..8],
+        Type = type,
+        Heading = heading,
+        Body = body,
+    };
 }

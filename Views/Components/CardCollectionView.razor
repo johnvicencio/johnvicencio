@@ -1,7 +1,14 @@
 <section class="card-collection">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
-        <h2>@Section.Heading</h2>
+        @if (HeadingLevel == 1)
+        {
+            <h1>@Section.Heading</h1>
+        }
+        else
+        {
+            <h2>@Section.Heading</h2>
+        }
     }
     @if (Section.Columns.Count > 0)
     {
@@ -30,4 +37,7 @@
 @code {
     [Parameter]
     public PageSection Section { get; set; } = new();
+
+    [Parameter]
+    public int HeadingLevel { get; set; } = 2;
 }

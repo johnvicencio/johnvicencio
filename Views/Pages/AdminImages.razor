@@ -1,0 +1,110 @@
+@page "/admin/images"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject ImageAssetController Images
+
+<PageTitle>Admin — Images</PageTitle>
+
+<div class="login-page" style="width:100%">
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Images</h2>
+            <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        </div>
+
+        <p class="pagination-info">Browse static images from <code>wwwroot/images</code>. This page reads <code>/images/index.json</code>, so add new files to <code>wwwroot/images</code> and regenerate the index when the folder changes.</p>
+        @if (folders.Count > 0)
+        {
+            <label>Folder
+                <select @bind="selectedFolder">
+                    <option value="">All images</option>
+                    @foreach (var folder in folders)
+                    {
+                        <option value="@folder">@folder</option>
+                    }
+                </select>
+            </label>
+        }
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <p class="pagination-info" style="margin-top:0.5rem">@message</p>
+        }
+
+        <hr />
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (VisibleImages.Count == 0)
+        {
+            <p class="pagination-info" style="text-align:center">No images found.</p>
+        }
+        else
+        {
+            <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem">
+                @foreach (var image in VisibleImages)
+                {
+                    <article style="margin:0">
+                        <img src="@image.Url" alt="@image.FileName" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:0.5rem" />
+                        <p style="font-family:monospace;font-size:0.75rem;word-break:break-all">@image.FileName</p>
+                        @if (!string.IsNullOrWhiteSpace(image.Folder))
+                        {
+                            <p class="pagination-info" style="font-size:0.75rem">@image.Folder</p>
+                        }
+                        <label>Relative Path
+                            <input readonly value="@image.Url" />
+                        </label>
+                        <button class="outline" title="Select" aria-label="Select" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => SelectImage(image.Url)"><i class="site-icon" data-lucide="check"></i>Select</button>
+                    </article>
+                }
+            </div>
+        }
+    </article>
+</div>
+
+@code {
+    private bool loading = true;
+    private string message = "";
+    private string selectedFolder = "";
+    private List<ImageAsset> imageList = [];
+    private List<string> folders = [];
+    private List<ImageAsset> VisibleImages => string.IsNullOrWhiteSpace(selectedFolder)
+        ? imageList
+        : imageList.Where(image => image.Folder == selectedFolder).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        await LoadImagesAsync();
+    }
+
+    private async Task LoadImagesAsync()
+    {
+        loading = true;
+        try
+        {
+            imageList = await Images.GetImagesAsync();
+            folders = imageList.Select(image => image.Folder).Where(folder => !string.IsNullOrWhiteSpace(folder)).Distinct().OrderBy(folder => folder).ToList();
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void SelectImage(string url)
+    {
+        message = $"Selected image path: {url}";
+    }
+
+}

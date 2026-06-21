@@ -32,8 +32,10 @@
     private string message = string.Empty;
     private VaultLoginResult? result;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await Session.TryRestoreAsync(Js);
+
         if (Session.IsLoggedIn)
             Navigation.NavigateTo("/admin", replace: true);
     }

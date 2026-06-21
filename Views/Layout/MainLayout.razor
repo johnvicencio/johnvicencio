@@ -1,36 +1,84 @@
 @inherits LayoutComponentBase
+@implements IDisposable
 @inject IJSRuntime Js
 @inject VaultSessionService Session
 @inject NavigationManager Nav
+@inject PageController Pages
+@inject SiteController Site
 
 <div class="site-shell">
-    <header class="container">
-        <nav>
-            <ul>
-                <li><strong><a class="site-nav-link" href="/"><i class="site-icon" data-lucide="home"></i>johnvicencio</a></strong></li>
-            </ul>
-            <ul>
-                <li><a class="site-nav-link" href="/about"><i class="site-icon" data-lucide="user"></i>About</a></li>
-                <li><a class="site-nav-link" href="/blog"><i class="site-icon" data-lucide="book-open"></i>Blog</a></li>
-                <li><a class="site-nav-link" href="/contact"><i class="site-icon" data-lucide="mail"></i>Contact</a></li>
-                @if (Session.IsLoggedIn)
-                {
-                    <li><a class="site-nav-link" href="/admin"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
-                    <li><a class="site-nav-link" href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
-                }
-            </ul>
-        </nav>
+    <header class="site-header">
+        <div class="container">
+            <nav>
+                <ul>
+                    <li><strong><a class="site-nav-link site-brand-link" href="/"><img class="site-brand-img" src="/images/johnvicencio-brand.png" alt="johnvicencio" /></a></strong></li>
+                </ul>
+                <ul>
+                    @foreach (var link in allNavLinks)
+                    {
+                        <li><a class="site-nav-link" href="@link.Url"><i class="site-icon" data-lucide="@link.Icon"></i>@link.Label</a></li>
+                    }
+                    @if (Session.IsLoggedIn)
+                    {
+                        <li><a class="site-nav-link" href="/admin"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
+                        <li><a class="site-nav-link" href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
+                    }
+                </ul>
+            </nav>
+        </div>
     </header>
 
     <main class="container site-main">
         @Body
     </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-about">
+                    <h4>@footerAboutHeader</h4>
+                    <p>@footerAbout</p>
+                </div>
+                <div class="footer-col footer-sections">
+                    <h4>Sections</h4>
+                    <ul>
+                        @foreach (var sec in allNavLinks)
+                        {
+                            <li><a href="@sec.Url"><i class="site-icon" data-lucide="@sec.Icon"></i>@sec.Label</a></li>
+                        }
+                    </ul>
+                </div>
+                <div class="footer-col footer-connect">
+                    <h4>Connect</h4>
+                    <ul class="footer-connect-list">
+                        @foreach (var connect in footerConnects)
+                        {
+                            <li><a href="@connect.Url" target="_blank" rel="noopener noreferrer"><i class="site-icon" data-lucide="@connect.Icon"></i>@connect.Platform</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2026 John Vicencio. Made with <span class="footer-heart">&hearts;</span> in the USA.</p>
+            </div>
+        </div>
+    </footer>
 </div>
 
 @code {
+    private List<CustomNavLink> allNavLinks = [];
+    private string footerAboutHeader = "";
+    private string footerAbout = "";
+    private List<FooterConnect> footerConnects = [];
+
     protected override async Task OnInitializedAsync()
     {
         await Session.TryRestoreAsync(Js);
+        Pages.PagesChanged += OnPagesChanged;
+        Site.SettingsChanged += OnSettingsChanged;
+        await LoadNavAsync();
     }
 
     private async Task LogOut()
@@ -42,5 +90,76 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private async Task LoadNavAsync()
+    {
+        var settings = await Site.GetSettingsAsync();
+        var saved = settings.NavLinks ?? [];
+
+        if (saved.Count > 0)
+        {
+            allNavLinks = saved
+                .Where(n => !string.IsNullOrWhiteSpace(n.Label) && !string.IsNullOrWhiteSpace(n.Url))
+                .Select(n => new CustomNavLink
+                {
+                    Label = n.Label,
+                    Url = n.Url,
+                    Icon = string.IsNullOrWhiteSpace(n.Icon) ? "link" : n.Icon
+                })
+                .ToList();
+        }
+        else
+        {
+            var pages = await Pages.GetPagesAsync();
+            allNavLinks = pages
+                .Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(p => p.SortOrder)
+                .ThenBy(p => p.Title)
+                .Select(p => new CustomNavLink
+                {
+                    Label = p.Title,
+                    Url = $"/{p.Slug}",
+                    Icon = p.Slug.ToLowerInvariant() switch
+                    {
+                        "about" => "user",
+                        "blog" => "book-open",
+                        "contact" => "mail",
+                        _ => "file-text",
+                    }
+                })
+                .ToList();
+        }
+
+        footerAboutHeader = string.IsNullOrWhiteSpace(settings.FooterAboutHeader)
+            ? "About John Vicencio"
+            : settings.FooterAboutHeader;
+        footerAbout = string.IsNullOrWhiteSpace(settings.FooterAbout)
+            ? "John Serrano Vicencio was born in Manila, Philippines, and grew up in San Diego, California. His passion is to look at reality with depth and clarity while keeping an open mind. He focuses on C# and the .NET ecosystem, blending philosophy with software craftsmanship."
+            : settings.FooterAbout;
+        footerConnects = [..(settings.FooterConnects ?? [])];
+    }
+
+    private void OnPagesChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await LoadNavAsync();
+            StateHasChanged();
+            await Js.InvokeVoidAsync("lucide.createIcons");
+        });
+    }
+
+    private async void OnSettingsChanged()
+    {
+        await LoadNavAsync();
+        StateHasChanged();
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    public void Dispose()
+    {
+        Pages.PagesChanged -= OnPagesChanged;
+        Site.SettingsChanged -= OnSettingsChanged;
     }
 }

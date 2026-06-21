@@ -1,13 +1,7 @@
 [build]
-  command = "dotnet publish -c Release"
+  command = "node scripts/generate-image-index.mjs && dotnet publish -c Release"
   publish = "bin/Release/net8.0/publish/wwwroot"
   functions = "netlify/functions"
-
-[dev]
-  command = "dotnet run --launch-profile wasm"
-  targetPort = 5196
-  port = 8888
-  publish = "bin/Debug/net8.0/wwwroot"
 
 [[redirects]]
   from = "/*"

@@ -1,14 +1,26 @@
+@inject HttpClient Http
+
 <section class="contact-section">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
-        <h2>@Section.Heading</h2>
+        @if (HeadingLevel == 1)
+        {
+            <h1>@Section.Heading</h1>
+        }
+        else
+        {
+            <h2>@Section.Heading</h2>
+        }
     }
     @if (!string.IsNullOrWhiteSpace(Section.Body))
     {
         <p>@((MarkupString)Section.Body)</p>
     }
 
-    <form class="contact-form" @onsubmit="HandleSubmit">
+    <form class="contact-form" @onsubmit="HandleSubmit" @onsubmit:preventDefault>
+        <label style="position:absolute;left:-10000px" aria-hidden="true">Website
+            <input tabindex="-1" autocomplete="off" @bind="website" />
+        </label>
         <label>Name
             <input @bind="contactName" placeholder="Your name" />
         </label>
@@ -17,6 +29,9 @@
         </label>
         <label>Message
             <textarea @bind="contactMessage" rows="4" placeholder="Your message..."></textarea>
+        </label>
+        <label>Human Check: What is @challengeLeft + @challengeRight?
+            <input inputmode="numeric" @bind="challengeAnswer" placeholder="Answer" />
         </label>
         <button type="submit" aria-busy="@sending">Send Message</button>
     </form>
@@ -31,21 +46,76 @@
     [Parameter]
     public PageSection Section { get; set; } = new();
 
+    [Parameter]
+    public int HeadingLevel { get; set; } = 2;
+
     private string contactName = "";
     private string contactEmail = "";
     private string contactMessage = "";
+    private string website = "";
+    private string challengeAnswer = "";
+    private int challengeLeft = Random.Shared.Next(2, 10);
+    private int challengeRight = Random.Shared.Next(2, 10);
     private bool sending;
     private string statusMessage = "";
 
     private async Task HandleSubmit()
     {
+        if (string.IsNullOrWhiteSpace(contactName) || string.IsNullOrWhiteSpace(contactEmail) || string.IsNullOrWhiteSpace(contactMessage))
+        {
+            statusMessage = "Please complete name, email, and message.";
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(website) || !int.TryParse(challengeAnswer, out var answer) || answer != challengeLeft + challengeRight)
+        {
+            statusMessage = "Please complete the human check.";
+            return;
+        }
+
         sending = true;
         statusMessage = "";
-        await Task.Delay(500);
-        statusMessage = "Message sent (demo).";
-        contactName = "";
-        contactEmail = "";
-        contactMessage = "";
-        sending = false;
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/.netlify/functions/contact", new
+            {
+                name = contactName,
+                email = contactEmail,
+                message = contactMessage,
+                website
+            });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                statusMessage = $"Could not send message: {(int)response.StatusCode} {response.ReasonPhrase}. {error}";
+                return;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<ContactSubmitResult>();
+            statusMessage = result?.EmailSent == true
+                ? "Message sent."
+                : "Message saved. Email notification was not sent; check SMTP settings.";
+            contactName = "";
+            contactEmail = "";
+            contactMessage = "";
+            website = "";
+            challengeAnswer = "";
+            challengeLeft = Random.Shared.Next(2, 10);
+            challengeRight = Random.Shared.Next(2, 10);
+        }
+        catch (Exception ex)
+        {
+            statusMessage = ex.Message;
+        }
+        finally
+        {
+            sending = false;
+        }
+    }
+
+    private sealed class ContactSubmitResult
+    {
+        public bool EmailSent { get; set; }
     }
 }

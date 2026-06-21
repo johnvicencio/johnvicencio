@@ -5,11 +5,13 @@ namespace johnvicencio.Controllers;
 public sealed class VaultController
 {
     private readonly JsonContentService jsonContent;
+    private readonly DataStore store;
     private readonly VaultCryptoService crypto;
 
-    public VaultController(JsonContentService jsonContent, VaultCryptoService crypto)
+    public VaultController(JsonContentService jsonContent, DataStore store, VaultCryptoService crypto)
     {
         this.jsonContent = jsonContent;
+        this.store = store;
         this.crypto = crypto;
     }
 
@@ -21,7 +23,8 @@ public sealed class VaultController
             return VaultLoginResult.Fail("Enter a username.");
         }
 
-        var vault = await jsonContent.ReadAsync<UserVault>($"data/users/{safeUsername}.json");
+        var vault = await store.LoadSingleAsync<UserVault>($"users/{safeUsername}");
+        vault ??= await jsonContent.ReadAsync<UserVault>($"data/users/{safeUsername}.json");
         if (vault is null)
         {
             return VaultLoginResult.Fail("Vault not found.");

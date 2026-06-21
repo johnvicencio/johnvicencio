@@ -1,0 +1,127 @@
+@inject ImageAssetController Images
+
+@if (Open)
+{
+    <div class="image-picker-backdrop" @onclick="Cancel">
+        <div class="image-picker-modal" @onclick:stopPropagation>
+            <div class="table-toolbar">
+                <h3 style="margin:0">Select Image</h3>
+                <button class="outline secondary" title="Close" aria-label="Close" @onclick="Cancel"><i class="site-icon" data-lucide="x"></i></button>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <p class="pagination-info" style="color:var(--pico-del-color)">@errorMessage</p>
+            }
+            else if (loading)
+            {
+                <p class="pagination-info">Loading images...</p>
+            }
+            else
+            {
+                <label>Folder
+                    <select @bind="selectedFolder">
+                        <option value="">All images</option>
+                        @foreach (var folder in folders)
+                        {
+                            <option value="@folder">@folder</option>
+                        }
+                    </select>
+                </label>
+
+                <div class="image-picker-grid">
+                    @foreach (var image in VisibleImages)
+                    {
+                        <button type="button" class="image-picker-tile @(image.Url == selectedPath ? "selected" : "")" @onclick="() => Select(image.Url)">
+                            <img src="@image.Url" alt="@image.FileName" />
+                            <span>@image.Url</span>
+                        </button>
+                    }
+                </div>
+
+                <label>Selected Relative Path
+                    <input readonly value="@selectedPath" />
+                </label>
+
+                <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                    <button class="outline secondary" @onclick="Cancel">Cancel</button>
+                    <button disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="Confirm"><i class="site-icon" data-lucide="check"></i>OK</button>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool Open { get; set; }
+
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private bool loading;
+    private string errorMessage = "";
+    private string selectedFolder = "";
+    private string selectedPath = "";
+    private List<ImageAsset> imageList = [];
+    private List<string> folders = [];
+
+    private List<ImageAsset> VisibleImages => string.IsNullOrWhiteSpace(selectedFolder)
+        ? imageList
+        : imageList.Where(image => image.Folder == selectedFolder).ToList();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        selectedPath = Value;
+        if (Open && imageList.Count == 0 && !loading)
+        {
+            await LoadImagesAsync();
+        }
+    }
+
+    private async Task LoadImagesAsync()
+    {
+        loading = true;
+        errorMessage = "";
+        try
+        {
+            imageList = await Images.GetImagesAsync();
+            folders = imageList
+                .Select(image => image.Folder)
+                .Where(folder => !string.IsNullOrWhiteSpace(folder))
+                .Distinct()
+                .OrderBy(folder => folder)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void Select(string path)
+    {
+        selectedPath = path;
+    }
+
+    private async Task Confirm()
+    {
+        await ValueChanged.InvokeAsync(selectedPath);
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task Cancel()
+    {
+        await OnClose.InvokeAsync();
+    }
+}

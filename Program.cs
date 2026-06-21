@@ -12,6 +12,8 @@ builder.Services.AddScoped<AppEnvironment>();
 builder.Services.AddScoped<DataStore>();
 builder.Services.AddScoped<PageController>();
 builder.Services.AddScoped<BlogController>();
+builder.Services.AddScoped<ContactMessageController>();
+builder.Services.AddScoped<ImageAssetController>();
 builder.Services.AddScoped<SiteController>();
 builder.Services.AddScoped<RouterController>();
 builder.Services.AddScoped<JsonContentService>();

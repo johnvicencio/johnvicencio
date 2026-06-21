@@ -4,6 +4,7 @@
 @inject NavigationManager Nav
 @inject BlogController Blog
 @inject PageController Pages
+@inject ImageAssetController Images
 
 <PageTitle>Admin — @(PostId is null ? "Add Post" : "Edit Post")</PageTitle>
 
@@ -46,9 +47,21 @@
                     </label>
                 </div>
 
-                <label>Content
-                    <textarea @bind="editPostContent" rows="6"></textarea>
+                <label>Content</label>
+                <RichTextEditor @bind-Value="editPostContent" MinHeight="400" />
+
+                <label>Post Image URL
+                    <input @bind="editPostImageUrl" />
                 </label>
+                <button type="button" class="outline" @onclick="() => showImagePicker = true"><i class="site-icon" data-lucide="image"></i>Select Image</button>
+                @if (!string.IsNullOrWhiteSpace(editPostImageUrl))
+                {
+                    <p class="pagination-info">Selected: <code>@editPostImageUrl</code></p>
+                }
+                @if (!string.IsNullOrWhiteSpace(editPostImageUrl))
+                {
+                    <img src="@editPostImageUrl" alt="Post image preview" style="width:100%;max-height:260px;object-fit:cover;border-radius:0.5rem" />
+                }
 
                 <label>Summary
                     <textarea @bind="editPostSummary" rows="2"></textarea>
@@ -61,6 +74,11 @@
                 <hr />
                 <button @onclick="SavePost" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Post</button>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <p class="pagination-info" style="margin-top:0.5rem">@message</p>
+                }
             </div>
         }
     </article>
@@ -75,6 +93,7 @@
     private bool saving;
     private bool isAddMode;
     private bool hasBlogPage;
+    private string message = "";
 
     private string editPostTitle = "";
     private string editPostSlug = "";
@@ -82,7 +101,9 @@
     private string editPostKeywords = "";
     private string editPostContent = "";
     private string editPostSummary = "";
+    private string editPostImageUrl = "";
     private string editPostDate = "";
+    private bool showImagePicker;
 
     protected override async Task OnInitializedAsync()
     {
@@ -108,6 +129,7 @@
                 editPostKeywords = post.Keywords;
                 editPostContent = post.Content;
                 editPostSummary = post.Summary;
+                editPostImageUrl = post.ImageUrl;
                 editPostDate = post.PublishedOn.ToString("yyyy-MM-dd");
             }
         }
@@ -137,6 +159,7 @@
     private async Task SavePost()
     {
         saving = true;
+        message = "";
         try
         {
             var existingPost = isAddMode ? null : (await Blog.GetPostsAsync()).FirstOrDefault(p => p.Id == PostId);
@@ -149,6 +172,7 @@
                 Keywords = editPostKeywords,
                 Content = editPostContent,
                 Summary = editPostSummary,
+                ImageUrl = editPostImageUrl,
                 PublishedOn = DateOnly.TryParse(editPostDate, out var d) ? d : DateOnly.FromDateTime(DateTime.UtcNow),
             };
 
@@ -159,10 +183,20 @@
 
             Nav.NavigateTo("/admin/blog");
         }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
         finally
         {
             saving = false;
         }
+    }
+
+    private Task SetImagePath(string path)
+    {
+        editPostImageUrl = path;
+        return Task.CompletedTask;
     }
 
     static string ToSlug(string title)
@@ -181,3 +215,5 @@
         return result;
     }
 }
+
+<ImagePicker Open="showImagePicker" Value="editPostImageUrl" ValueChanged="SetImagePath" OnClose="() => showImagePicker = false" />

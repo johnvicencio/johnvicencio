@@ -1,0 +1,85 @@
+@page "/admin/partials"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject IJSRuntime Js
+
+<PageTitle>Admin — Partials</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:960px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Partials</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else
+        {
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;max-width:960px;margin:1rem auto 0;width:100%">
+
+                <article class="admin-card">
+                    <h3>Nav Bar</h3>
+                    <p style="margin:0.25rem 0;font-size:0.9rem;color:var(--app-muted)">
+                        Manage all nav bar links. Add, edit, delete, reorder, or sync from pages.
+                    </p>
+                    <hr />
+                    <button class="outline" title="Manage Nav Bar" aria-label="Manage Nav Bar" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/partials/navmenu")'><i class="site-icon" data-lucide="menu"></i></button>
+                </article>
+
+                <article class="admin-card">
+                    <h3>Footer About</h3>
+                    <p style="margin:0.25rem 0;font-size:0.9rem;color:var(--app-muted)">
+                        Edit the about text that appears in the footer.
+                    </p>
+                    <hr />
+                    <button class="outline" title="Manage Footer About" aria-label="Manage Footer About" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/partials/footerabout")'><i class="site-icon" data-lucide="align-left"></i></button>
+                </article>
+
+                <article class="admin-card">
+                    <h3>Footer Sections</h3>
+                    <p style="margin:0.25rem 0;font-size:0.9rem;color:var(--app-muted)">
+                        Manage section links that appear in the footer.
+                    </p>
+                    <hr />
+                    <button class="outline" title="Manage Footer Sections" aria-label="Manage Footer Sections" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/partials/footersections")'><i class="site-icon" data-lucide="list"></i></button>
+                </article>
+
+                <article class="admin-card">
+                    <h3>Footer Connect</h3>
+                    <p style="margin:0.25rem 0;font-size:0.9rem;color:var(--app-muted)">
+                        Manage social media / connect links in the footer.
+                    </p>
+                    <hr />
+                    <button class="outline" title="Manage Footer Connect" aria-label="Manage Footer Connect" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/partials/footerconnect")'><i class="site-icon" data-lucide="share-2"></i></button>
+                </article>
+
+            </div>
+        }
+    </article>
+
+</div>
+
+@code {
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+        loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+}

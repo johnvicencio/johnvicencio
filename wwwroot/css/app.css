@@ -10,11 +10,24 @@
     --pico-font-family: 'Adamina', Georgia, serif;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: 'Adamina', Georgia, serif;
+    min-height: 100%;
+    margin: 0;
+}
+
+.site-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .site-main {
+    flex: 1;
     padding-block: 2rem 4rem;
 }
 
@@ -24,14 +37,35 @@ body {
     gap: 0.35rem;
 }
 
+.admin-card {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.admin-card hr {
+    margin-top: auto;
+}
+
 .site-icon {
     width: 1rem;
     height: 1rem;
     stroke-width: 2;
 }
 
+.site-brand-img {
+    display: block;
+    height: 2rem;
+    width: auto;
+}
+
+.site-brand-link {
+    padding: 0 !important;
+}
+
 input, textarea, select {
-    max-width: 340px;
+    width: 100%;
+    max-width: 100%;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
 }
@@ -141,220 +175,182 @@ code {
     color: #c02d76;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
-}
-
-/* ─── Material Design Theme Layer (overrides Pico) ─── */
-
 :root {
-    --md-primary: #1976d2;
-    --md-primary-light: #63a4ff;
-    --md-primary-dark: #004ba0;
-    --md-secondary: #ff6f00;
-    --md-surface: #ffffff;
-    --md-background: #f5f5f5;
-    --md-error: #d32f2f;
-    --md-on-primary: #ffffff;
-    --md-on-surface: #212121;
-    --md-on-background: #616161;
-    --md-border: #e0e0e0;
-    --md-divider: #eeeeee;
+    --app-surface: #ffffff;
+    --app-surface-muted: #f8fafc;
+    --app-background: #f5f7fb;
+    --app-border: #dfe5ec;
+    --app-border-soft: #edf1f5;
+    --app-text: #1f2937;
+    --app-muted: #667085;
+    --app-primary: #1f6feb;
+    --app-primary-hover: #1559c7;
+    --app-danger: #b42318;
+    --app-success: #027a48;
+    --app-radius-sm: 0.375rem;
+    --app-radius-md: 0.625rem;
+    --app-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+    --app-shadow-md: 0 8px 24px rgba(16, 24, 40, 0.10);
 
     --pico-font-family: 'Adamina', Georgia, serif;
     --pico-line-height: 1.6;
-    --pico-text-underline-offset: 0.1rem;
-    --pico-border-radius: 0.25rem;
-    --pico-border-width: 1px;
+    --pico-border-radius: var(--app-radius-sm);
     --pico-outline-width: 0.125rem;
-    --pico-transition: 0.2s ease-in-out;
-    --pico-spacing: 0.75rem;
-    --pico-typography-spacing-vertical: 0.75rem;
-    --pico-block-spacing-vertical: 0.75rem;
+    --pico-transition: 160ms ease;
+    --pico-spacing: 0.875rem;
+    --pico-typography-spacing-vertical: 0.875rem;
+    --pico-block-spacing-vertical: 0.875rem;
     --pico-block-spacing-horizontal: 1rem;
-    --pico-form-element-spacing-vertical: 0.5rem;
+    --pico-form-element-spacing-vertical: 0.625rem;
     --pico-form-element-spacing-horizontal: 0.75rem;
-    --pico-group-box-shadow: none;
-    --pico-nav-element-spacing-vertical: 0.75rem;
-    --pico-nav-element-spacing-horizontal: 0.5rem;
     --pico-nav-link-spacing-vertical: 0.5rem;
-    --pico-nav-link-spacing-horizontal: 0.5rem;
+    --pico-nav-link-spacing-horizontal: 0.65rem;
 
-    --pico-primary: var(--md-primary);
-    --pico-primary-background: var(--md-primary);
-    --pico-primary-hover: var(--md-primary-dark);
-    --pico-primary-hover-background: var(--md-primary-dark);
-    --pico-primary-focus: rgba(25, 118, 210, 0.25);
-    --pico-primary-inverse: var(--md-on-primary);
-    --pico-secondary: var(--md-secondary);
-    --pico-background-color: var(--md-background);
-    --pico-card-background-color: var(--md-surface);
-    --pico-card-border-color: var(--md-border);
-    --pico-card-box-shadow: none;
-    --pico-card-sectioning-background-color: var(--md-surface);
-    --pico-dropdown-background-color: var(--md-surface);
-    --pico-dropdown-border-color: var(--md-border);
-    --pico-dropdown-box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
-    --pico-dropdown-hover-background-color: #f5f5f5;
-    --pico-form-element-background-color: var(--md-surface);
-    --pico-form-element-selected-background-color: #e3f2fd;
-    --pico-form-element-border-color: var(--md-border);
-    --pico-form-element-color: var(--md-on-surface);
-    --pico-form-element-placeholder-color: var(--md-on-background);
-    --pico-form-element-active-background-color: var(--md-surface);
-    --pico-form-element-active-border-color: var(--md-primary);
-    --pico-form-element-focus-color: var(--md-primary);
-    --pico-form-element-disabled-background-color: #fafafa;
-    --pico-form-element-disabled-border-color: #e0e0e0;
-    --pico-form-element-disabled-color: #9e9e9e;
-    --pico-form-element-invalid-active-border-color: var(--md-error);
-    --pico-form-element-invalid-border-color: var(--md-error);
-    --pico-form-element-valid-active-border-color: #2e7d32;
-    --pico-form-element-valid-border-color: #2e7d32;
-    --pico-mark-background-color: #fff9c4;
-    --pico-mark-color: var(--md-on-surface);
-    --pico-muted-color: var(--md-on-background);
-    --pico-group-box-shadow-focus-with-button: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
-    --pico-group-box-shadow-focus-with-input: 0 0 0 0.0625rem var(--pico-form-element-active-border-color);
-    --pico-h1-color: var(--md-on-surface);
-    --pico-h2-color: var(--md-on-surface);
-    --pico-h3-color: var(--md-on-surface);
-    --pico-h4-color: var(--md-on-surface);
-    --pico-h5-color: var(--md-on-surface);
-    --pico-h6-color: var(--md-on-surface);
-    --pico-heading-color: var(--md-on-surface);
-    --pico-ins-color: #2e7d32;
-    --pico-del-color: var(--md-error);
-    --pico-table-border-color: var(--md-border);
-    --pico-table-stripped-row-background-color: #fafafa;
-    --pico-code-background-color: #f5f5f5;
-    --pico-code-color: var(--md-on-surface);
-    --pico-code-kbd-background-color: var(--md-on-surface);
-    --pico-code-kbd-color: var(--md-surface);
-    --pico-tag-background-color: #e0e0e0;
-    --pico-tag-color: var(--md-on-surface);
+    --pico-primary: var(--app-primary);
+    --pico-primary-background: var(--app-primary);
+    --pico-primary-border: var(--app-primary);
+    --pico-primary-hover: var(--app-primary-hover);
+    --pico-primary-hover-background: var(--app-primary-hover);
+    --pico-primary-focus: rgba(31, 111, 235, 0.18);
+    --pico-primary-inverse: #ffffff;
+    --pico-background-color: var(--app-background);
+    --pico-card-background-color: var(--app-surface);
+    --pico-card-border-color: var(--app-border-soft);
+    --pico-card-box-shadow: var(--app-shadow-sm);
+    --pico-card-sectioning-background-color: var(--app-surface-muted);
+    --pico-form-element-background-color: var(--app-surface);
+    --pico-form-element-border-color: var(--app-border);
+    --pico-form-element-color: var(--app-text);
+    --pico-form-element-placeholder-color: var(--app-muted);
+    --pico-form-element-active-background-color: var(--app-surface);
+    --pico-form-element-active-border-color: var(--app-primary);
+    --pico-form-element-focus-color: var(--app-primary);
+    --pico-muted-color: var(--app-muted);
+    --pico-heading-color: var(--app-text);
+    --pico-del-color: var(--app-danger);
+    --pico-ins-color: var(--app-success);
+    --pico-table-border-color: var(--app-border-soft);
+    --pico-table-stripped-row-background-color: var(--app-surface-muted);
+    --pico-code-background-color: #eef2f7;
+    --pico-code-color: var(--app-text);
+
+    --app-footer-bg: #e0e0e0;
+    --app-footer-text: #424242;
+    --app-footer-heading: #212121;
+    --app-footer-border: rgba(0, 0, 0, 0.1);
 }
 
-/* ─── Material Elevation (classless on articles, sections, etc.) ─── */
+body {
+    background: var(--app-background);
+    color: var(--app-text);
+}
 
 article {
-    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
-    border: none;
-    transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--app-border-soft);
+    border-radius: var(--app-radius-md);
+    box-shadow: var(--app-shadow-sm);
+    transition: border-color var(--pico-transition), box-shadow var(--pico-transition), transform var(--pico-transition);
 }
 
 article:hover {
-    box-shadow: 0 5px 5px -3px rgba(0,0,0,0.2), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+    border-color: var(--app-border);
+    box-shadow: var(--app-shadow-md);
+    transform: translateY(-1px);
 }
 
-/* ─── Material Cards (keep article as elevated card) ─── */
-article {
-    background: var(--md-surface);
-    border-radius: var(--pico-border-radius);
-    padding: 1rem;
-}
-
-/* ─── Material Buttons ─── */
 button, [role=button], input[type=submit], input[type=reset], input[type=button] {
-    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.35rem;
     font-weight: 600;
-    font-size: 0.8125rem;
-    letter-spacing: 0.0892857143em;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
+    line-height: 1.2;
+    text-decoration: none;
+    border-radius: var(--app-radius-sm);
+    box-shadow: none;
+    transition: background-color var(--pico-transition), border-color var(--pico-transition), color var(--pico-transition), box-shadow var(--pico-transition), transform var(--pico-transition);
 }
 
-button:not(.outline):not(.secondary), [role=button]:not(.outline):not(.secondary) {
-    box-shadow: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+button:not(:disabled):hover, [role=button]:not(:disabled):hover, input[type=submit]:not(:disabled):hover {
+    transform: translateY(-1px);
 }
 
-button:not(.outline):not(.secondary):hover, [role=button]:not(.outline):not(.secondary):hover {
-    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+button.secondary, [role=button].secondary {
+    color: var(--app-text);
 }
 
 button.outline, [role=button].outline {
-    border-color: var(--md-border);
-    color: var(--md-primary);
+    border-color: var(--app-border);
+    color: var(--app-primary);
+    background-color: transparent;
 }
 
 button.outline:hover, [role=button].outline:hover {
-    background: rgba(25, 118, 210, 0.04);
-    border-color: var(--md-primary);
+    border-color: var(--app-primary);
+    background-color: rgba(31, 111, 235, 0.06);
+}
+
+button.danger, [role=button].danger {
+    --pico-primary: var(--app-danger);
+    --pico-primary-background: var(--app-danger);
+    --pico-primary-border: var(--app-danger);
+    --pico-primary-hover: #912018;
+    --pico-primary-hover-background: #912018;
 }
 
 button.danger.outline, [role=button].danger.outline {
-    border-color: var(--md-error);
-    color: var(--md-error);
+    border-color: color-mix(in srgb, var(--app-danger) 55%, white);
+    color: var(--app-danger);
 }
 
 button.danger.outline:hover, [role=button].danger.outline:hover {
-    background: rgba(211, 47, 47, 0.04);
-    border-color: var(--md-error);
+    border-color: var(--app-danger);
+    background-color: rgba(180, 35, 24, 0.06);
 }
 
-/* ─── Material Input Fields ─── */
 input, textarea, select {
-    max-width: 280px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    border-radius: 0.25rem;
-    border: 1px solid var(--md-border);
-    background: var(--md-surface);
-    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--app-radius-sm);
+    transition: border-color var(--pico-transition), box-shadow var(--pico-transition), background-color var(--pico-transition);
 }
 
 input:focus, textarea:focus, select:focus {
-    border-color: var(--md-primary);
-    box-shadow: none;
+    box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
 }
 
-input.filled, textarea.filled, select.filled {
-    background: #f5f5f5;
-    border: none;
-    border-bottom: 2px solid var(--md-border);
-    border-radius: 0.25rem 0.25rem 0 0;
-    padding: 0.75rem 0.75rem 0.5rem;
+label {
+    color: var(--app-text);
+    font-weight: 600;
 }
 
-input.filled:focus, textarea.filled:focus {
-    border-bottom-color: var(--md-primary);
-    background: #e8e8e8;
-}
-
-/* ─── Material Table ─── */
 table {
     width: 100%;
-    border-collapse: collapse;
-    border: 1px solid var(--md-border);
-    border-radius: var(--pico-border-radius);
     overflow: hidden;
+    border: 1px solid var(--app-border-soft);
+    border-radius: var(--app-radius-md);
+    background: var(--app-surface);
 }
 
 table th {
-    background: #fafafa;
-    font-weight: 600;
-    font-size: 0.8125rem;
+    background: var(--app-surface-muted);
+    color: var(--app-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--md-on-background);
+}
+
+table th, table td {
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--md-divider);
+    vertical-align: middle;
+    border-color: var(--app-border-soft);
 }
 
-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--md-divider);
-    font-size: 0.875rem;
-}
-
-table tr:last-child td {
-    border-bottom: none;
-}
-
-table tr:hover td {
-    background: #f5f5f5;
+table tbody tr:hover td,
+table tbody tr:hover th {
+    background: color-mix(in srgb, var(--app-primary) 4%, var(--app-surface));
 }
 
 table th.sortable {
@@ -374,27 +370,28 @@ th.sortable::after {
     height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-bottom: 5px solid #bdbdbd;
-    opacity: 0.4;
+    border-bottom: 5px solid var(--app-muted);
+    opacity: 0.35;
 }
 
 th.sortable.asc::after {
     border-bottom: none;
-    border-top: 5px solid var(--md-primary);
+    border-top: 5px solid var(--app-primary);
     opacity: 1;
 }
 
 th.sortable.desc::after {
     border-top: none;
-    border-bottom: 5px solid var(--md-primary);
+    border-bottom: 5px solid var(--app-primary);
     opacity: 1;
 }
 
 .table-wrap {
-    background: var(--md-surface);
-    border-radius: var(--pico-border-radius);
-    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
-    overflow: hidden;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border-soft);
+    border-radius: var(--app-radius-md);
+    box-shadow: var(--app-shadow-sm);
+    overflow: auto;
 }
 
 .table-toolbar {
@@ -404,41 +401,41 @@ th.sortable.desc::after {
     flex-wrap: wrap;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--md-divider);
+    border-bottom: 1px solid var(--app-border-soft);
 }
 
 .table-toolbar-left, .table-toolbar-right {
     display: flex;
     gap: 0.75rem;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .table-search input {
-    max-width: 240px;
+    max-width: 18rem;
 }
 
 .table-pagination {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    border-top: 1px solid var(--md-divider);
+    border-top: 1px solid var(--app-border-soft);
 }
 
 .pagination-btn {
-    min-width: 2.25rem;
-    height: 2.25rem;
+    width: 2.35rem;
+    min-width: 2.35rem;
+    height: 2.35rem;
     padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .pagination-info {
-    font-size: 0.8125rem;
-    color: var(--md-on-background);
     margin: 0 0.5rem;
+    color: var(--app-muted);
+    font-size: 0.85rem;
 }
 
 .table-fixed-header {
@@ -449,47 +446,61 @@ th.sortable.desc::after {
 .table-fixed-header thead th {
     position: sticky;
     top: 0;
-    background: #fafafa;
     z-index: 1;
 }
 
-/* ─── Material Navigation (Pico nav override) ─── */
-nav {
-    border-bottom: 1px solid var(--md-divider);
-    padding: 0.5rem 0;
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--app-background);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--app-border-soft);
+}
+
+.site-header nav {
     margin-bottom: 0;
+    padding: 0.05rem 0;
+    border-bottom: none;
+    background: transparent;
+    backdrop-filter: none;
 }
 
-nav ul li a {
-    font-weight: 500;
-    font-size: 0.875rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.25rem;
-    transition: background 0.2s;
+.site-header nav ul li a {
+    --pico-nav-link-spacing-vertical: 0.15rem;
+    border-radius: 999px;
+    color: var(--app-text);
+    font-weight: 600;
+    transition: background-color var(--pico-transition), color var(--pico-transition);
 }
 
-nav ul li a:hover {
-    background: rgba(0,0,0,0.04);
+.site-header nav ul li a:hover {
+    background: rgba(31, 111, 235, 0.08);
+    color: var(--app-primary);
+    text-decoration: none;
 }
 
-/* ─── Material Typography ─── */
-h1 { font-size: 2rem; font-weight: 400; letter-spacing: -0.0125em; }
-h2 { font-size: 1.5rem; font-weight: 400; letter-spacing: -0.0083em; }
-h3 { font-size: 1.25rem; font-weight: 500; letter-spacing: normal; }
-h4 { font-size: 1rem; font-weight: 500; letter-spacing: 0.00735em; }
-h5 { font-size: 0.875rem; font-weight: 500; letter-spacing: normal; }
-h6 { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.0125em; }
+.site-header nav ul li strong a {
+    color: var(--app-text);
+}
 
-/* ─── Material Chip (classless on small elements) ─── */
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -0.035em; }
+h2 { font-size: clamp(1.55rem, 3vw, 2.25rem); letter-spacing: -0.02em; }
+h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+h4 { font-size: 1.1rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
 small, .chip {
     display: inline-block;
-    background: #e0e0e0;
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
+    padding: 0.2rem 0.65rem;
+    border: 1px solid var(--app-border-soft);
+    border-radius: 999px;
+    background: var(--app-surface-muted);
+    color: var(--app-muted);
     font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.2;
-    color: var(--md-on-surface);
+    font-weight: 600;
+    line-height: 1.3;
 }
 
 small a, .chip a {
@@ -497,10 +508,169 @@ small a, .chip a {
     text-decoration: none;
 }
 
-/* ─── Material Divider ─── */
 hr {
     border: none;
     height: 1px;
-    background: var(--md-divider);
+    background: var(--app-border-soft);
     margin: 1rem 0;
+}
+
+@media (max-width: 575.98px) {
+    .table-toolbar {
+        align-items: stretch;
+    }
+
+    .table-toolbar-left,
+    .table-toolbar-right {
+        width: 100%;
+    }
+
+    .table-toolbar button,
+    .table-toolbar [role=button] {
+        flex: 1 1 auto;
+    }
+
+    table {
+        min-width: 42rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .site-main {
+        padding-block: 3rem 5rem;
+    }
+}
+/* Image picker */
+.image-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.image-picker-modal {
+    width: min(960px, 100%);
+    max-height: 90vh;
+    overflow: auto;
+    background: var(--pico-card-background-color);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.35);
+}
+
+.image-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+    max-height: 48vh;
+    overflow: auto;
+    margin: 1rem 0;
+}
+
+.image-picker-tile {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.4rem;
+    background: transparent;
+    border: 1px solid var(--app-border);
+    color: inherit;
+    text-align: left;
+}
+
+.image-picker-tile.selected {
+    border-color: var(--pico-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pico-primary) 30%, transparent);
+}
+
+.image-picker-tile img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 0.35rem;
+}
+
+.image-picker-tile span {
+    font-family: monospace;
+    font-size: 0.7rem;
+    word-break: break-all;
+}
+
+/* Footer */
+.site-footer {
+    background: var(--app-footer-bg);
+    color: var(--app-footer-text);
+    padding: 2.5rem 0 0;
+}
+
+.site-footer h4 {
+    color: var(--app-footer-heading);
+    font-size: 1rem;
+    margin: 0 0 0.75rem;
+}
+
+.site-footer a {
+    color: var(--app-footer-text);
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    color: var(--app-footer-heading);
+    text-decoration: underline;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2rem;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 0.4rem;
+}
+
+.footer-connect-list li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.footer-about p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--app-footer-text);
+    margin: 0;
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--app-footer-border);
+    margin-top: 2.5rem;
+    padding: 1rem 0;
+}
+
+.footer-bottom p {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--app-footer-text);
+    margin: 0;
+}
+
+.footer-heart {
+    color: #e11d48;
+}
+
+@media (max-width: 767.98px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
 }
