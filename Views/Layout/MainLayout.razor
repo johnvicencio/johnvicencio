@@ -76,6 +76,18 @@
     protected override async Task OnInitializedAsync()
     {
         await Session.TryRestoreAsync(Js);
+
+        if (!Session.IsLoggedIn)
+        {
+            var path = new Uri(Nav.Uri).AbsolutePath;
+            if (!path.Equals("/login", StringComparison.OrdinalIgnoreCase))
+                Session.ReturnUrl = Nav.Uri;
+        }
+        else
+        {
+            Session.ReturnUrl = null;
+        }
+
         Pages.PagesChanged += OnPagesChanged;
         Site.SettingsChanged += OnSettingsChanged;
         await LoadNavAsync();
