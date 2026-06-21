@@ -26,6 +26,8 @@ public sealed class SiteSetting
 
     public string ToEmail { get; set; } = "";
 
+    public bool MaintenanceMode { get; set; }
+
     // Partials
     public List<CustomNavLink> NavLinks { get; set; } = [];
     public string FooterAboutHeader { get; set; } = "";

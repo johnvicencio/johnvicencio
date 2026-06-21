@@ -44,6 +44,16 @@
                 </label>
             </div>
 
+            <div style="margin-top:0.5rem">
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+                    <input type="checkbox" role="switch" @bind="settings.MaintenanceMode" />
+                    Maintenance Mode
+                </label>
+                <p style="font-size:0.9rem;color:var(--app-muted);margin:0.25rem 0 0 1.8rem">
+                    When enabled, the homepage shows "Under Maintenance" instead of normal content.
+                </p>
+            </div>
+
             <hr />
 
             <h3>Email / SMTP</h3>
