@@ -36,12 +36,11 @@
             <div class="table-wrap"><table>
                 <thead>
                     <tr>
-                        <th>Status</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Message</th>
                         <th>Submitted</th>
-                        <th>Actions</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,11 +48,10 @@
                     {
                         var snippet = GetSnippet(message);
                         <tr>
-                            <td>@(message.IsRead ? "Read" : "New")</td>
-                            <td><strong>@message.Name</strong></td>
-                            <td>@message.Email</td>
+                            <td style="white-space:nowrap"><strong>@message.Name</strong></td>
+                            <td style="font-size:0.85rem">@message.Email</td>
                             <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.85rem;color:var(--app-muted)">@snippet</td>
-                            <td style="white-space:nowrap">@FormatDate(message.SubmittedUtc)</td>
+                            <td style="white-space:nowrap;font-size:0.8rem">@FormatDate(message.SubmittedUtc)</td>
                             <td>
                                 <button class="outline" title="Open Message" aria-label="Open Message" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/messages/{message.Id}")'><i class="site-icon" data-lucide="@(message.IsRead ? "mail-open" : "mail")"></i></button>
                             </td>
@@ -148,6 +146,6 @@
     private static string FormatDate(DateTimeOffset dto)
     {
         var local = dto.ToLocalTime();
-        return local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt").ToLowerInvariant();
+        return (local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt")).ToLowerInvariant();
     }
 }
