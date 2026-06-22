@@ -1,6 +1,6 @@
 import { getStore } from "@netlify/blobs";
 
-const allowedNames = new Set(["pages", "posts", "settings"]);
+const allowedNames = new Set(["pages", "posts", "settings", "messages", "contact-rate-limits"]);
 
 export default async (request: Request) => {
   if (request.method === "OPTIONS") return empty(204);
