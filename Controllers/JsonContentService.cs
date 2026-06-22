@@ -13,6 +13,13 @@ public sealed class JsonContentService
 
     public async Task<T?> ReadAsync<T>(string path)
     {
-        return await httpClient.GetFromJsonAsync<T>(path);
+        try
+        {
+            return await httpClient.GetFromJsonAsync<T>(path);
+        }
+        catch
+        {
+            return default;
+        }
     }
 }

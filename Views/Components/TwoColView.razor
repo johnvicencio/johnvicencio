@@ -1,7 +1,14 @@
-<section class="grid-section">
+<section id="@Section.AnchorId" class="grid-section">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
-        <h2>@Section.Heading</h2>
+        @if (HeadingLevel == 1)
+        {
+            <h1>@Section.Heading</h1>
+        }
+        else
+        {
+            <h2>@Section.Heading</h2>
+        }
     }
     <div class="grid" style="grid-template-columns:1fr 1fr;gap:1.5rem">
         @for (var ci = 0; ci < Math.Min(Section.Columns.Count, 2); ci++)
@@ -18,7 +25,13 @@
                 }
                 @if (!string.IsNullOrWhiteSpace(col.ActionText) && !string.IsNullOrWhiteSpace(col.ActionUrl))
                 {
-                    <a href="@col.ActionUrl" role="button" class="outline">@col.ActionText</a>
+                    <a href="@col.ActionUrl" role="button" class="outline">
+                        @if (!string.IsNullOrWhiteSpace(col.ActionIcon))
+                        {
+                            <i class="site-icon" data-lucide="@col.ActionIcon"></i>
+                        }
+                        @col.ActionText
+                    </a>
                 }
             </div>
         }
@@ -28,4 +41,7 @@
 @code {
     [Parameter]
     public PageSection Section { get; set; } = new();
+
+    [Parameter]
+    public int HeadingLevel { get; set; } = 2;
 }

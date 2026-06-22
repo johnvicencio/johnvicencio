@@ -1,3 +1,4 @@
+using System.Text.Json;
 using johnvicencio.Models;
 
 namespace johnvicencio.Controllers;
@@ -5,11 +6,13 @@ namespace johnvicencio.Controllers;
 public sealed class VaultController
 {
     private readonly JsonContentService jsonContent;
+    private readonly DataStore store;
     private readonly VaultCryptoService crypto;
 
-    public VaultController(JsonContentService jsonContent, VaultCryptoService crypto)
+    public VaultController(JsonContentService jsonContent, DataStore store, VaultCryptoService crypto)
     {
         this.jsonContent = jsonContent;
+        this.store = store;
         this.crypto = crypto;
     }
 
@@ -21,7 +24,8 @@ public sealed class VaultController
             return VaultLoginResult.Fail("Enter a username.");
         }
 
-        var vault = await jsonContent.ReadAsync<UserVault>($"data/users/{safeUsername}.json");
+        var vault = await store.LoadSingleAsync<UserVault>($"users/{safeUsername}");
+        vault ??= await jsonContent.ReadAsync<UserVault>($"data/users/{safeUsername}.json");
         if (vault is null)
         {
             return VaultLoginResult.Fail("Vault not found.");
@@ -35,6 +39,68 @@ public sealed class VaultController
         catch
         {
             return VaultLoginResult.Fail("Vault could not be unlocked.");
+        }
+    }
+
+    public async Task<VaultChangePasswordResult> ChangePasswordAsync(
+        string currentPassphrase, string newPassphrase)
+    {
+        var loginResult = await LoginAsync("admin", currentPassphrase);
+        if (!loginResult.Unlocked || loginResult.Vault is null || loginResult.Payload is null)
+        {
+            return VaultChangePasswordResult.Fail("Current password is incorrect.");
+        }
+
+        try
+        {
+            var (salt, iv, cipherText, tag, iterations) =
+                await crypto.EncryptAsync(loginResult.Payload, newPassphrase);
+
+            var vault = loginResult.Vault;
+            vault.Salt = salt;
+            vault.Iv = iv;
+            vault.CipherText = cipherText;
+            vault.Tag = tag;
+            vault.Iterations = iterations;
+
+            await store.SaveAsync(vault, "users/admin");
+            return VaultChangePasswordResult.Ok("Password changed successfully.");
+        }
+        catch
+        {
+            return VaultChangePasswordResult.Fail("Could not change password. Try again.");
+        }
+    }
+
+    public async Task<VaultChangePasswordResult> GenerateResetVaultAsync(string newPassphrase)
+    {
+        var payload = JsonSerializer.Serialize(new { username = "admin", role = "admin" });
+
+        try
+        {
+            var (salt, iv, cipherText, tag, iterations) =
+                await crypto.EncryptAsync(payload, newPassphrase);
+
+            var vault = new UserVault
+            {
+                Username = "admin",
+                DisplayName = "Admin",
+                Algorithm = "AES-GCM",
+                Kdf = "PBKDF2-HMAC-SHA256",
+                Iterations = iterations,
+                Salt = salt,
+                Iv = iv,
+                CipherText = cipherText,
+                Tag = tag,
+                CreatedUtc = DateTimeOffset.UtcNow
+            };
+
+            await store.SaveAsync(vault, "users/admin");
+            return VaultChangePasswordResult.Ok("Password reset successfully.");
+        }
+        catch
+        {
+            return VaultChangePasswordResult.Fail("Could not reset password. Try again.");
         }
     }
 
@@ -73,5 +139,28 @@ public sealed class VaultLoginResult
     public static VaultLoginResult Fail(string message)
     {
         return new VaultLoginResult(false, message, null, null);
+    }
+}
+
+public sealed class VaultChangePasswordResult
+{
+    private VaultChangePasswordResult(bool success, string message)
+    {
+        Success = success;
+        Message = message;
+    }
+
+    public bool Success { get; }
+
+    public string Message { get; }
+
+    public static VaultChangePasswordResult Ok(string message)
+    {
+        return new VaultChangePasswordResult(true, message);
+    }
+
+    public static VaultChangePasswordResult Fail(string message)
+    {
+        return new VaultChangePasswordResult(false, message);
     }
 }

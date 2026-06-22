@@ -1,18 +1,23 @@
 @page "/blog/{Slug}"
 @inject BlogController Blog
+@inject IJSRuntime Js
 
 @if (post is null)
 {
-    <PageTitle>Post not found</PageTitle>
+    <PageTitle>Post not found — John Vicencio</PageTitle>
     <p>Post not found.</p>
 }
 else
 {
-    <PageTitle>@post.Title</PageTitle>
+    <PageTitle>@post.Title — John Vicencio</PageTitle>
     <article>
         <h1>@post.Title</h1>
         <p><time>@post.PublishedOn.ToString("MMMM d, yyyy")</time></p>
-        <p>@post.Content</p>
+        @if (!string.IsNullOrWhiteSpace(post.ImageUrl))
+        {
+            <img src="@post.ImageUrl" alt="@post.Title" style="width:100%;max-height:420px;object-fit:cover;border-radius:0.75rem" />
+        }
+        <div class="content-body">@((MarkupString)post.Content)</div>
     </article>
 }
 
@@ -25,5 +30,20 @@ else
     protected override async Task OnParametersSetAsync()
     {
         post = await Blog.GetPostAsync(Slug);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (post is not null)
+        {
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = $"{post.Title} — John Vicencio",
+                description = (post.Summary ?? post.Content ?? "").Length > 160
+                    ? (post.Summary ?? post.Content ?? "")[..157] + "..."
+                    : (post.Summary ?? post.Content ?? ""),
+                image = string.IsNullOrWhiteSpace(post.ImageUrl) ? null : $"https://johnvicencio.com{post.ImageUrl}"
+            });
+        }
     }
 }

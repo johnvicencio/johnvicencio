@@ -3,13 +3,13 @@
 @inject NavigationManager Nav
 @inject BlogController Blog
 
-<PageTitle>Admin — Delete Post</PageTitle>
+<PageTitle>@deleteTitle</PageTitle>
 
 <div class="login-page" style="width:100%">
 
-    <article style="width:100%;max-width:960px;margin:0 auto">
+    <article style="width:100%;max-width:1200px;margin:0 auto">
         <div class="table-toolbar">
-            <h2 style="margin:0">Delete Post</h2>
+            <h2 style="margin:0">@deleteTitle</h2>
             <div>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
             </div>
@@ -45,6 +45,8 @@
     private bool loading = true;
     private bool deleting;
     private johnvicencio.Models.BlogPost? post;
+
+    private string deleteTitle => $"Delete {post?.Title ?? "Post"} Post";
 
     protected override async Task OnInitializedAsync()
     {

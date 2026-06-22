@@ -35,4 +35,27 @@ public sealed class VaultCryptoService
             vault.Iterations,
             passphrase);
     }
+
+    public async Task<(string Salt, string Iv, string CipherText, string Tag, int Iterations)> EncryptAsync(
+        string payload, string passphrase)
+    {
+        if (string.IsNullOrWhiteSpace(passphrase) || passphrase.Length < MinimumPassphraseLength)
+        {
+            throw new InvalidOperationException($"Passphrase must be at least {MinimumPassphraseLength} characters.");
+        }
+
+        var result = await jsRuntime.InvokeAsync<EncryptResult>(
+            "johnvicencioVault.encrypt", payload, passphrase);
+
+        return (result.Salt, result.Iv, result.CipherText, result.Tag, result.Iterations);
+    }
+
+    private sealed class EncryptResult
+    {
+        public string Salt { get; set; } = "";
+        public string Iv { get; set; } = "";
+        public string CipherText { get; set; } = "";
+        public string Tag { get; set; } = "";
+        public int Iterations { get; set; }
+    }
 }

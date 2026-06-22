@@ -15,6 +15,8 @@ public sealed class VaultSessionService
 
     public string? Payload { get; private set; }
 
+    public string? ReturnUrl { get; set; }
+
     public void SignIn(UserVault vault, string payload)
     {
         Vault = vault;

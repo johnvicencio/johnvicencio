@@ -3,12 +3,14 @@
 @inject NavigationManager Nav
 @inject SiteController Site
 @inject IJSRuntime Js
+@inject DataStore Store
+@inject JsonContentService JsonContent
 
-<PageTitle>Admin — Settings</PageTitle>
+<PageTitle>Settings</PageTitle>
 
 <div class="login-page" style="width:100%">
 
-    <article style="width:100%;max-width:960px;margin:0 auto">
+    <article style="width:100%;max-width:1200px;margin:0 auto">
         <div class="table-toolbar">
             <h2 style="margin:0">Settings</h2>
             <div>
@@ -23,6 +25,11 @@
         else
         {
             <h3>General</h3>
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <p role="alert" class="form-alert form-alert-success">@message</p>
+            }
 
             <div class="grid" style="grid-template-columns:1fr 1fr">
                 <label>Site Name
@@ -42,9 +49,20 @@
                 </label>
             </div>
 
+            <div style="margin-top:0.5rem">
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+                    <input type="checkbox" role="switch" @bind="settings.MaintenanceMode" />
+                    Maintenance Mode
+                </label>
+                <p style="font-size:0.9rem;color:var(--app-muted);margin:0.25rem 0 0 1.8rem">
+                    When enabled, the homepage shows "Under Maintenance" instead of normal content.
+                </p>
+            </div>
+
             <hr />
 
             <h3>Email / SMTP</h3>
+            <p style="font-size:0.9rem">Google app passwords are encrypted by the Netlify Function before saving to Blobs. Set <code>SETTINGS_ENCRYPTION_KEY</code> in Netlify first.</p>
 
             <div class="grid" style="grid-template-columns:1fr 1fr">
                 <label>SMTP Host
@@ -59,10 +77,18 @@
                 <label>SMTP Username
                     <input @bind="settings.SmtpUsername" />
                 </label>
-                <label>SMTP Password
-                    <input type="password" @bind="settings.SmtpPassword" />
+                <label>Google App Password
+                    <input type="password" @bind="settings.SmtpPassword" placeholder="Leave blank to keep existing password" />
                 </label>
             </div>
+            @if (settings.SmtpPasswordConfigured)
+            {
+                <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="lock-keyhole"></i>Encrypted app password is saved in Netlify Blobs.</p>
+            }
+            else
+            {
+                <p class="pagination-info"><i class="site-icon" data-lucide="circle-alert"></i>No Google app password is saved yet.</p>
+            }
 
             <div class="grid" style="grid-template-columns:1fr 1fr">
                 <label>From Email
@@ -80,11 +106,6 @@
             <hr />
             <button @onclick="SaveSettings" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Settings</button>
 
-            @if (!string.IsNullOrWhiteSpace(message))
-            {
-                <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-            }
-
             <hr />
 
             <h3>Netlify Content Writes</h3>
@@ -94,8 +115,36 @@
             <button @onclick="SaveContentTokenAsync"><i class="site-icon" data-lucide="key-round"></i>Save Token</button>
             @if (tokenSaved)
             {
-                <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
+                <p role="alert" class="form-alert form-alert-success"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
             }
+
+            <hr />
+
+            <h3>Admin Vault</h3>
+            @if (!string.IsNullOrWhiteSpace(vaultMessage))
+            {
+                <p role="alert" class="form-alert form-alert-success">@vaultMessage</p>
+            }
+            <p>Seed the encrypted admin vault into Netlify Blobs as <code>users/admin.json</code>. This stores the encrypted login vault, not the plain password.</p>
+            @if (checkingVault)
+            {
+                <p class="pagination-info"><i class="site-icon" data-lucide="loader"></i>Checking admin vault status...</p>
+            }
+            else if (adminVaultSeeded)
+            {
+                <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="check-circle"></i>Seeded: Admin Vault exists in Netlify Blobs.</p>
+            }
+            else
+            {
+                <p class="pagination-info"><i class="site-icon" data-lucide="circle-alert"></i>Not seeded yet: Admin Vault was not found in Netlify Blobs.</p>
+            }
+            <button class="outline" @onclick="SeedAdminVaultAsync" aria-busy="@seedingVault"><i class="site-icon" data-lucide="database"></i>Seed Admin Vault</button>
+
+            <hr />
+
+            <h3>Account</h3>
+            <p>Change your admin login password.</p>
+            <button class="outline" @onclick='() => Nav.NavigateTo("/admin/change-password")'><i class="site-icon" data-lucide="key-round"></i>Change Password</button>
         }
     </article>
 
@@ -108,6 +157,10 @@
     private SiteSetting settings = new();
     private string contentToken = string.Empty;
     private bool tokenSaved;
+    private bool seedingVault;
+    private bool checkingVault;
+    private bool adminVaultSeeded;
+    private string vaultMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,11 +171,14 @@
         }
 
         settings = await Site.GetSettingsAsync();
+        await CheckAdminVaultAsync();
         loading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+
         if (!firstRender) return;
 
         contentToken = await Js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token") ?? string.Empty;
@@ -136,8 +192,19 @@
         message = "";
         try
         {
+            var savedNewPassword = !string.IsNullOrWhiteSpace(settings.SmtpPassword);
             await Site.UpdateSettingsAsync(settings);
+            if (savedNewPassword)
+            {
+                settings.SmtpPassword = "";
+                settings.SmtpPasswordConfigured = true;
+            }
+
             message = "Settings saved.";
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
         }
         finally
         {
@@ -149,5 +216,47 @@
     {
         await Js.InvokeVoidAsync("window.localStorage.setItem", "jv_content_token", contentToken);
         tokenSaved = !string.IsNullOrWhiteSpace(contentToken);
+    }
+
+    private async Task SeedAdminVaultAsync()
+    {
+        seedingVault = true;
+        vaultMessage = "";
+
+        try
+        {
+            var adminVault = await JsonContent.ReadAsync<johnvicencio.Models.UserVault>("data/users/admin.json");
+            if (adminVault is null)
+            {
+                vaultMessage = "Local admin vault was not found.";
+                return;
+            }
+
+            await Store.SaveAsync(adminVault, "users/admin");
+            adminVaultSeeded = true;
+            vaultMessage = "Admin vault saved to Netlify Blobs.";
+        }
+        catch (Exception ex)
+        {
+            vaultMessage = ex.Message;
+        }
+        finally
+        {
+            seedingVault = false;
+        }
+    }
+
+    private async Task CheckAdminVaultAsync()
+    {
+        checkingVault = true;
+        try
+        {
+            var adminVault = await Store.LoadSingleAsync<johnvicencio.Models.UserVault>("users/admin");
+            adminVaultSeeded = adminVault is not null;
+        }
+        finally
+        {
+            checkingVault = false;
+        }
     }
 }

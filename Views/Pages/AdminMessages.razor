@@ -1,0 +1,151 @@
+@page "/admin/messages"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject ContactMessageController Messages
+@inject IJSRuntime Js
+
+<PageTitle>Messages</PageTitle>
+
+<div class="login-page" style="width:100%">
+    <article style="width:100%;max-width:1200px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Messages</h2>
+            <div>
+                <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+            </div>
+        </div>
+
+        <div style="margin-bottom:0.75rem">
+            <input value="@search" @oninput="OnSearchInput" placeholder="Search name, email, or message..." />
+        </div>
+
+        @if (loading)
+        {
+            <p class="pagination-info" style="text-align:center">Loading...</p>
+        }
+        else if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <p class="pagination-info" style="padding:1rem;color:var(--pico-del-color)">@errorMessage</p>
+        }
+        else if (filteredList.Count == 0)
+        {
+            <p class="pagination-info" style="padding:1rem;text-align:center">@(string.IsNullOrWhiteSpace(search) ? "No messages yet." : "No messages match your search.")</p>
+        }
+        else
+        {
+            <div class="table-wrap"><table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                        <th>Submitted</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var message in filteredList)
+                    {
+                        var snippet = GetSnippet(message);
+                        <tr>
+                            <td style="white-space:nowrap"><strong>@message.Name</strong></td>
+                            <td style="font-size:0.85rem">@message.Email</td>
+                            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.85rem;color:var(--app-muted)">@snippet</td>
+                            <td style="white-space:nowrap;font-size:0.8rem">@FormatDate(message.SubmittedUtc)</td>
+                            <td>
+                                <button class="outline" title="Open Message" aria-label="Open Message" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/messages/{message.Id}")'><i class="site-icon" data-lucide="@(message.IsRead ? "mail-open" : "mail")"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table></div>
+        }
+    </article>
+</div>
+
+@code {
+    private bool loading = true;
+    private string errorMessage = "";
+    private List<ContactMessage> messageList = [];
+    private List<ContactMessage> filteredList = [];
+    private string search = "";
+    private string searchQuery = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        try
+        {
+            messageList = await Messages.GetMessagesAsync();
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        search = e.Value?.ToString() ?? "";
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            searchQuery = "";
+            filteredList = [..messageList];
+        }
+        else
+        {
+            searchQuery = search.Trim();
+            var q = searchQuery.ToLowerInvariant();
+            filteredList = messageList
+                .Where(m =>
+                    m.Name.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    m.Email.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    m.Message.Contains(q, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
+    private string GetSnippet(ContactMessage message)
+    {
+        var text = message.Message.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            var idx = text.IndexOf(searchQuery, StringComparison.OrdinalIgnoreCase);
+            if (idx >= 0)
+            {
+                var start = Math.Max(0, idx - 20);
+                var len = Math.Min(searchQuery.Length + 40, text.Length - start);
+                var snippet = (start > 0 ? "..." : "") + text.Substring(start, len) + (start + len < text.Length ? "..." : "");
+                return snippet;
+            }
+        }
+        if (text.Length <= 60) return text;
+        return text[..57] + "...";
+    }
+
+    private static string FormatDate(DateTimeOffset dto)
+    {
+        var local = dto.ToLocalTime();
+        return (local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt")).ToLowerInvariant();
+    }
+}

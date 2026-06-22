@@ -1,51 +1,155 @@
-<section class="contact-section">
+@inject HttpClient Http
+
+<section id="@Section.AnchorId" class="contact-section">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
-        <h2>@Section.Heading</h2>
+        @if (HeadingLevel == 1)
+        {
+            <h1>@Section.Heading</h1>
+        }
+        else
+        {
+            <h2>@Section.Heading</h2>
+        }
     }
     @if (!string.IsNullOrWhiteSpace(Section.Body))
     {
         <p>@((MarkupString)Section.Body)</p>
     }
 
-    <form class="contact-form" @onsubmit="HandleSubmit">
-        <label>Name
-            <input @bind="contactName" placeholder="Your name" />
-        </label>
-        <label>Email
-            <input type="email" @bind="contactEmail" placeholder="your@email.com" />
-        </label>
-        <label>Message
-            <textarea @bind="contactMessage" rows="4" placeholder="Your message..."></textarea>
-        </label>
-        <button type="submit" aria-busy="@sending">Send Message</button>
-    </form>
-
     @if (!string.IsNullOrWhiteSpace(statusMessage))
     {
-        <p class="pagination-info">@statusMessage</p>
+        <p role="alert" class="form-alert @ContactAlertClass">@statusMessage</p>
     }
+
+    <form class="contact-form" @onsubmit="HandleSubmit" @onsubmit:preventDefault @onkeydown="TrackKeyboard" @onpaste="TrackPaste" @oninput="TrackInput">
+        <label style="position:absolute;left:-10000px" aria-hidden="true">Website
+            <input tabindex="-1" autocomplete="off" @bind="website" />
+        </label>
+        <input @bind="contactName" aria-label="Your name" placeholder="Your name" />
+        <input type="email" @bind="contactEmail" aria-label="Your email" placeholder="your@email.com" />
+        <textarea @bind="contactMessage" rows="4" aria-label="Your message" placeholder="Your message..."></textarea>
+        <label class="contact-consent">
+            <input type="checkbox" @bind="consentAccepted" />
+            <span>I agree to the <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+        </label>
+        <div class="contact-actions">
+            <button type="submit" aria-busy="@sending">Send Message</button>
+        </div>
+    </form>
+
 </section>
 
 @code {
     [Parameter]
     public PageSection Section { get; set; } = new();
 
+    [Parameter]
+    public int HeadingLevel { get; set; } = 2;
+
     private string contactName = "";
     private string contactEmail = "";
     private string contactMessage = "";
+    private string website = "";
+    private bool consentAccepted;
+    private DateTime formStartedUtc = DateTime.UtcNow;
+    private int keyboardEvents;
+    private int pasteEvents;
+    private int inputEvents;
     private bool sending;
     private string statusMessage = "";
 
+    private string ContactAlertClass => statusMessage.StartsWith("Message sent", StringComparison.OrdinalIgnoreCase)
+        ? "form-alert-success"
+        : "form-alert-danger";
+
     private async Task HandleSubmit()
     {
+        if (string.IsNullOrWhiteSpace(contactName) || string.IsNullOrWhiteSpace(contactEmail) || string.IsNullOrWhiteSpace(contactMessage))
+        {
+            statusMessage = "Please complete name, email, and message.";
+            return;
+        }
+
+        if (!consentAccepted)
+        {
+            statusMessage = "Please agree to the terms and privacy policy.";
+            return;
+        }
+
         sending = true;
         statusMessage = "";
-        await Task.Delay(500);
-        statusMessage = "Message sent (demo).";
-        contactName = "";
-        contactEmail = "";
-        contactMessage = "";
-        sending = false;
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/.netlify/functions/contact", new
+            {
+                name = contactName,
+                email = contactEmail,
+                message = contactMessage,
+                website,
+                consentAccepted,
+                interaction = new
+                {
+                    elapsedMs = (int)Math.Max(0, (DateTime.UtcNow - formStartedUtc).TotalMilliseconds),
+                    keyboardEvents,
+                    pasteEvents,
+                    inputEvents
+                }
+            });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                statusMessage = $"Could not send message: {(int)response.StatusCode} {response.ReasonPhrase}. {error}";
+                return;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<ContactSubmitResult>();
+            statusMessage = result?.EmailSent == true
+                ? "Message sent."
+                : "Message saved. Email notification was not sent; check SMTP settings.";
+            contactName = "";
+            contactEmail = "";
+            contactMessage = "";
+            website = "";
+            consentAccepted = false;
+            ResetInteractionTracking();
+        }
+        catch (Exception ex)
+        {
+            statusMessage = ex.Message;
+        }
+        finally
+        {
+            sending = false;
+        }
+    }
+
+    private sealed class ContactSubmitResult
+    {
+        public bool EmailSent { get; set; }
+    }
+
+    private void TrackKeyboard()
+    {
+        keyboardEvents++;
+    }
+
+    private void TrackPaste()
+    {
+        pasteEvents++;
+    }
+
+    private void TrackInput()
+    {
+        inputEvents++;
+    }
+
+    private void ResetInteractionTracking()
+    {
+        formStartedUtc = DateTime.UtcNow;
+        keyboardEvents = 0;
+        pasteEvents = 0;
+        inputEvents = 0;
     }
 }

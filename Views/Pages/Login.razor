@@ -4,11 +4,16 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime Js
 
-<PageTitle>Login</PageTitle>
+<PageTitle>Login — John Vicencio</PageTitle>
 
 <div class="login-page">
 <h1>Login</h1>
 <p>Type your username and password:</p>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <p role="alert" class="form-alert form-alert-danger">@message</p>
+}
 
 <EditForm Model="loginForm" OnValidSubmit="UnlockVaultAsync" class="login-form">
     <DataAnnotationsValidator />
@@ -18,13 +23,12 @@
     <InputText type="password" @bind-Value="loginForm.Passphrase" placeholder="Password" autocomplete="current-password" />
 
     <button type="submit" aria-busy="@isBusy">Submit</button>
+
+    <p style="margin-top:1rem;text-align:center;font-size:0.85rem">
+        <a href="/admin/reset-password">Forgot your password?</a>
+    </p>
 </EditForm>
 </div>
-
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <p>@message</p>
-}
 
 @code {
     private readonly LoginForm loginForm = new();
@@ -32,10 +36,12 @@
     private string message = string.Empty;
     private VaultLoginResult? result;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await Session.TryRestoreAsync(Js);
+
         if (Session.IsLoggedIn)
-            Navigation.NavigateTo("/admin", replace: true);
+            Navigation.NavigateTo(Session.ReturnUrl ?? "/admin", replace: true);
     }
 
     private async Task UnlockVaultAsync()
@@ -52,11 +58,17 @@
             {
                 Session.SignIn(result.Vault, result.Payload);
                 await Session.PersistAsync(Js);
-                Navigation.NavigateTo("/admin", replace: true);
+                var redirect = Session.ReturnUrl ?? "/admin";
+                Session.ReturnUrl = null;
+                Navigation.NavigateTo(redirect, replace: true);
                 return;
             }
 
             message = result.Message;
+        }
+        catch
+        {
+            message = "Login could not be completed. Check the username and password, then try again.";
         }
         finally
         {

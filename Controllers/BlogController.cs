@@ -29,23 +29,34 @@ public sealed class BlogController
     public async Task AddPostAsync(BlogPost post)
     {
         var all = await GetPostsAsync();
-        all.Add(post);
-        await store.SaveAsync(all, ContentName);
+        if (all.Any(p => p.Slug.Equals(post.Slug, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException($"A post with slug '{post.Slug}' already exists.");
+
+        var updated = new List<BlogPost>(all) { post };
+        await store.SaveAsync(updated, ContentName);
+        posts = updated;
     }
 
     public async Task UpdatePostAsync(BlogPost post)
     {
         var all = await GetPostsAsync();
-        var index = all.FindIndex(p => p.Id == post.Id);
+        if (all.Any(p => p.Id != post.Id && p.Slug.Equals(post.Slug, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException($"A post with slug '{post.Slug}' already exists.");
+
+        var updated = new List<BlogPost>(all);
+        var index = updated.FindIndex(p => p.Id == post.Id);
         if (index >= 0)
-            all[index] = post;
-        await store.SaveAsync(all, ContentName);
+            updated[index] = post;
+        await store.SaveAsync(updated, ContentName);
+        posts = updated;
     }
 
     public async Task DeletePostAsync(string postId)
     {
         var all = await GetPostsAsync();
-        all.RemoveAll(p => p.Id == postId);
-        await store.SaveAsync(all, ContentName);
+        var updated = new List<BlogPost>(all);
+        updated.RemoveAll(p => p.Id == postId);
+        await store.SaveAsync(updated, ContentName);
+        posts = updated;
     }
 }

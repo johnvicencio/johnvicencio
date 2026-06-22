@@ -3,7 +3,9 @@
 @inject NavigationManager Nav
 @inject PageController Pages
 @inject BlogController Blog
+@inject ContactMessageController Messages
 @inject DataStore Store
+@inject IJSRuntime Js
 
 <PageTitle>Admin</PageTitle>
 
@@ -17,9 +19,9 @@ else
 {
     <h1>Admin Dashboard</h1>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:960px;margin:0 auto;width:100%">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:1200px;margin:0 auto;width:100%">
 
-        <article style="margin:0">
+        <article class="admin-card">
             <h3>Pages</h3>
             <p class="pagination-info" style="margin:0.25rem 0">
                 @totalPages page(s)
@@ -28,28 +30,60 @@ else
                 @totalSections section(s)
             </p>
             <hr />
-            <button class="outline" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="settings"></i>Manage</button>
+            <button class="outline" title="Manage Pages" aria-label="Manage Pages" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="sliders-horizontal"></i></button>
         </article>
 
-        <article style="margin:0">
+        <article class="admin-card">
             <h3>Blog</h3>
             <p class="pagination-info" style="margin:0.25rem 0">
                 @totalPosts post(s)
             </p>
             <hr />
-            <button class="outline" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="settings"></i>Manage</button>
+            <button class="outline" title="Manage Blog" aria-label="Manage Blog" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="book-open"></i></button>
         </article>
 
-        <article style="margin:0">
+        <article class="admin-card">
+            <h3>Messages</h3>
+            @if (!string.IsNullOrWhiteSpace(messageError))
+            {
+                <p class="pagination-info" style="margin:0.25rem 0;color:var(--pico-del-color)">Counts unavailable</p>
+            }
+            else
+            {
+                <p class="pagination-info" style="margin:0.25rem 0">
+                    @totalMessages total
+                </p>
+                <p class="pagination-info" style="margin:0.25rem 0">
+                    @newMessages new
+                </p>
+            }
+            <hr />
+            <button class="outline" title="Manage Messages" aria-label="Manage Messages" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="inbox"></i></button>
+        </article>
+
+        <article class="admin-card">
+            <h3>Images</h3>
+            <p class="pagination-info" style="margin:0.25rem 0">Upload and reuse media</p>
+            <hr />
+            <button class="outline" title="Manage Images" aria-label="Manage Images" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/images")'><i class="site-icon" data-lucide="image"></i></button>
+        </article>
+
+        <article class="admin-card">
+            <h3>Partials</h3>
+            <p class="pagination-info" style="margin:0.25rem 0">Nav links, footer, connect</p>
+            <hr />
+            <button class="outline" title="Manage Partials" aria-label="Manage Partials" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="puzzle"></i></button>
+        </article>
+
+        <article class="admin-card">
             <h3>Settings</h3>
             <p class="pagination-info" style="margin:0.25rem 0">—</p>
             <hr />
-            <button class="outline" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/settings")'><i class="site-icon" data-lucide="settings"></i>Manage</button>
+            <button class="outline" title="Manage Settings" aria-label="Manage Settings" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/settings")'><i class="site-icon" data-lucide="settings"></i></button>
         </article>
 
     </div>
 }
-
 </div>
 
 @code {
@@ -57,6 +91,9 @@ else
     private int totalPages;
     private int totalSections;
     private int totalPosts;
+    private int totalMessages;
+    private int newMessages;
+    private string messageError = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,11 +110,27 @@ else
             totalPages = pageList.Count;
             totalSections = pageList.Sum(p => p.Sections.Count);
             totalPosts = postList.Count;
+
+            try
+            {
+                var messageList = await Messages.GetMessagesAsync();
+                totalMessages = messageList.Count;
+                newMessages = messageList.Count(m => !m.IsRead);
+            }
+            catch (Exception ex)
+            {
+                messageError = ex.Message;
+            }
         }
         finally
         {
             loading = false;
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
     }
 
 }

@@ -1,8 +1,9 @@
 @page "/blog"
 @inject BlogController BlogController
 @inject RouterController Router
+@inject IJSRuntime Js
 
-<PageTitle>Blog</PageTitle>
+<PageTitle>Blog — John Vicencio</PageTitle>
 
 <h1>Blog</h1>
 
@@ -13,21 +14,74 @@
 else
 {
     <section class="post-list">
-        @foreach (var post in posts)
+        @foreach (var post in PagedPosts)
         {
             <article>
+                @if (!string.IsNullOrWhiteSpace(post.ImageUrl))
+                {
+                    <img src="@post.ImageUrl" alt="@post.Title" style="width:100%;max-height:240px;object-fit:cover;border-radius:0.5rem" />
+                }
                 <h2><a href="@Router.BlogPostPath(post.Slug)">@post.Title</a></h2>
-                <p>@post.Summary</p>
+                <p class="post-list-date"><time datetime="@post.PublishedOn.ToString("yyyy-MM-dd")">@post.PublishedOn.ToString("MMMM d, yyyy")</time></p>
+                <p>@Truncate(post.Summary, 200)</p>
             </article>
         }
     </section>
+
+    @if (TotalPages > 1)
+    {
+        <nav class="table-pagination" aria-label="Blog pagination">
+            <button class="outline secondary pagination-btn" title="Previous Page" aria-label="Previous Page" disabled="@(currentPage == 1)" @onclick="PreviousPage"><i class="site-icon" data-lucide="chevron-left"></i></button>
+            <span class="pagination-info">Page @currentPage of @TotalPages</span>
+            <button class="outline secondary pagination-btn" title="Next Page" aria-label="Next Page" disabled="@(currentPage == TotalPages)" @onclick="NextPage"><i class="site-icon" data-lucide="chevron-right"></i></button>
+        </nav>
+    }
 }
 
 @code {
-    private IReadOnlyList<johnvicencio.Models.BlogPost> posts = [];
+    private List<johnvicencio.Models.BlogPost> posts = [];
+    private int currentPage = 1;
+    private const int PageSize = 5;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(posts.Count / (double)PageSize));
+
+    private IEnumerable<johnvicencio.Models.BlogPost> PagedPosts => posts
+        .Skip((currentPage - 1) * PageSize)
+        .Take(PageSize);
 
     protected override async Task OnInitializedAsync()
     {
-        posts = await BlogController.GetPostsAsync();
+        posts = (await BlogController.GetPostsAsync())
+            .OrderByDescending(post => post.PublishedOn)
+            .ToList();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = "Blog — John Vicencio",
+                description = "Read the latest thoughts, projects, and insights from John Vicencio on C#, .NET, philosophy, and software craftsmanship."
+            });
+        }
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private static string Truncate(string value, int maxLength)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        return value.Length <= maxLength ? value : value[..maxLength] + "...";
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1) currentPage--;
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < TotalPages) currentPage++;
     }
 }

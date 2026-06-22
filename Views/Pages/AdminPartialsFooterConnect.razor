@@ -1,0 +1,151 @@
+@page "/admin/partials/footerconnect"
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject SiteController Site
+@inject IJSRuntime Js
+
+<PageTitle>Footer Connect</PageTitle>
+
+<div class="login-page" style="width:100%">
+
+    <article style="width:100%;max-width:1200px;margin:0 auto">
+        <div class="table-toolbar">
+            <h2 style="margin:0">Footer Connect</h2>
+            <div>
+                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
+            </div>
+        </div>
+
+        <p style="font-size:0.9rem;color:var(--app-muted)">
+            Manage social media and connect links in the footer. Use the icon search button to choose from available Lucide icons.
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <p role="alert" class="form-alert form-alert-success">@message</p>
+        }
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:25%">Platform</th>
+                        <th style="width:35%">URL</th>
+                        <th style="width:20%">Icon</th>
+                        <th style="width:20%">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < footerConnects.Count; i++)
+                    {
+                        var idx = i;
+                        <tr>
+                            <td><input @bind="footerConnects[idx].Platform" placeholder="e.g. Twitter" /></td>
+                            <td><input @bind="footerConnects[idx].Url" placeholder="https://twitter.com/..." /></td>
+                            <td>
+                                <div style="display:flex;gap:0.35rem;align-items:center">
+                                    <input @bind="footerConnects[idx].Icon" placeholder="icon-name" />
+                                    <button type="button" class="outline" title="Choose icon" aria-label="Choose icon" style="padding:0.35rem 0.5rem;min-height:auto" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
+                                    @if (!string.IsNullOrWhiteSpace(footerConnects[idx].Icon))
+                                    {
+                                        <i class="site-icon" data-lucide="@footerConnects[idx].Icon"></i>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <button class="outline secondary" title="Remove" aria-label="Remove connect link" @onclick="() => RemoveConnect(idx)" style="padding:0.25rem 0.5rem;min-height:auto">
+                                    <i class="site-icon" data-lucide="trash-2"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div style="padding:0.75rem 1rem;border-top:1px solid var(--app-border-soft)">
+                <button class="outline" @onclick="AddConnect"><i class="site-icon" data-lucide="plus"></i>Add Connect Link</button>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+            <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
+        </div>
+
+    </article>
+
+</div>
+
+<IconPicker Open="showIconPicker" Value="@_pickIconValue" ValueChanged="OnIconPicked" OnClose="() => showIconPicker = false" />
+
+@code {
+    private bool saving;
+    private string message = "";
+    private List<FooterConnect> footerConnects = [];
+    private int iconTarget;
+    private string? _pickIconValue;
+    private bool showIconPicker;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        var settings = await Site.GetSettingsAsync();
+        footerConnects = [..(settings.FooterConnects ?? [])];
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private void AddConnect()
+    {
+        footerConnects.Add(new FooterConnect());
+    }
+
+    private void RemoveConnect(int index)
+    {
+        if (index >= 0 && index < footerConnects.Count)
+            footerConnects.RemoveAt(index);
+    }
+
+    private void OpenIconPicker(int index)
+    {
+        iconTarget = index;
+        _pickIconValue = footerConnects[index].Icon;
+        showIconPicker = true;
+    }
+
+    private void OnIconPicked(string? icon)
+    {
+        if (icon is not null && iconTarget >= 0 && iconTarget < footerConnects.Count)
+            footerConnects[iconTarget].Icon = icon;
+
+        _pickIconValue = icon;
+        showIconPicker = false;
+    }
+
+    private async Task Save()
+    {
+        saving = true;
+        message = "";
+        try
+        {
+            var settings = await Site.GetSettingsAsync();
+            settings.FooterConnects = footerConnects;
+            await Site.UpdateSettingsAsync(settings);
+            Nav.NavigateTo("/admin/partials");
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

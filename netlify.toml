@@ -1,13 +1,58 @@
 [build]
-  command = "dotnet publish -c Release"
+  command = "node scripts/generate-image-index.mjs && dotnet publish -c Release"
   publish = "bin/Release/net8.0/publish/wwwroot"
   functions = "netlify/functions"
 
 [dev]
-  command = "dotnet run --launch-profile wasm"
-  targetPort = 5196
+  framework = "#static"
+  command = "dotnet watch publish -c Release"
+  publish = "bin/Release/net8.0/publish/wwwroot"
   port = 8888
-  publish = "bin/Debug/net8.0/wwwroot"
+
+[[redirects]]
+  from = "/_framework/*"
+  to = "/_framework/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/_content/*"
+  to = "/_content/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/css/*"
+  to = "/css/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/js/*"
+  to = "/js/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/images/*"
+  to = "/images/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/manifest.webmanifest"
+  to = "/manifest.webmanifest"
+  status = 200
+
+[[redirects]]
+  from = "/icon-*.png"
+  to = "/icon-:splat.png"
+  status = 200
+
+[[redirects]]
+  from = "/experience"
+  to = "/#experience"
+  status = 301
+
+[[redirects]]
+  from = "/portfolio"
+  to = "/#portfolio"
+  status = 301
 
 [[redirects]]
   from = "/*"

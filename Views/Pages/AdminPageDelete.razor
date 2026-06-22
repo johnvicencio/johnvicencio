@@ -3,13 +3,13 @@
 @inject NavigationManager Nav
 @inject PageController Pages
 
-<PageTitle>Admin — Delete Page</PageTitle>
+<PageTitle>@deleteTitle</PageTitle>
 
 <div class="login-page" style="width:100%">
 
-    <article style="width:100%;max-width:960px;margin:0 auto">
+    <article style="width:100%;max-width:1200px;margin:0 auto">
         <div class="table-toolbar">
-            <h2 style="margin:0">Delete Page</h2>
+            <h2 style="margin:0">@deleteTitle</h2>
             <div>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
             </div>
@@ -50,6 +50,8 @@
     private bool deleting;
     private bool deleted;
     private Page? currentPage;
+
+    private string deleteTitle => $"Delete {currentPage?.Title ?? "Page"} Page";
 
     protected override async Task OnInitializedAsync()
     {

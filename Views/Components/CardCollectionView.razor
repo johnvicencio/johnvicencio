@@ -1,25 +1,104 @@
-<section class="card-collection">
+@inject IJSRuntime Js
+
+<section id="@Section.AnchorId" class="card-collection @(IsGridCard ? "grid-card-section" : "row-card-section")">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
-        <h2>@Section.Heading</h2>
+        <div class="row-card-heading">
+        @if (!string.IsNullOrWhiteSpace(Section.Icon))
+        {
+            <i class="site-icon" data-lucide="@Section.Icon"></i>
+        }
+        @if (HeadingLevel == 1)
+        {
+            <h1>@Section.Heading</h1>
+        }
+        else
+        {
+            <h2>@Section.Heading</h2>
+        }
+        </div>
     }
     @if (Section.Columns.Count > 0)
     {
-        <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
+        @if (IsGridCard)
+        {
+            <div class="grid-card-grid">
+                @foreach (var item in Section.Columns)
+                {
+                    <article class="portfolio-card">
+                        <div class="portfolio-card-media">
+                            @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                            {
+                                <a class="portfolio-card-image" href="@(string.IsNullOrWhiteSpace(item.ImageLink) ? item.ActionUrl : item.ImageLink)" target="@LinkTarget(item.ImageLinkNewTab)" rel="@LinkRel(item.ImageLinkNewTab)">
+                                    <img src="@item.ImageUrl" alt="@item.ImageAlt" />
+                                </a>
+                            }
+                            @if (expandedCards.Contains(item) && !string.IsNullOrWhiteSpace(item.Body))
+                            {
+                                <div class="portfolio-card-reveal">@((MarkupString)item.Body)</div>
+                            }
+                        </div>
+                        <div class="portfolio-card-titlebar">
+                            <h3>@item.Title</h3>
+                            <button type="button" class="outline secondary" @onclick="() => ToggleCard(item)" aria-label="Toggle @item.Title description">
+                                <i class="site-icon" data-lucide="@(expandedCards.Contains(item) ? "x" : "ellipsis")"></i>
+                            </button>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(item.ActionText) && !string.IsNullOrWhiteSpace(item.ActionUrl))
+                        {
+                            <div class="portfolio-card-action">
+                                <a href="@item.ActionUrl" target="@LinkTarget(item.ActionNewTab)" rel="@LinkRel(item.ActionNewTab)">@item.ActionText</a>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row-card-list">
             @foreach (var item in Section.Columns)
             {
-                <article>
-                    @if (!string.IsNullOrWhiteSpace(item.Title))
+                <article class="row-card">
+                    <div class="row-card-avatar">
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            @if (!string.IsNullOrWhiteSpace(item.ImageLink))
+                            {
+                                <a href="@item.ImageLink" target="@LinkTarget(item.ImageLinkNewTab)" rel="@LinkRel(item.ImageLinkNewTab)">
+                                    <img src="@item.ImageUrl" alt="@item.ImageAlt" />
+                                </a>
+                            }
+                            else
+                            {
+                                <img src="@item.ImageUrl" alt="@item.ImageAlt" />
+                            }
+                        }
+                    </div>
+                    <div class="row-card-body">
+                        @if (!string.IsNullOrWhiteSpace(item.Title))
+                        {
+                            <h3>@item.Title</h3>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                        {
+                            <p class="row-card-subtitle">@((MarkupString)item.Subtitle)</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(item.Body))
+                        {
+                            <div class="row-card-description">@((MarkupString)item.Body)</div>
+                        }
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.ActionUrl))
                     {
-                        <h3>@item.Title</h3>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(item.Body))
-                    {
-                        <div>@((MarkupString)item.Body)</div>
+                        <a class="row-card-action" href="@item.ActionUrl" target="@LinkTarget(item.ActionNewTab)" rel="@LinkRel(item.ActionNewTab)" aria-label="@($"Open {item.Title}")">
+                            <i class="site-icon" data-lucide="@(string.IsNullOrWhiteSpace(item.ActionIcon) ? "external-link" : item.ActionIcon)"></i>
+                        </a>
                     }
                 </article>
             }
-        </div>
+            </div>
+        }
     }
     else if (!string.IsNullOrWhiteSpace(Section.Body))
     {
@@ -30,4 +109,26 @@
 @code {
     [Parameter]
     public PageSection Section { get; set; } = new();
+
+    [Parameter]
+    public int HeadingLevel { get; set; } = 2;
+
+    private bool IsGridCard => Section.Type is "grid-card" or "portfolio";
+
+    private readonly HashSet<SectionColumn> expandedCards = [];
+
+    private void ToggleCard(SectionColumn item)
+    {
+        if (!expandedCards.Add(item))
+            expandedCards.Remove(item);
+    }
+
+    private static string? LinkTarget(bool newTab) => newTab ? "_blank" : null;
+
+    private static string? LinkRel(bool newTab) => newTab ? "noopener noreferrer" : null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
 }

@@ -1,51 +1,75 @@
 @page "/contact"
 @inject PageController Pages
+@inject IJSRuntime Js
 
-<PageTitle>Contact</PageTitle>
+<PageTitle>Contact — John Vicencio</PageTitle>
 
-@if (currentPage is null)
+@if (loading)
 {
     <p>Loading contact page...</p>
 }
+else if (currentPage is null)
+{
+    <p>Contact page content was not found.</p>
+}
 else
 {
-    <h1>@currentPage.Title</h1>
-    <p>@currentPage.Description</p>
-
+    var hasPageH1 = false;
     @foreach (var section in currentPage.Sections)
     {
+        var headingLevel = !hasPageH1 && !string.IsNullOrWhiteSpace(section.Heading) ? 1 : 2;
+        if (headingLevel == 1)
+        {
+            hasPageH1 = true;
+        }
+
         if (section.Type.Equals("hero", StringComparison.OrdinalIgnoreCase))
         {
-            <HeroView Section="section" />
+            <HeroView Section="section" HeadingLevel="headingLevel" />
         }
         else if (section.Type.Equals("2-col", StringComparison.OrdinalIgnoreCase))
         {
-            <TwoColView Section="section" />
+            <TwoColView Section="section" HeadingLevel="headingLevel" />
         }
         else if (section.Type.Equals("3-col", StringComparison.OrdinalIgnoreCase))
         {
-            <ThreeColView Section="section" />
+            <ThreeColView Section="section" HeadingLevel="headingLevel" />
         }
-        else if (section.Type.Equals("cards", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("cardcollection", StringComparison.OrdinalIgnoreCase))
+        else if (section.Type.Equals("cards", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("cardcollection", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("row-card", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("grid-card", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("portfolio", StringComparison.OrdinalIgnoreCase))
         {
-            <CardCollectionView Section="section" />
+            <CardCollectionView Section="section" HeadingLevel="headingLevel" />
         }
         else if (section.Type.Equals("contact", StringComparison.OrdinalIgnoreCase))
         {
-            <ContactView Section="section" />
+            <ContactView Section="section" HeadingLevel="headingLevel" />
         }
         else
         {
-            <ContentView Section="section" />
+            <ContentView Section="section" HeadingLevel="headingLevel" />
         }
     }
 }
 
 @code {
     private Page? currentPage;
+    private bool loading = true;
 
     protected override async Task OnInitializedAsync()
     {
         currentPage = await Pages.GetPageAsync("contact");
+        loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = "Contact — John Vicencio",
+                description = "Get in touch with John Vicencio. Send a message, ask a question, or discuss a project."
+            });
+        }
+        await Js.InvokeVoidAsync("lucide.createIcons");
     }
 }

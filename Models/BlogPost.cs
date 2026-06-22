@@ -16,5 +16,7 @@ public sealed class BlogPost
 
     public string Summary { get; set; } = string.Empty;
 
+    public string ImageUrl { get; set; } = string.Empty;
+
     public DateOnly PublishedOn { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 }
