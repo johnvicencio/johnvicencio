@@ -505,6 +505,26 @@ th.sortable.desc::after {
     font-size: 0.85rem;
 }
 
+.sort-icon {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sort-icon:hover {
+    color: var(--pico-primary);
+}
+
+.post-list h2 a,
+.post-list h2 a:hover {
+    text-decoration: none;
+}
+
+.post-list-date {
+    margin: 0.85rem 0 0.35rem;
+    color: var(--app-muted);
+    font-size: 0.9rem;
+}
+
 .table-fixed-header {
     max-height: 500px;
     overflow: auto;

@@ -44,6 +44,7 @@
                 </label>
 
                 <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                    <button class="outline secondary" disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="ClearSelection"><i class="site-icon" data-lucide="image-off"></i>Clear Image</button>
                     <button class="outline secondary" @onclick="Cancel">Cancel</button>
                     <button disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="Confirm"><i class="site-icon" data-lucide="check"></i>OK</button>
                 </div>
@@ -116,6 +117,13 @@
 
     private async Task Confirm()
     {
+        await ValueChanged.InvokeAsync(selectedPath);
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task ClearSelection()
+    {
+        selectedPath = "";
         await ValueChanged.InvokeAsync(selectedPath);
         await OnClose.InvokeAsync();
     }

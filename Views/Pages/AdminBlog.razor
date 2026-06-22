@@ -8,7 +8,7 @@
 
 <div class="login-page" style="width:100%">
 
-    <article style="width:100%;max-width:960px;margin:0 auto">
+    <article style="width:100%;max-width:1200px;margin:0 auto">
         <div class="table-toolbar">
             <h2 style="margin:0">Blog Posts</h2>
             <div style="display:flex;gap:0.5rem">
@@ -30,42 +30,57 @@
             <p class="pagination-info" style="padding:1rem;text-align:center">No posts yet.</p>
         }
 
-        @if (hasBlogPage)
+        @if (hasBlogPage && postList.Count > 0)
         {
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Slug</th>
-                        <th>Published</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var pt in PagedPosts)
-                    {
-                        <tr>
-                            <td style="font-family:monospace;font-size:0.75rem">@pt.Id</td>
-                            <td><strong>@pt.Title</strong></td>
-                            <td>@pt.Slug</td>
-                            <td>@pt.PublishedOn.ToString("yyyy-MM-dd")</td>
-                            <td>
-                                <button class="outline" title="Edit" aria-label="Edit" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
-                                <button class="outline danger" title="Delete" aria-label="Delete" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <div style="margin-bottom:0.75rem">
+                <input value="@search" @oninput="OnSearchInput" placeholder="Search title, slug, summary, content, or date..." />
+            </div>
 
-            @if (TotalPages > 1)
+            @if (filteredList.Count == 0)
             {
-                <div class="pagination" style="display:flex;gap:0.5rem;align-items:center;justify-content:center;margin-top:1rem">
-                    <button class="outline secondary" title="Previous Page" aria-label="Previous Page" disabled="@(currentPage == 1)" @onclick="PreviousPage"><i class="site-icon" data-lucide="chevron-left"></i></button>
+                <p class="pagination-info" style="padding:1rem;text-align:center">No posts match your search.</p>
+            }
+            else
+            {
+                <table style="table-layout:fixed">
+                    <colgroup>
+                        <col style="width:6rem" />
+                        <col />
+                        <col style="width:8rem" />
+                        <col style="width:7rem" />
+                        <col style="width:7rem" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title <span tabindex="0" class="sort-icon" @onclick="SortByTitle" @onkeydown="KeySortByTitle">@SortIcon("title")</span></th>
+                            <th>Slug</th>
+                            <th>Date <span tabindex="0" class="sort-icon" @onclick="SortByPublished" @onkeydown="KeySortByPublished">@SortIcon("published")</span></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pt in PagedPosts)
+                        {
+                            <tr>
+                                <td style="font-family:monospace;font-size:0.75rem">@pt.Id</td>
+                                <td><strong>@pt.Title</strong></td>
+                                <td>@pt.Slug</td>
+                                <td>@pt.PublishedOn.ToString("M/d/yyyy")</td>
+                                <td>
+                                    <button class="outline" title="Edit" aria-label="Edit" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
+                                    <button class="outline danger" title="Delete" aria-label="Delete" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <nav class="table-pagination" aria-label="Blog pagination">
+                    <button class="outline secondary pagination-btn" title="Previous Page" aria-label="Previous Page" disabled="@(currentPage == 1)" @onclick="PreviousPage"><i class="site-icon" data-lucide="chevron-left"></i></button>
                     <span class="pagination-info">Page @currentPage of @TotalPages</span>
-                    <button class="outline secondary" title="Next Page" aria-label="Next Page" disabled="@(currentPage == TotalPages)" @onclick="NextPage"><i class="site-icon" data-lucide="chevron-right"></i></button>
-                </div>
+                    <button class="outline secondary pagination-btn" title="Next Page" aria-label="Next Page" disabled="@(currentPage == TotalPages)" @onclick="NextPage"><i class="site-icon" data-lucide="chevron-right"></i></button>
+                </nav>
             }
         }
     </article>
@@ -74,13 +89,17 @@
 
 @code {
     private List<johnvicencio.Models.BlogPost> postList = [];
+    private List<johnvicencio.Models.BlogPost> filteredList = [];
     private bool hasBlogPage;
+    private string search = "";
     private int currentPage = 1;
     private const int PageSize = 10;
+    private string sortBy = "published";
+    private bool sortDesc = true;
 
-    private int TotalPages => Math.Max(1, (int)Math.Ceiling(postList.Count / (double)PageSize));
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(filteredList.Count / (double)PageSize));
 
-    private IEnumerable<johnvicencio.Models.BlogPost> PagedPosts => postList
+    private IEnumerable<johnvicencio.Models.BlogPost> PagedPosts => filteredList
         .Skip((currentPage - 1) * PageSize)
         .Take(PageSize);
 
@@ -93,8 +112,73 @@
         }
 
         postList = await Blog.GetPostsAsync();
+        ApplyFilter();
         var pageList = await Pages.GetPagesAsync();
         hasBlogPage = pageList.Any(p => p.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        search = e.Value?.ToString() ?? "";
+        currentPage = 1;
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        IEnumerable<johnvicencio.Models.BlogPost> query = postList;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var q = search.Trim();
+            query = query.Where(post =>
+                post.Title.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                post.Slug.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                post.Summary.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                post.Content.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                post.PublishedOn.ToString("yyyy-MM-dd").Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                post.PublishedOn.ToString("MMMM d, yyyy").Contains(q, StringComparison.OrdinalIgnoreCase));
+        }
+
+        query = sortBy switch
+        {
+            "title" => sortDesc
+                ? query.OrderByDescending(p => p.Title)
+                : query.OrderBy(p => p.Title),
+            "slug" => sortDesc
+                ? query.OrderByDescending(p => p.Slug)
+                : query.OrderBy(p => p.Slug),
+            _ => sortDesc
+                ? query.OrderByDescending(p => p.PublishedOn)
+                : query.OrderBy(p => p.PublishedOn),
+        };
+
+        filteredList = query.ToList();
+    }
+
+    private void ToggleSort(string column)
+    {
+        if (sortBy == column)
+            sortDesc = !sortDesc;
+        else
+        {
+            sortBy = column;
+            sortDesc = true;
+        }
+        currentPage = 1;
+        ApplyFilter();
+    }
+
+    private void SortByTitle() => ToggleSort("title");
+    private void SortByPublished() => ToggleSort("published");
+
+    private void KeySortByTitle(KeyboardEventArgs e) { if (e.Key is "Enter" or " ") SortByTitle(); }
+    private void KeySortByPublished(KeyboardEventArgs e) { if (e.Key is "Enter" or " ") SortByPublished(); }
+
+    private string SortIcon(string column)
+    {
+        if (sortBy != column) return "\u25B2";
+        return sortDesc ? "\u25BC" : "\u25B2";
     }
 
     private void PreviousPage()

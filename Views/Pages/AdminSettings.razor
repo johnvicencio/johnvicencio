@@ -10,7 +10,7 @@
 
 <div class="login-page" style="width:100%">
 
-    <article style="width:100%;max-width:960px;margin:0 auto">
+    <article style="width:100%;max-width:1200px;margin:0 auto">
         <div class="table-toolbar">
             <h2 style="margin:0">Settings</h2>
             <div>
@@ -139,6 +139,12 @@
                 <p class="pagination-info"><i class="site-icon" data-lucide="circle-alert"></i>Not seeded yet: Admin Vault was not found in Netlify Blobs.</p>
             }
             <button class="outline" @onclick="SeedAdminVaultAsync" aria-busy="@seedingVault"><i class="site-icon" data-lucide="database"></i>Seed Admin Vault</button>
+
+            <hr />
+
+            <h3>Account</h3>
+            <p>Change your admin login password.</p>
+            <button class="outline" @onclick='() => Nav.NavigateTo("/admin/change-password")'><i class="site-icon" data-lucide="key-round"></i>Change Password</button>
         }
     </article>
 
@@ -171,6 +177,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+
         if (!firstRender) return;
 
         contentToken = await Js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token") ?? string.Empty;

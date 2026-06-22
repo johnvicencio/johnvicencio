@@ -10,13 +10,6 @@
 {
     <p>Loading home page...</p>
 }
-else if (maintenanceMode)
-{
-    <div style="text-align:center;padding:4rem 1rem">
-        <h1>Under Maintenance</h1>
-        <p style="font-size:1.2rem;color:var(--app-muted)">This site is currently undergoing scheduled maintenance. Please check back soon.</p>
-    </div>
-}
 else if (page is null)
 {
     <p>Home page content was not found.</p>
@@ -62,7 +55,6 @@ else
 @code {
     private Page? page;
     private bool loading = true;
-    private bool maintenanceMode;
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,14 +64,7 @@ else
             return;
         }
 
-        var settings = await Site.GetSettingsAsync();
-        maintenanceMode = settings.MaintenanceMode;
-
-        if (!maintenanceMode)
-        {
-            page = await Pages.GetPageAsync("home");
-        }
-
+        page = await Pages.GetPageAsync("home");
         loading = false;
     }
 }

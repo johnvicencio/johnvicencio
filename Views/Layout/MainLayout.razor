@@ -46,7 +46,17 @@
     </header>
 
     <main class="container site-main">
-        @Body
+        @if (maintenanceMode && !Session.IsLoggedIn)
+        {
+            <div style="text-align:center;padding:4rem 1rem">
+                <h1>Under Maintenance</h1>
+                <p style="font-size:1.2rem;color:var(--app-muted)">This site is currently undergoing scheduled maintenance. Please check back soon.</p>
+            </div>
+        }
+        else
+        {
+            @Body
+        }
     </main>
 
     <footer class="site-footer">
@@ -91,6 +101,7 @@
     private string footerAbout = "";
     private List<FooterConnect> footerConnects = [];
     private bool mobileMenuOpen;
+    private bool maintenanceMode;
 
     protected override async Task OnInitializedAsync()
     {
@@ -137,6 +148,7 @@
     private async Task LoadNavAsync()
     {
         var settings = await Site.GetSettingsAsync();
+        maintenanceMode = settings.MaintenanceMode;
         var saved = settings.NavLinks ?? [];
 
         if (saved.Count > 0)
