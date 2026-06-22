@@ -1,4 +1,6 @@
-<section class="hero">
+@inject IJSRuntime Js
+
+<section id="@Section.AnchorId" class="hero @(Section.ImageFullWidth ? "hero-full-width" : "hero-contained")">
     @if (!string.IsNullOrWhiteSpace(Section.ImageUrl))
     {
         <img src="@Section.ImageUrl" alt="@Section.ImageAlt" class="hero-image" />
@@ -42,4 +44,9 @@
 
     [Parameter]
     public int HeadingLevel { get; set; } = 2;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
 }

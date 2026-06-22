@@ -20,7 +20,17 @@ type SiteSettings = {
   ToEmail?: string;
 };
 
+type ContactInteraction = {
+  elapsedMs?: number;
+  keyboardEvents?: number;
+  pasteEvents?: number;
+  inputEvents?: number;
+};
+
+type RateState = Record<string, number[]>;
+
 const key = "messages.json";
+const rateKey = "contact-rate-limits.json";
 
 export default async (request: Request) => {
   if (request.method === "OPTIONS") return empty(204);
@@ -32,18 +42,29 @@ export default async (request: Request) => {
     const email = clean(input.email, 180);
     const message = clean(input.message, 4000);
     const website = clean(input.website, 180);
+    const consentAccepted = input.consentAccepted === true;
+    const interaction = normalizeInteraction(input.interaction);
 
     if (!name || !email || !message) {
       return json({ error: "Name, email, and message are required" }, 400);
     }
 
-    if (website) return json({ ok: true, emailSent: false });
+    if (website) return json({ error: "Submission rejected" }, 400);
+    if (!consentAccepted) return json({ error: "Terms and privacy consent is required" }, 400);
+    if ((interaction.elapsedMs ?? 0) < 2000) return json({ error: "Submission rejected" }, 400);
     if (!isValidEmail(email)) return json({ error: "Enter a valid email address" }, 400);
-    if (hasUnsafeContent(name) || hasUnsafeContent(email) || hasUnsafeContent(message)) {
+    if (hasUnsafeContent(name) || hasUnsafeContent(email) || hasUnsafeContent(message) || hasEncodedUnsafeContent(message)) {
       return json({ error: "Message contains unsupported content" }, 400);
     }
+    if (countLinks(message) > 3) return json({ error: "Message contains too many links" }, 400);
 
     const store = getStore("content");
+    const rateResult = await checkRateLimits(store, request, email, message);
+    if (!rateResult.ok) return json({ error: rateResult.reason }, 429);
+
+    const spam = scoreSpam({ name, email, message, interaction });
+    if (spam.score >= 6) return json({ error: "Submission rejected" }, 400);
+
     const messages = await readMessages(store);
     messages.unshift({
       id: crypto.randomUUID(),
@@ -135,6 +156,155 @@ function isValidEmail(value: string) {
 
 function hasUnsafeContent(value: string) {
   return /<\s*script|javascript\s*:|on\w+\s*=|<\s*iframe|<\s*object|<\s*embed|data\s*:/i.test(value);
+}
+
+function hasEncodedUnsafeContent(value: string) {
+  const variants = new Set<string>([value]);
+  let decoded = value;
+  for (let i = 0; i < 3; i++) {
+    try {
+      decoded = decodeURIComponent(decoded);
+      variants.add(decoded);
+    } catch {
+      break;
+    }
+  }
+
+  variants.add(value
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#0*39;/gi, "'")
+    .replace(/&amp;/gi, "&"));
+
+  return [...variants].some(hasUnsafeContent);
+}
+
+function countLinks(value: string) {
+  return (value.match(/https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|io|co|biz|info)\b/gi) ?? []).length;
+}
+
+function normalizeInteraction(value: unknown): ContactInteraction {
+  if (!value || typeof value !== "object") return {};
+  const input = value as ContactInteraction;
+  return {
+    elapsedMs: clampNumber(input.elapsedMs, 0, 60 * 60 * 1000),
+    keyboardEvents: clampNumber(input.keyboardEvents, 0, 10000),
+    pasteEvents: clampNumber(input.pasteEvents, 0, 10000),
+    inputEvents: clampNumber(input.inputEvents, 0, 10000),
+  };
+}
+
+function clampNumber(value: unknown, min: number, max: number) {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(min, Math.min(max, Math.floor(value)))
+    : undefined;
+}
+
+function scoreSpam(input: { name: string; email: string; message: string; interaction: ContactInteraction }) {
+  const reasons: string[] = [];
+  let score = 0;
+  const elapsedMs = input.interaction.elapsedMs ?? 0;
+  const keyboardEvents = input.interaction.keyboardEvents ?? 0;
+  const pasteEvents = input.interaction.pasteEvents ?? 0;
+  const inputEvents = input.interaction.inputEvents ?? 0;
+
+  if (keyboardEvents === 0) addScore("no keyboard events", 2);
+  if (pasteEvents > 0 && keyboardEvents <= 1) addScore("paste-heavy", 2);
+  if (elapsedMs > 0 && elapsedMs < 5000) addScore("very short interaction", 1);
+  if (inputEvents <= 2) addScore("low interaction", 1);
+  if (uppercaseRatio(input.message) > 0.65 && input.message.length > 40) addScore("excessive capitalization", 1);
+  if (hasSpamKeywords(input.message)) addScore("spam keywords", 2);
+  if (hasRepeatedPhrases(input.message)) addScore("repeated phrases", 2);
+  if (isSuspiciousEmail(input.email)) addScore("suspicious email", 1);
+
+  return { score, reasons };
+
+  function addScore(reason: string, points: number) {
+    score += points;
+    reasons.push(reason);
+  }
+}
+
+function uppercaseRatio(value: string) {
+  const letters = value.replace(/[^a-z]/gi, "");
+  if (!letters) return 0;
+  const uppercase = letters.replace(/[^A-Z]/g, "");
+  return uppercase.length / letters.length;
+}
+
+function hasSpamKeywords(value: string) {
+  return /\b(crypto|forex|casino|viagra|loan|payday|seo backlinks|guest post|whatsapp|telegram|investment opportunity)\b/i.test(value);
+}
+
+function hasRepeatedPhrases(value: string) {
+  const words = value.toLowerCase().match(/[a-z0-9]{3,}/g) ?? [];
+  if (words.length < 12) return false;
+  const counts = new Map<string, number>();
+  for (let i = 0; i <= words.length - 3; i++) {
+    const phrase = `${words[i]} ${words[i + 1]} ${words[i + 2]}`;
+    const next = (counts.get(phrase) ?? 0) + 1;
+    if (next >= 3) return true;
+    counts.set(phrase, next);
+  }
+  return false;
+}
+
+function isSuspiciousEmail(value: string) {
+  const lower = value.toLowerCase();
+  return /@(mailinator|10minutemail|tempmail|guerrillamail|yopmail|trashmail|sharklasers)\./.test(lower) ||
+    /^[a-z0-9]{18,}@/.test(lower);
+}
+
+async function checkRateLimits(store: ReturnType<typeof getStore>, request: Request, email: string, message: string) {
+  const state = await readRateState(store);
+  const now = Date.now();
+  const clientIp = request.headers.get("x-nf-client-connection-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("client-ip") ||
+    "unknown";
+  const userAgent = request.headers.get("user-agent") || "unknown";
+  const checks = [
+    { key: `email:${await sha256(email.toLowerCase())}`, limit: 5, windowMs: 60 * 60 * 1000, reason: "Too many messages from this email" },
+    { key: `message:${await sha256(normalizeMessageForHash(message))}`, limit: 3, windowMs: 24 * 60 * 60 * 1000, reason: "Repeated message submitted too often" },
+    { key: `ip:${await sha256(clientIp)}`, limit: 20, windowMs: 60 * 60 * 1000, reason: "Too many messages from this network" },
+    { key: `ua:${await sha256(userAgent)}`, limit: 30, windowMs: 60 * 60 * 1000, reason: "Too many messages from this browser" },
+  ];
+
+  let blockedReason = "";
+  for (const check of checks) {
+    const existing = (state[check.key] ?? []).filter((time) => now - time < check.windowMs);
+    existing.push(now);
+    state[check.key] = existing;
+    if (existing.length > check.limit && !blockedReason) blockedReason = check.reason;
+  }
+
+  await writeRateState(store, state, now);
+  return blockedReason ? { ok: false, reason: blockedReason } : { ok: true, reason: "" };
+}
+
+async function readRateState(store: ReturnType<typeof getStore>) {
+  const body = await store.get(rateKey, { type: "text" });
+  if (!body) return {} as RateState;
+  return JSON.parse(body) as RateState;
+}
+
+async function writeRateState(store: ReturnType<typeof getStore>, state: RateState, now: number) {
+  const maxAge = 24 * 60 * 60 * 1000;
+  for (const key of Object.keys(state)) {
+    state[key] = state[key].filter((time) => now - time < maxAge).slice(-100);
+    if (state[key].length === 0) delete state[key];
+  }
+  await store.set(rateKey, JSON.stringify(state), { metadata: { updatedAt: new Date().toISOString() } });
+}
+
+function normalizeMessageForHash(value: string) {
+  return value.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+async function sha256(value: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Buffer.from(digest).toString("hex");
 }
 
 async function sendEmailNotification(store: ReturnType<typeof getStore>, message: ContactMessage) {

@@ -6,7 +6,7 @@
 @inject DataStore Store
 @inject JsonContentService JsonContent
 
-<PageTitle>Admin — Settings</PageTitle>
+<PageTitle>Settings</PageTitle>
 
 <div class="login-page" style="width:100%">
 
@@ -25,6 +25,11 @@
         else
         {
             <h3>General</h3>
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <p role="alert" class="form-alert form-alert-success">@message</p>
+            }
 
             <div class="grid" style="grid-template-columns:1fr 1fr">
                 <label>Site Name
@@ -101,11 +106,6 @@
             <hr />
             <button @onclick="SaveSettings" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Settings</button>
 
-            @if (!string.IsNullOrWhiteSpace(message))
-            {
-                <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-            }
-
             <hr />
 
             <h3>Netlify Content Writes</h3>
@@ -115,12 +115,16 @@
             <button @onclick="SaveContentTokenAsync"><i class="site-icon" data-lucide="key-round"></i>Save Token</button>
             @if (tokenSaved)
             {
-                <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
+                <p role="alert" class="form-alert form-alert-success"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
             }
 
             <hr />
 
             <h3>Admin Vault</h3>
+            @if (!string.IsNullOrWhiteSpace(vaultMessage))
+            {
+                <p role="alert" class="form-alert form-alert-success">@vaultMessage</p>
+            }
             <p>Seed the encrypted admin vault into Netlify Blobs as <code>users/admin.json</code>. This stores the encrypted login vault, not the plain password.</p>
             @if (checkingVault)
             {
@@ -135,10 +139,6 @@
                 <p class="pagination-info"><i class="site-icon" data-lucide="circle-alert"></i>Not seeded yet: Admin Vault was not found in Netlify Blobs.</p>
             }
             <button class="outline" @onclick="SeedAdminVaultAsync" aria-busy="@seedingVault"><i class="site-icon" data-lucide="database"></i>Seed Admin Vault</button>
-            @if (!string.IsNullOrWhiteSpace(vaultMessage))
-            {
-                <p class="pagination-info" style="margin-top:0.5rem">@vaultMessage</p>
-            }
         }
     </article>
 

@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "generate:image-index": "node scripts/generate-image-index.mjs",
-    "dev": "netlify dev -c \"dotnet run --launch-profile wasm\" --target-port 5196 -p 8888"
+    "dev": "netlify dev"
   },
   "dependencies": {
     "@netlify/blobs": "^8.2.0",

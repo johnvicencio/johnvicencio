@@ -13,34 +13,38 @@ else if (currentPage is null)
 }
 else
 {
-    <h1>@currentPage.Title</h1>
-    <p>@currentPage.Description</p>
-
+    var hasPageH1 = false;
     @foreach (var section in currentPage.Sections)
     {
+        var headingLevel = !hasPageH1 && !string.IsNullOrWhiteSpace(section.Heading) ? 1 : 2;
+        if (headingLevel == 1)
+        {
+            hasPageH1 = true;
+        }
+
         if (section.Type.Equals("hero", StringComparison.OrdinalIgnoreCase))
         {
-            <HeroView Section="section" HeadingLevel="2" />
+            <HeroView Section="section" HeadingLevel="headingLevel" />
         }
         else if (section.Type.Equals("2-col", StringComparison.OrdinalIgnoreCase))
         {
-            <TwoColView Section="section" HeadingLevel="2" />
+            <TwoColView Section="section" HeadingLevel="headingLevel" />
         }
         else if (section.Type.Equals("3-col", StringComparison.OrdinalIgnoreCase))
         {
-            <ThreeColView Section="section" HeadingLevel="2" />
+            <ThreeColView Section="section" HeadingLevel="headingLevel" />
         }
-        else if (section.Type.Equals("cards", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("cardcollection", StringComparison.OrdinalIgnoreCase))
+        else if (section.Type.Equals("cards", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("cardcollection", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("row-card", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("grid-card", StringComparison.OrdinalIgnoreCase) || section.Type.Equals("portfolio", StringComparison.OrdinalIgnoreCase))
         {
-            <CardCollectionView Section="section" HeadingLevel="2" />
+            <CardCollectionView Section="section" HeadingLevel="headingLevel" />
         }
         else if (section.Type.Equals("contact", StringComparison.OrdinalIgnoreCase))
         {
-            <ContactView Section="section" HeadingLevel="2" />
+            <ContactView Section="section" HeadingLevel="headingLevel" />
         }
         else
         {
-            <ContentView Section="section" HeadingLevel="2" />
+            <ContentView Section="section" HeadingLevel="headingLevel" />
         }
     }
 }

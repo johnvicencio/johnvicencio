@@ -11,7 +11,7 @@
 
             @if (!string.IsNullOrWhiteSpace(errorMessage))
             {
-                <p class="pagination-info" style="color:var(--pico-del-color)">@errorMessage</p>
+                <p role="alert" class="form-alert form-alert-danger">@errorMessage</p>
             }
             else if (loading)
             {

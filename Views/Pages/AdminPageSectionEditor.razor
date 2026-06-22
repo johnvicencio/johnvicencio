@@ -1,11 +1,11 @@
-@page "/admin/pages/{PageId}/sections/add"
-@page "/admin/pages/{PageId}/sections/add/{Type}"
+@page "/admin/pages/{PageId}/sections/{SectionId}/{Type}/add"
 @page "/admin/pages/{PageId}/sections/edit/{SectionId}"
 @inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject PageController Pages
+@inject IJSRuntime Js
 
-<PageTitle>Admin — @title</PageTitle>
+<PageTitle>@title</PageTitle>
 
 <div class="login-page" style="width:100%">
 
@@ -25,57 +25,28 @@
         {
             <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
         }
-        else if (showTypeSelector)
-        {
-            <div class="section-type-grid">
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/hero")'>
-                    <i class="site-icon" data-lucide="image" style="font-size:1.5rem"></i>
-                    <span>Hero</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/2-col")'>
-                    <i class="site-icon" data-lucide="columns-2" style="font-size:1.5rem"></i>
-                    <span>2 Columns</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/3-col")'>
-                    <i class="site-icon" data-lucide="columns-3" style="font-size:1.5rem"></i>
-                    <span>3 Columns</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/cards")'>
-                    <i class="site-icon" data-lucide="grid-3x3" style="font-size:1.5rem"></i>
-                    <span>Card Collection</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/content")'>
-                    <i class="site-icon" data-lucide="file-text" style="font-size:1.5rem"></i>
-                    <span>Content</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add/contact")'>
-                    <i class="site-icon" data-lucide="mail" style="font-size:1.5rem"></i>
-                    <span>Contact</span>
-                </button>
-            </div>
-        }
         else
         {
             <div class="page-editor">
-                <div class="grid" style="grid-template-columns:1fr 1fr">
-                    <label>Section ID
-                        <input readonly class="pagination-info" value="@sec.SectionId" style="cursor:not-allowed" />
-                    </label>
-                    <label>Type
-                        <select @bind="sec.Type" @bind:after="OnTypeChanged">
-                            <option value="hero">Hero</option>
-                            <option value="2-col">2 Columns</option>
-                            <option value="3-col">3 Columns</option>
-                            <option value="cards">Card Collection</option>
-                            <option value="content">Content</option>
-                            <option value="contact">Contact</option>
-                        </select>
-                    </label>
-                </div>
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <p role="alert" class="form-alert form-alert-danger">@message</p>
+                }
 
-                <label>Heading
-                    <input @bind="sec.Heading" />
+                <label>Section ID
+                    <input readonly class="pagination-info" value="@sec.SectionId" style="cursor:not-allowed" />
                 </label>
+
+                <label>Anchor ID <small>Optional, for links like <code>#experience</code>.</small>
+                    <input @bind="sec.AnchorId" placeholder="experience" />
+                </label>
+
+                @if (sec.Type is not "3-col" && !IsRowCardSection(sec.Type))
+                {
+                    <label>Heading
+                        <input @bind="sec.Heading" />
+                    </label>
+                }
 
                 @switch (sec.Type)
                 {
@@ -86,7 +57,7 @@
                         <label>Image URL
                             <input @bind="sec.ImageUrl" />
                         </label>
-                        <button type="button" class="outline" @onclick="() => showImagePicker = true"><i class="site-icon" data-lucide="image"></i>Select Image</button>
+                        <button type="button" class="outline" @onclick="OpenSectionImagePicker"><i class="site-icon" data-lucide="image"></i>Select Image</button>
                         @if (!string.IsNullOrWhiteSpace(sec.ImageUrl))
                         {
                             <p class="pagination-info">Selected: <code>@sec.ImageUrl</code></p>
@@ -94,12 +65,18 @@
                         <label>Image Alt Text
                             <input @bind="sec.ImageAlt" />
                         </label>
+                        <label>Image Layout
+                            <select @bind="sec.ImageFullWidth">
+                                <option value="true">Full width</option>
+                                <option value="false">Within container</option>
+                            </select>
+                        </label>
                         <hr />
                         <div class="table-toolbar">
                             <h5 style="margin:0">Buttons</h5>
                             @if (sec.Buttons.Count < 3)
                             {
-                                <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="AddButton"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
+                                <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => AddButton()"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
                             }
                         </div>
                         @for (var bi = 0; bi < sec.Buttons.Count; bi++)
@@ -109,13 +86,11 @@
                             <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <div class="grid" style="grid-template-columns:1fr 1fr">
                                     <label>Button Icon
-                                        <select @bind="btn.Icon">
-                                            <option value="">None</option>
-                                            @foreach (var icon in AvailableIcons)
-                                            {
-                                                <option value="@icon">@icon</option>
-                                            }
-                                        </select>
+                                        <div style="display:flex;gap:0.5rem;align-items:center">
+                                            <input @bind="btn.Icon" placeholder="icon-name" />
+                                            <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenIconPicker(localBi)"><i class="site-icon" data-lucide="search"></i></button>
+                                            @if (!string.IsNullOrWhiteSpace(btn.Icon)) { <i class="site-icon" data-lucide="@btn.Icon"></i> }
+                                        </div>
                                     </label>
                                     <label>Button Text
                                         <input @bind="btn.Text" />
@@ -125,7 +100,6 @@
                                     <label>Button URL
                                         <input @bind="btn.Url" />
                                     </label>
-                                    <p class="pagination-info" style="align-self:end">@if (!string.IsNullOrWhiteSpace(btn.Icon)) { <i class="site-icon" data-lucide="@btn.Icon"></i> } Current icon</p>
                                 </div>
                                 <button class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveButton(localBi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
                             </div>
@@ -133,9 +107,7 @@
                         break;
 
                     case "2-col":
-                    case "3-col":
-                        var colCount = sec.Type == "2-col" ? 2 : 3;
-                        for (var ci = 0; ci < Math.Min(sec.Columns.Count, colCount); ci++)
+                        for (var ci = 0; ci < Math.Min(sec.Columns.Count, 2); ci++)
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
@@ -144,9 +116,60 @@
                                 <label>Title
                                     <input @bind="col.Title" />
                                 </label>
-                                <label>Body
-                                    <textarea @bind="col.Body" rows="3"></textarea>
+                                <label>Body</label>
+                                <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="220" />
+                                <hr />
+                                <div class="table-toolbar">
+                                    <h6 style="margin:0">Button</h6>
+                                    @if (string.IsNullOrWhiteSpace(col.ActionText) && string.IsNullOrWhiteSpace(col.ActionUrl))
+                                    {
+                                        <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => AddColumnButton(localCi)"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(col.ActionText) || !string.IsNullOrWhiteSpace(col.ActionUrl))
+                                {
+                                    <div class="grid" style="grid-template-columns:1fr 1fr">
+                                        <label>Button Icon
+                                            <div style="display:flex;gap:0.5rem;align-items:center">
+                                                <input @bind="col.ActionIcon" placeholder="icon-name" />
+                                                <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                                @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
+                                            </div>
+                                        </label>
+                                        <label>Button Text
+                                            <input @bind="col.ActionText" />
+                                        </label>
+                                    </div>
+                                    <div class="grid" style="grid-template-columns:1fr 1fr">
+                                        <label>Button URL
+                                            <input @bind="col.ActionUrl" />
+                                        </label>
+                                    </div>
+                                    <button class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveColumnButton(localCi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
+                                }
+                            </div>
+                        }
+                        break;
+
+                    case "3-col":
+                        for (var ci = 0; ci < Math.Min(sec.Columns.Count, 3); ci++)
+                        {
+                            var col = sec.Columns[ci];
+                            var localCi = ci;
+                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                                <h5>Column @(localCi + 1)</h5>
+                                <label>Icon
+                                    <div style="display:flex;gap:0.5rem;align-items:center">
+                                        <input @bind="col.ActionIcon" placeholder="icon-name" />
+                                        <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                        @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
+                                    </div>
                                 </label>
+                                <label>Title
+                                    <input @bind="col.Title" />
+                                </label>
+                                <label>Body</label>
+                                <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="220" />
                                 <div class="grid" style="grid-template-columns:1fr 1fr">
                                     <label>Action Text
                                         <input @bind="col.ActionText" />
@@ -159,19 +182,155 @@
                         }
                         break;
 
-                    case "cards":
-                    case "cardcollection":
+                    case "grid-card":
+                    case "portfolio":
+                        <label>Section Icon
+                            <div style="display:flex;gap:0.5rem;align-items:center">
+                                <input @bind="sec.Icon" placeholder="icon-name" />
+                                <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
+                                @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
+                            </div>
+                        </label>
+                        <label>Header
+                            <input @bind="sec.Heading" />
+                        </label>
+                        <div class="table-toolbar">
+                            <h5 style="margin:0">Grid Cards</h5>
+                            <button type="button" class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="AddGridCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
+                        </div>
                         @for (var ci = 0; ci < sec.Columns.Count; ci++)
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
                             <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
-                                <h5>Item @(localCi + 1)</h5>
-                                <label>Title
+                                <div class="table-toolbar">
+                                    <h5 style="margin:0">Card @(localCi + 1)</h5>
+                                    <button type="button" class="outline danger" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
+                                </div>
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Image URL
+                                        <input @bind="col.ImageUrl" />
+                                    </label>
+                                    <label>Image Alt Name
+                                        <input @bind="col.ImageAlt" />
+                                    </label>
+                                </div>
+                                <button type="button" class="outline" @onclick="() => OpenColumnImagePicker(localCi)"><i class="site-icon" data-lucide="image"></i>Select Image</button>
+                                @if (!string.IsNullOrWhiteSpace(col.ImageUrl))
+                                {
+                                    <p class="pagination-info">Selected: <code>@col.ImageUrl</code></p>
+                                }
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Image Link
+                                        <input @bind="col.ImageLink" />
+                                    </label>
+                                    <label>Image Link Target
+                                        <select @bind="col.ImageLinkNewTab">
+                                            <option value="false">Same window</option>
+                                            <option value="true">New tab</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <label>Header
                                     <input @bind="col.Title" />
                                 </label>
-                                <label>Body
-                                    <textarea @bind="col.Body" rows="3"></textarea>
+                                <label>Description</label>
+                                <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="180" />
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Bottom Link Text
+                                        <input @bind="col.ActionText" />
+                                    </label>
+                                    <label>Bottom Link URL
+                                        <input @bind="col.ActionUrl" />
+                                    </label>
+                                </div>
+                                <label>Bottom Link Target
+                                    <select @bind="col.ActionNewTab">
+                                        <option value="false">Same window</option>
+                                        <option value="true">New tab</option>
+                                    </select>
+                                </label>
+                            </div>
+                        }
+                        break;
+
+                    case "cards":
+                    case "cardcollection":
+                    case "row-card":
+                        <label>Section Icon
+                            <div style="display:flex;gap:0.5rem;align-items:center">
+                                <input @bind="sec.Icon" placeholder="icon-name" />
+                                <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
+                                @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
+                            </div>
+                        </label>
+                        <label>Header
+                            <input @bind="sec.Heading" />
+                        </label>
+                        <div class="table-toolbar">
+                            <h5 style="margin:0">Cards</h5>
+                            <button type="button" class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="AddRowCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
+                        </div>
+                        @for (var ci = 0; ci < sec.Columns.Count; ci++)
+                        {
+                            var col = sec.Columns[ci];
+                            var localCi = ci;
+                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                                <div class="table-toolbar">
+                                    <h5 style="margin:0">Card @(localCi + 1)</h5>
+                                    <button type="button" class="outline danger" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
+                                </div>
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Avatar Image URL
+                                        <input @bind="col.ImageUrl" />
+                                    </label>
+                                    <label>Image Alt Name
+                                        <input @bind="col.ImageAlt" />
+                                    </label>
+                                </div>
+                                <button type="button" class="outline" @onclick="() => OpenColumnImagePicker(localCi)"><i class="site-icon" data-lucide="image"></i>Select Avatar</button>
+                                @if (!string.IsNullOrWhiteSpace(col.ImageUrl))
+                                {
+                                    <p class="pagination-info">Selected: <code>@col.ImageUrl</code></p>
+                                }
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Image Link
+                                        <input @bind="col.ImageLink" />
+                                    </label>
+                                    <label>Image Link Target
+                                        <select @bind="col.ImageLinkNewTab">
+                                            <option value="false">Same window</option>
+                                            <option value="true">New tab</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Title
+                                        <input @bind="col.Title" />
+                                    </label>
+                                    <label>Sub Title
+                                        <input @bind="col.Subtitle" />
+                                    </label>
+                                </div>
+                                <label>Description</label>
+                                <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="180" />
+                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <label>Right Icon
+                                        <div style="display:flex;gap:0.5rem;align-items:center">
+                                            <input @bind="col.ActionIcon" placeholder="icon-name" />
+                                            <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                            @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
+                                        </div>
+                                    </label>
+                                    <label>Right Link
+                                        <input @bind="col.ActionUrl" />
+                                    </label>
+                                </div>
+                                <label>Right Link Target
+                                    <select @bind="col.ActionNewTab">
+                                        <option value="false">Same window</option>
+                                        <option value="true">New tab</option>
+                                    </select>
                                 </label>
                             </div>
                         }
@@ -194,10 +353,6 @@
                 <button @onclick="SaveSection" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Section</button>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
 
-                @if (!string.IsNullOrWhiteSpace(message))
-                {
-                    <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-                }
             </div>
         }
     </article>
@@ -214,17 +369,44 @@
     [Parameter]
     public string? Type { get; set; }
 
-    private string title => (SectionId is not null) ? "Edit Section" : "Add Section";
+    private string title
+    {
+        get
+        {
+            var action = isAddMode ? "Add" : "Edit";
+            var pageName = page?.Title ?? "Page";
+            var typeName = TypeDisplayName(sec?.Type);
+            return string.IsNullOrWhiteSpace(typeName)
+                ? $"{action} {pageName} Section"
+                : $"{action} {pageName} {typeName} Section";
+        }
+    }
+
+    private static string TypeDisplayName(string? type) => type switch
+    {
+        "hero" => "Hero",
+        "2-col" => "2-Column",
+        "3-col" => "3-Column",
+        "cards" or "cardcollection" or "row-card" => "Row Card",
+        "grid-card" or "portfolio" => "Grid Card",
+        "content" => "Content",
+        "contact" => "Contact",
+        _ => "",
+    };
 
     private bool loading = true;
     private bool saving;
     private bool isAddMode;
-    private bool showTypeSelector;
     private string message = "";
     private Page? page;
     private PageSection sec = new();
     private bool showImagePicker;
-    private static readonly string[] AvailableIcons = ["arrow-right", "external-link", "mail", "download", "book-open", "calendar", "github", "linkedin", "send", "sparkles"];
+    private int imageTarget = -1;
+    private int iconTarget;
+    private bool iconTargetIsColumn;
+    private bool iconTargetIsSection;
+    private string? _pickIconValue;
+    private bool showIconPicker;
 
     protected override async Task OnInitializedAsync()
     {
@@ -234,6 +416,26 @@
             return;
         }
 
+        await InitAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Session.IsLoggedIn)
+            await InitAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private async Task InitAsync()
+    {
+        loading = true;
+        isAddMode = false;
+        message = "";
+
         page = await Pages.GetPageByIdAsync(PageId);
         if (page is null) { loading = false; return; }
         if (page.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase))
@@ -242,49 +444,43 @@
             return;
         }
 
-        if (SectionId is not null)
+        if (SectionId is not null && !string.IsNullOrWhiteSpace(Type))
         {
-            isAddMode = false;
+            isAddMode = true;
+            sec = new PageSection
+            {
+                SectionId = SectionId,
+                Type = Type,
+            };
+            EnsureDefaultColumns();
+        }
+        else if (SectionId is not null)
+        {
             var found = page.Sections.FirstOrDefault(s => s.SectionId == SectionId);
             if (found is not null)
             {
+                isAddMode = false;
                 sec = new PageSection
                 {
                     SectionId = found.SectionId,
+                    AnchorId = found.AnchorId,
                     Type = found.Type,
                     Heading = found.Heading,
                     Body = found.Body,
+                    Icon = found.Icon,
                     ActionText = found.ActionText,
                     ActionUrl = found.ActionUrl,
                     ImageUrl = found.ImageUrl,
                     ImageAlt = found.ImageAlt,
+                    ImageFullWidth = found.ImageFullWidth,
                     Buttons = [.. found.Buttons],
                     Columns = [.. found.Columns],
                 };
             }
             EnsureDefaultColumns();
         }
-        else if (!string.IsNullOrWhiteSpace(Type))
-        {
-            isAddMode = true;
-            sec = new PageSection
-            {
-                SectionId = Guid.NewGuid().ToString("N")[..8],
-                Type = Type,
-            };
-            EnsureDefaultColumns();
-        }
-        else
-        {
-            showTypeSelector = true;
-        }
 
         loading = false;
-    }
-
-    private void OnTypeChanged()
-    {
-        EnsureDefaultColumns();
     }
 
     private void EnsureDefaultColumns()
@@ -293,15 +489,17 @@
             while (sec.Columns.Count < 2) sec.Columns.Add(new SectionColumn());
         else if (sec.Type is "3-col" && sec.Columns.Count < 3)
             while (sec.Columns.Count < 3) sec.Columns.Add(new SectionColumn());
-        else if (sec.Type is "cards" or "cardcollection" && sec.Columns.Count < 3)
-            while (sec.Columns.Count < 3) sec.Columns.Add(new SectionColumn());
-        else if (sec.Type is not ("2-col" or "3-col" or "cards" or "cardcollection"))
+        else if (sec.Type is not ("2-col" or "3-col") && !IsRowCardSection(sec.Type) && !IsGridCardSection(sec.Type))
             sec.Columns.Clear();
     }
 
-    private void AddButton()
+    private static bool IsRowCardSection(string? type) => type is "cards" or "cardcollection" or "row-card";
+
+    private static bool IsGridCardSection(string? type) => type is "grid-card" or "portfolio";
+
+    private void AddButton(int maxButtons = 3)
     {
-        if (sec.Buttons.Count < 3)
+        if (sec.Buttons.Count < maxButtons)
             sec.Buttons.Add(new SectionButton());
     }
 
@@ -311,25 +509,71 @@
             sec.Buttons.RemoveAt(index);
     }
 
+    private void AddColumnButton(int index)
+    {
+        if (index < 0 || index >= sec.Columns.Count) return;
+        sec.Columns[index].ActionText = "Button";
+        sec.Columns[index].ActionUrl = "#";
+        sec.Columns[index].ActionIcon = "";
+    }
+
+    private void RemoveColumnButton(int index)
+    {
+        if (index < 0 || index >= sec.Columns.Count) return;
+        sec.Columns[index].ActionText = null;
+        sec.Columns[index].ActionUrl = null;
+        sec.Columns[index].ActionIcon = null;
+    }
+
+    private void AddRowCard()
+    {
+        sec.Columns.Add(new SectionColumn
+        {
+            ActionIcon = "briefcase",
+            ActionNewTab = true,
+            ImageLinkNewTab = true,
+        });
+    }
+
+    private void AddGridCard()
+    {
+        sec.Columns.Add(new SectionColumn
+        {
+            ActionText = "Link",
+            ImageLinkNewTab = true,
+            ActionNewTab = true,
+        });
+    }
+
+    private void RemoveRowCard(int index)
+    {
+        if (index >= 0 && index < sec.Columns.Count)
+            sec.Columns.RemoveAt(index);
+    }
+
     private async Task SaveSection()
     {
         saving = true;
         message = "";
         try
         {
+            NormalizeSectionBeforeSave();
             page = await Pages.GetPageByIdAsync(PageId);
             if (page is null) return;
 
             var updatedSections = page.Sections.Select(existing => new PageSection
             {
                 SectionId = existing.SectionId,
+                AnchorId = existing.AnchorId,
                 Type = existing.Type,
                 Heading = existing.Heading,
                 Body = existing.Body,
+                Icon = existing.Icon,
                 ActionText = existing.ActionText,
                 ActionUrl = existing.ActionUrl,
                 ImageUrl = existing.ImageUrl,
                 ImageAlt = existing.ImageAlt,
+                ImageFullWidth = existing.ImageFullWidth,
                 Buttons = [.. existing.Buttons],
                 Columns = [.. existing.Columns],
             }).ToList();
@@ -369,12 +613,83 @@
         }
     }
 
+    private void OnIconPicked(string? icon)
+    {
+        if (icon is not null && iconTargetIsSection)
+            sec.Icon = icon;
+        else if (icon is not null && iconTargetIsColumn && iconTarget >= 0 && iconTarget < sec.Columns.Count)
+            sec.Columns[iconTarget].ActionIcon = icon;
+        else if (icon is not null && iconTarget >= 0 && iconTarget < sec.Buttons.Count)
+            sec.Buttons[iconTarget].Icon = icon;
+
+        _pickIconValue = icon;
+        showIconPicker = false;
+    }
+
+    private void NormalizeSectionBeforeSave()
+    {
+        if (sec.Type is "3-col")
+            sec.Heading = "";
+
+        if (sec.Type is not "2-col") return;
+
+        sec.Buttons.Clear();
+    }
+
+    private void OpenIconPicker(int index)
+    {
+        iconTarget = index;
+        iconTargetIsColumn = false;
+        iconTargetIsSection = false;
+        _pickIconValue = sec.Buttons[index].Icon;
+        showIconPicker = true;
+    }
+
+    private void OpenSectionIconPicker()
+    {
+        iconTarget = -1;
+        iconTargetIsColumn = false;
+        iconTargetIsSection = true;
+        _pickIconValue = sec.Icon;
+        showIconPicker = true;
+    }
+
+    private void OpenColumnIconPicker(int index)
+    {
+        iconTarget = index;
+        iconTargetIsColumn = true;
+        iconTargetIsSection = false;
+        _pickIconValue = sec.Columns[index].ActionIcon;
+        showIconPicker = true;
+    }
+
+    private void OpenSectionImagePicker()
+    {
+        imageTarget = -1;
+        showImagePicker = true;
+    }
+
+    private void OpenColumnImagePicker(int index)
+    {
+        imageTarget = index;
+        showImagePicker = true;
+    }
+
     private Task SetImagePath(string path)
     {
-        sec.ImageUrl = path;
+        if (imageTarget >= 0 && imageTarget < sec.Columns.Count)
+            sec.Columns[imageTarget].ImageUrl = path;
+        else
+            sec.ImageUrl = path;
+
         return Task.CompletedTask;
     }
 
+    private string CurrentImagePickerValue => imageTarget >= 0 && imageTarget < sec.Columns.Count
+        ? sec.Columns[imageTarget].ImageUrl ?? ""
+        : sec.ImageUrl ?? "";
+
 }
 
-<ImagePicker Open="showImagePicker" Value="sec.ImageUrl" ValueChanged="SetImagePath" OnClose="() => showImagePicker = false" />
+<ImagePicker Open="showImagePicker" Value="CurrentImagePickerValue" ValueChanged="SetImagePath" OnClose="() => showImagePicker = false" />
+<IconPicker Open="showIconPicker" Value="@_pickIconValue" ValueChanged="OnIconPicked" OnClose="() => showIconPicker = false" />

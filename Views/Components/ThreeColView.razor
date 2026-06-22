@@ -1,4 +1,4 @@
-<section class="grid-section">
+<section id="@Section.AnchorId" class="grid-section three-col-section">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
         @if (HeadingLevel == 1)
@@ -14,14 +14,18 @@
         @for (var ci = 0; ci < Math.Min(Section.Columns.Count, 3); ci++)
         {
             var col = Section.Columns[ci];
-            <div class="grid-col">
+            <div class="grid-col three-col-icon-block">
+                @if (!string.IsNullOrWhiteSpace(col.ActionIcon))
+                {
+                    <div class="three-col-icon"><i class="site-icon" data-lucide="@col.ActionIcon"></i></div>
+                }
                 @if (!string.IsNullOrWhiteSpace(col.Title))
                 {
                     <h3>@col.Title</h3>
                 }
                 @if (!string.IsNullOrWhiteSpace(col.Body))
                 {
-                    <div>@((MarkupString)col.Body)</div>
+                    <div class="content-body">@((MarkupString)col.Body)</div>
                 }
                 @if (!string.IsNullOrWhiteSpace(col.ActionText) && !string.IsNullOrWhiteSpace(col.ActionUrl))
                 {

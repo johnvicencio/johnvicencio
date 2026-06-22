@@ -9,11 +9,14 @@
 <div class="site-shell">
     <header class="site-header">
         <div class="container">
-            <nav>
-                <ul>
+            <nav class="site-nav">
+                <ul class="site-nav-brand">
                     <li><strong><a class="site-nav-link site-brand-link" href="/"><img class="site-brand-img" src="/images/johnvicencio-brand.png" alt="johnvicencio" /></a></strong></li>
                 </ul>
-                <ul>
+                <button type="button" class="site-menu-toggle outline secondary" aria-label="Toggle navigation menu" aria-expanded="@mobileMenuOpen" @onclick="ToggleMobileMenu">
+                    <i class="site-icon" data-lucide="@(mobileMenuOpen ? "x" : "menu")"></i>
+                </button>
+                <ul class="site-nav-links">
                     @foreach (var link in allNavLinks)
                     {
                         <li><a class="site-nav-link" href="@link.Url"><i class="site-icon" data-lucide="@link.Icon"></i>@link.Label</a></li>
@@ -25,6 +28,20 @@
                     }
                 </ul>
             </nav>
+            @if (mobileMenuOpen)
+            {
+                <nav class="site-mobile-nav" aria-label="Mobile navigation">
+                    @foreach (var link in allNavLinks)
+                    {
+                        <a class="site-nav-link" href="@link.Url" @onclick="CloseMobileMenu"><i class="site-icon" data-lucide="@link.Icon"></i>@link.Label</a>
+                    }
+                    @if (Session.IsLoggedIn)
+                    {
+                        <a class="site-nav-link" href="/admin" @onclick="CloseMobileMenu"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a>
+                        <a class="site-nav-link" href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a>
+                    }
+                </nav>
+            }
         </div>
     </header>
 
@@ -37,12 +54,12 @@
             <div class="footer-grid">
                 <div class="footer-col footer-about">
                     <h4>@footerAboutHeader</h4>
-                    <p>@footerAbout</p>
+                    <div class="footer-about-body">@((MarkupString)footerAbout)</div>
                 </div>
                 <div class="footer-col footer-sections">
                     <h4>Sections</h4>
                     <ul>
-                        @foreach (var sec in allNavLinks)
+                        @foreach (var sec in footerSectionLinks)
                         {
                             <li><a href="@sec.Url"><i class="site-icon" data-lucide="@sec.Icon"></i>@sec.Label</a></li>
                         }
@@ -69,9 +86,11 @@
 
 @code {
     private List<CustomNavLink> allNavLinks = [];
+    private List<CustomNavLink> footerSectionLinks = [];
     private string footerAboutHeader = "";
     private string footerAbout = "";
     private List<FooterConnect> footerConnects = [];
+    private bool mobileMenuOpen;
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,8 +114,19 @@
 
     private async Task LogOut()
     {
+        mobileMenuOpen = false;
         await Session.SignOutAsync(Js);
         Nav.NavigateTo("/", replace: true);
+    }
+
+    private void ToggleMobileMenu()
+    {
+        mobileMenuOpen = !mobileMenuOpen;
+    }
+
+    private void CloseMobileMenu()
+    {
+        mobileMenuOpen = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -113,6 +143,7 @@
         {
             allNavLinks = saved
                 .Where(n => !string.IsNullOrWhiteSpace(n.Label) && !string.IsNullOrWhiteSpace(n.Url))
+                .Where(n => !IsLegalUrl(n.Url))
                 .Select(n => new CustomNavLink
                 {
                     Label = n.Label,
@@ -125,7 +156,7 @@
         {
             var pages = await Pages.GetPagesAsync();
             allNavLinks = pages
-                .Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase))
+                .Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase) && !IsLegalSlug(p.Slug))
                 .OrderBy(p => p.SortOrder)
                 .ThenBy(p => p.Title)
                 .Select(p => new CustomNavLink
@@ -143,13 +174,39 @@
                 .ToList();
         }
 
+        footerSectionLinks = allNavLinks
+            .Concat([
+                new CustomNavLink { Label = "Terms & Conditions", Url = "/terms-and-conditions", Icon = "file-check" },
+                new CustomNavLink { Label = "Privacy", Url = "/privacy-policy", Icon = "fingerprint" },
+            ])
+            .ToList();
+
         footerAboutHeader = string.IsNullOrWhiteSpace(settings.FooterAboutHeader)
             ? "About John Vicencio"
             : settings.FooterAboutHeader;
         footerAbout = string.IsNullOrWhiteSpace(settings.FooterAbout)
             ? "John Serrano Vicencio was born in Manila, Philippines, and grew up in San Diego, California. His passion is to look at reality with depth and clarity while keeping an open mind. He focuses on C# and the .NET ecosystem, blending philosophy with software craftsmanship."
             : settings.FooterAbout;
-        footerConnects = [..(settings.FooterConnects ?? [])];
+        footerConnects = (settings.FooterConnects ?? [])
+            .Where(c => !string.IsNullOrWhiteSpace(c.Platform) && !string.IsNullOrWhiteSpace(c.Url))
+            .Select(c => new FooterConnect
+            {
+                Platform = c.Platform,
+                Url = c.Url,
+                Icon = string.IsNullOrWhiteSpace(c.Icon) ? "link" : c.Icon,
+            })
+            .ToList();
+    }
+
+    private static bool IsLegalSlug(string slug) =>
+        slug.Equals("terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
+        slug.Equals("privacy-policy", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsLegalUrl(string url)
+    {
+        var path = url.Split('#', '?')[0].TrimEnd('/');
+        return path.Equals("/terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/privacy-policy", StringComparison.OrdinalIgnoreCase);
     }
 
     private void OnPagesChanged()

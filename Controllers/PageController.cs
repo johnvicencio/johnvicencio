@@ -80,7 +80,7 @@ public sealed class PageController
     {
         var all = await GetPagesAsync();
         var movable = all
-            .Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase))
+            .Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase) && !IsLegalPage(p.Slug))
             .OrderBy(p => p.SortOrder)
             .ThenBy(p => p.Title)
             .ToList();
@@ -111,9 +111,13 @@ public sealed class PageController
             page.SortOrder = 0;
         }
 
-        foreach (var page in pageList.Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase)).OrderBy(p => p.SortOrder == 0 ? int.MaxValue : p.SortOrder).ThenBy(p => p.Title))
+        foreach (var page in pageList.Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase) && !IsLegalPage(p.Slug)).OrderBy(p => p.SortOrder == 0 ? int.MaxValue : p.SortOrder).ThenBy(p => p.Title))
         {
             page.SortOrder = next++;
         }
     }
+
+    private static bool IsLegalPage(string slug) =>
+        slug.Equals("terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
+        slug.Equals("privacy-policy", StringComparison.OrdinalIgnoreCase);
 }

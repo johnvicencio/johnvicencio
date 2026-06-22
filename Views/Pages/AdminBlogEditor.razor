@@ -5,13 +5,13 @@
 @inject BlogController Blog
 @inject PageController Pages
 
-<PageTitle>Admin — @(PostId is null ? "Add Post" : "Edit Post")</PageTitle>
+<PageTitle>@title</PageTitle>
 
 <div class="login-page" style="width:100%">
 
     <article style="width:100%;max-width:960px;margin:0 auto">
         <div class="table-toolbar">
-            <h2 style="margin:0">@(isAddMode ? "Add Post" : "Edit Post")</h2>
+            <h2 style="margin:0">@title</h2>
             <div>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
             </div>
@@ -28,6 +28,11 @@
         else
         {
             <div class="page-editor">
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <p role="alert" class="form-alert form-alert-danger">@message</p>
+                }
+
                 <div class="grid" style="grid-template-columns:1fr 1fr">
                     <label>Title
                         <input @bind="editPostTitle" @oninput="OnPostTitleChanged" />
@@ -74,10 +79,6 @@
                 <button @onclick="SavePost" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Post</button>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
 
-                @if (!string.IsNullOrWhiteSpace(message))
-                {
-                    <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-                }
             </div>
         }
     </article>
@@ -103,6 +104,10 @@
     private string editPostImageUrl = "";
     private string editPostDate = "";
     private bool showImagePicker;
+
+    private string title => PostId is null
+        ? "Add Post"
+        : string.IsNullOrWhiteSpace(editPostTitle) ? "Edit Post" : $"Edit {editPostTitle} Post";
 
     protected override async Task OnInitializedAsync()
     {

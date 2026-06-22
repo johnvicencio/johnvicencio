@@ -110,6 +110,7 @@
         if (firstRender)
         {
             rendered = true;
+            await Js.InvokeVoidAsync("richEditor.init", editorId);
             await Js.InvokeVoidAsync("richEditor.setHtml", editorId, Value);
         }
     }

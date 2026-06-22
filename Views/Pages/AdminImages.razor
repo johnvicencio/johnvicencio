@@ -3,7 +3,7 @@
 @inject NavigationManager Nav
 @inject ImageAssetController Images
 
-<PageTitle>Admin — Images</PageTitle>
+<PageTitle>Images</PageTitle>
 
 <div class="login-page" style="width:100%">
     <article style="width:100%;max-width:960px;margin:0 auto">
@@ -27,7 +27,7 @@
         }
         @if (!string.IsNullOrWhiteSpace(message))
         {
-            <p class="pagination-info" style="margin-top:0.5rem">@message</p>
+            <p role="alert" class="form-alert">@message</p>
         }
 
         <hr />

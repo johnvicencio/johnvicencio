@@ -1,30 +1,20 @@
-@page "/"
-@page "/home"
+@page "/{Slug}"
 @inject PageController Pages
-@inject NavigationManager Nav
-@inject SiteController Site
 
-<PageTitle>Home</PageTitle>
+<PageTitle>@(currentPage?.Title ?? "Not found")</PageTitle>
 
 @if (loading)
 {
-    <p>Loading home page...</p>
+    <p>Loading page...</p>
 }
-else if (maintenanceMode)
+else if (currentPage is null)
 {
-    <div style="text-align:center;padding:4rem 1rem">
-        <h1>Under Maintenance</h1>
-        <p style="font-size:1.2rem;color:var(--app-muted)">This site is currently undergoing scheduled maintenance. Please check back soon.</p>
-    </div>
-}
-else if (page is null)
-{
-    <p>Home page content was not found.</p>
+    <p role="alert">Sorry, there's nothing at this address.</p>
 }
 else
 {
     var hasPageH1 = false;
-    @foreach (var section in page.Sections)
+    @foreach (var section in currentPage.Sections)
     {
         var headingLevel = !hasPageH1 && !string.IsNullOrWhiteSpace(section.Heading) ? 1 : 2;
         if (headingLevel == 1)
@@ -60,26 +50,18 @@ else
 }
 
 @code {
-    private Page? page;
+    [Parameter]
+    public string? Slug { get; set; }
+
+    private Page? currentPage;
     private bool loading = true;
-    private bool maintenanceMode;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        if (new Uri(Nav.Uri).AbsolutePath.Equals("/home", StringComparison.OrdinalIgnoreCase))
-        {
-            Nav.NavigateTo("/", replace: true);
-            return;
-        }
-
-        var settings = await Site.GetSettingsAsync();
-        maintenanceMode = settings.MaintenanceMode;
-
-        if (!maintenanceMode)
-        {
-            page = await Pages.GetPageAsync("home");
-        }
-
+        loading = true;
+        currentPage = string.IsNullOrWhiteSpace(Slug)
+            ? null
+            : await Pages.GetPageAsync(Slug);
         loading = false;
     }
 }

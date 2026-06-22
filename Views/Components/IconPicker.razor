@@ -1,0 +1,83 @@
+@inject IJSRuntime Js
+
+@if (Open)
+{
+    <div class="icon-picker-backdrop" @onclick="Close">
+        <div class="icon-picker-modal" @onclick:stopPropagation>
+            <div class="table-toolbar">
+                <h4 style="margin:0">Select Icon</h4>
+                <button class="outline secondary" @onclick="Close" style="padding:0.25rem 0.5rem;font-size:0.75rem"><i class="site-icon" data-lucide="x"></i></button>
+            </div>
+
+            <input type="search" @bind="search" @bind:event="oninput" placeholder="Search icons..." style="margin-bottom:0.75rem" />
+
+            @if (icons.Count == 0)
+            {
+                <p class="pagination-info" style="text-align:center">Loading icons...</p>
+            }
+            else
+            {
+                var filtered = string.IsNullOrWhiteSpace(search)
+                    ? icons
+                    : icons.Where(i => i.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                @if (filtered.Count == 0)
+                {
+                    <p class="pagination-info" style="text-align:center">No icons matching "@search".</p>
+                }
+                else
+                {
+                    <div class="icon-picker-grid">
+                        @foreach (var icon in filtered)
+                        {
+                            var iName = icon;
+                            <button type="button" class="icon-picker-tile @(iName == Value ? "selected" : "")" title="@iName" @onclick="() => Select(iName)">
+                                <i class="site-icon" data-lucide="@iName" style="width:1rem;height:1rem"></i>
+                                <span>@iName</span>
+                            </button>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool Open { get; set; }
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private string search = "";
+    private List<string> icons = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        icons = await Js.InvokeAsync<List<string>>("getLucideIcons");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Open)
+            await Js.InvokeVoidAsync("lucide.createIcons");
+    }
+
+    private void Close()
+    {
+        OnClose.InvokeAsync();
+    }
+
+    private async Task Select(string icon)
+    {
+        await ValueChanged.InvokeAsync(icon);
+        await OnClose.InvokeAsync();
+    }
+}

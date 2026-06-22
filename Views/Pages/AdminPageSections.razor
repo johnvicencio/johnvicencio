@@ -3,13 +3,13 @@
 @inject NavigationManager Nav
 @inject PageController Pages
 
-<PageTitle>Admin — Sections</PageTitle>
+<PageTitle>@(page?.Title ?? "Page") Sections</PageTitle>
 
 <div class="login-page" style="width:100%">
 
     <article style="width:100%;max-width:960px;margin:0 auto">
         <div class="table-toolbar">
-            <h2 style="margin:0">Sections</h2>
+            <h2 style="margin:0">@(page?.Title ?? "Page") Sections</h2>
             <div style="display:flex;gap:0.5rem">
                 <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i></button>
                 @if (page?.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase) != true)
@@ -39,7 +39,7 @@
         {
             @if (!string.IsNullOrWhiteSpace(errorMessage))
             {
-                <p class="pagination-info" style="padding:1rem;color:var(--pico-del-color)">@errorMessage</p>
+                <p role="alert" class="form-alert form-alert-danger">@errorMessage</p>
             }
             <table>
                 <thead>

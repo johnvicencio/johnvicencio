@@ -1,6 +1,6 @@
 @inject HttpClient Http
 
-<section class="contact-section">
+<section id="@Section.AnchorId" class="contact-section">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
         @if (HeadingLevel == 1)
@@ -17,29 +17,27 @@
         <p>@((MarkupString)Section.Body)</p>
     }
 
-    <form class="contact-form" @onsubmit="HandleSubmit" @onsubmit:preventDefault>
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <p role="alert" class="form-alert @ContactAlertClass">@statusMessage</p>
+    }
+
+    <form class="contact-form" @onsubmit="HandleSubmit" @onsubmit:preventDefault @onkeydown="TrackKeyboard" @onpaste="TrackPaste" @oninput="TrackInput">
         <label style="position:absolute;left:-10000px" aria-hidden="true">Website
             <input tabindex="-1" autocomplete="off" @bind="website" />
         </label>
-        <label>Name
-            <input @bind="contactName" placeholder="Your name" />
+        <input @bind="contactName" aria-label="Your name" placeholder="Your name" />
+        <input type="email" @bind="contactEmail" aria-label="Your email" placeholder="your@email.com" />
+        <textarea @bind="contactMessage" rows="4" aria-label="Your message" placeholder="Your message..."></textarea>
+        <label class="contact-consent">
+            <input type="checkbox" @bind="consentAccepted" />
+            <span>I agree to the <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
         </label>
-        <label>Email
-            <input type="email" @bind="contactEmail" placeholder="your@email.com" />
-        </label>
-        <label>Message
-            <textarea @bind="contactMessage" rows="4" placeholder="Your message..."></textarea>
-        </label>
-        <label>Human Check: What is @challengeLeft + @challengeRight?
-            <input inputmode="numeric" @bind="challengeAnswer" placeholder="Answer" />
-        </label>
-        <button type="submit" aria-busy="@sending">Send Message</button>
+        <div class="contact-actions">
+            <button type="submit" aria-busy="@sending">Send Message</button>
+        </div>
     </form>
 
-    @if (!string.IsNullOrWhiteSpace(statusMessage))
-    {
-        <p class="pagination-info">@statusMessage</p>
-    }
 </section>
 
 @code {
@@ -53,11 +51,17 @@
     private string contactEmail = "";
     private string contactMessage = "";
     private string website = "";
-    private string challengeAnswer = "";
-    private int challengeLeft = Random.Shared.Next(2, 10);
-    private int challengeRight = Random.Shared.Next(2, 10);
+    private bool consentAccepted;
+    private DateTime formStartedUtc = DateTime.UtcNow;
+    private int keyboardEvents;
+    private int pasteEvents;
+    private int inputEvents;
     private bool sending;
     private string statusMessage = "";
+
+    private string ContactAlertClass => statusMessage.StartsWith("Message sent", StringComparison.OrdinalIgnoreCase)
+        ? "form-alert-success"
+        : "form-alert-danger";
 
     private async Task HandleSubmit()
     {
@@ -67,9 +71,9 @@
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(website) || !int.TryParse(challengeAnswer, out var answer) || answer != challengeLeft + challengeRight)
+        if (!consentAccepted)
         {
-            statusMessage = "Please complete the human check.";
+            statusMessage = "Please agree to the terms and privacy policy.";
             return;
         }
 
@@ -82,7 +86,15 @@
                 name = contactName,
                 email = contactEmail,
                 message = contactMessage,
-                website
+                website,
+                consentAccepted,
+                interaction = new
+                {
+                    elapsedMs = (int)Math.Max(0, (DateTime.UtcNow - formStartedUtc).TotalMilliseconds),
+                    keyboardEvents,
+                    pasteEvents,
+                    inputEvents
+                }
             });
 
             if (!response.IsSuccessStatusCode)
@@ -100,9 +112,8 @@
             contactEmail = "";
             contactMessage = "";
             website = "";
-            challengeAnswer = "";
-            challengeLeft = Random.Shared.Next(2, 10);
-            challengeRight = Random.Shared.Next(2, 10);
+            consentAccepted = false;
+            ResetInteractionTracking();
         }
         catch (Exception ex)
         {
@@ -117,5 +128,28 @@
     private sealed class ContactSubmitResult
     {
         public bool EmailSent { get; set; }
+    }
+
+    private void TrackKeyboard()
+    {
+        keyboardEvents++;
+    }
+
+    private void TrackPaste()
+    {
+        pasteEvents++;
+    }
+
+    private void TrackInput()
+    {
+        inputEvents++;
+    }
+
+    private void ResetInteractionTracking()
+    {
+        formStartedUtc = DateTime.UtcNow;
+        keyboardEvents = 0;
+        pasteEvents = 0;
+        inputEvents = 0;
     }
 }

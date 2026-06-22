@@ -5,7 +5,7 @@
 @inject PageController Pages
 @inject IJSRuntime Js
 
-<PageTitle>Admin — Nav Bar</PageTitle>
+<PageTitle>Nav Bar</PageTitle>
 
 <div class="login-page" style="width:100%">
 
@@ -22,6 +22,11 @@
             Page links are pre-loaded from <a href="/admin/pages">Pages</a>.
             Use <code>#block</code> URLs for same-page anchor links.
         </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <p role="alert" class="form-alert form-alert-success">@message</p>
+        }
 
         <div class="table-wrap">
             <table>
@@ -45,13 +50,30 @@
                             {
                                 <td><input @bind="navLinks[idx].Label" placeholder="e.g. About" /></td>
                                 <td><input @bind="navLinks[idx].Url" placeholder="e.g. /about or #block" /></td>
-                                <td><input @bind="navLinks[idx].Icon" placeholder="e.g. user" /></td>
+                                <td>
+                                    <div style="display:flex;gap:0.35rem;align-items:center">
+                                        <input @bind="navLinks[idx].Icon" placeholder="icon-name" />
+                                        <button type="button" class="outline" title="Choose icon" aria-label="Choose icon" style="padding:0.35rem 0.5rem;min-height:auto" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
+                                        @if (!string.IsNullOrWhiteSpace(navLinks[idx].Icon))
+                                        {
+                                            <i class="site-icon" data-lucide="@navLinks[idx].Icon"></i>
+                                        }
+                                    </div>
+                                </td>
                             }
                             else
                             {
                                 <td><span style="font-weight:600">@navLinks[idx].Label</span></td>
                                 <td><code style="font-size:0.85rem">@navLinks[idx].Url</code></td>
-                                <td><code style="font-size:0.85rem;color:var(--app-muted)">@navLinks[idx].Icon</code></td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(navLinks[idx].Icon))
+                                    {
+                                        <span style="display:inline-flex;align-items:center;gap:0.35rem">
+                                            <i class="site-icon" data-lucide="@navLinks[idx].Icon"></i>
+                                            <code style="font-size:0.85rem;color:var(--app-muted)">@navLinks[idx].Icon</code>
+                                        </span>
+                                    }
+                                </td>
                             }
                             <td style="white-space:nowrap">
                                 <button class="outline secondary" title="Move up" aria-label="Move up" @onclick="() => MoveNavLink(idx, -1)" disabled="@(idx == 0)" style="padding:0.25rem 0.45rem;min-height:auto">
@@ -99,13 +121,11 @@
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(message))
-        {
-            <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-        }
     </article>
 
 </div>
+
+<IconPicker Open="showIconPicker" Value="@_pickIconValue" ValueChanged="OnIconPicked" OnClose="() => showIconPicker = false" />
 
 @code {
     private bool saving;
@@ -114,6 +134,9 @@
     private List<CustomNavLink> navLinks = [];
     private HashSet<int> editingNav = [];
     private Dictionary<int, CustomNavLink> editingBackup = [];
+    private int iconTarget;
+    private string? _pickIconValue;
+    private bool showIconPicker;
 
     protected override async Task OnInitializedAsync()
     {
@@ -207,6 +230,22 @@
     {
         navLinks.Add(new CustomNavLink());
         editingNav.Add(navLinks.Count - 1);
+    }
+
+    private void OpenIconPicker(int index)
+    {
+        iconTarget = index;
+        _pickIconValue = navLinks[index].Icon;
+        showIconPicker = true;
+    }
+
+    private void OnIconPicked(string? icon)
+    {
+        if (icon is not null && iconTarget >= 0 && iconTarget < navLinks.Count)
+            navLinks[iconTarget].Icon = icon;
+
+        _pickIconValue = icon;
+        showIconPicker = false;
     }
 
     private async Task RemoveNavLink(int index)

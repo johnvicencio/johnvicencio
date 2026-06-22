@@ -3,7 +3,7 @@
 @inject NavigationManager Nav
 @inject PageController Pages
 
-<PageTitle>Admin — Pages</PageTitle>
+<PageTitle>Pages</PageTitle>
 
 <div class="login-page" style="width:100%">
 
@@ -35,16 +35,17 @@
             <tbody>
                 @foreach (var pg in OrderedPages)
                 {
-                    var movablePages = OrderedPages.Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase)).ToList();
+                    var movablePages = OrderedPages.Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase) && !IsLegalPage(p.Slug)).ToList();
                     var orderIndex = movablePages.FindIndex(p => p.Id == pg.Id);
                     var isHome = pg.Slug.Equals("home", StringComparison.OrdinalIgnoreCase);
+                    var isLegalPage = IsLegalPage(pg.Slug);
                     <tr>
                         <td style="font-family:monospace;font-size:0.75rem">@pg.Id</td>
                         <td><strong>@pg.Title</strong></td>
                         <td>@pg.Slug</td>
                         <td>@pg.Sections.Count</td>
                         <td>
-                            @if (isHome)
+                            @if (isHome || isLegalPage)
                             {
                                 <span class="pagination-info">Locked</span>
                             }
@@ -73,6 +74,10 @@
     private List<Page> pageList = [];
     private bool savingOrder;
     private List<Page> OrderedPages => pageList.OrderBy(p => p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase) ? -1 : p.SortOrder).ThenBy(p => p.Title).ToList();
+
+    private static bool IsLegalPage(string slug) =>
+        slug.Equals("terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
+        slug.Equals("privacy-policy", StringComparison.OrdinalIgnoreCase);
 
     protected override async Task OnInitializedAsync()
     {

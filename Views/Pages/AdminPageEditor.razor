@@ -4,13 +4,13 @@
 @inject NavigationManager Nav
 @inject PageController Pages
 
-<PageTitle>Admin — @(PageId is null ? "Add Page" : "Edit Page")</PageTitle>
+<PageTitle>@title</PageTitle>
 
 <div class="login-page" style="width:100%">
 
     <article style="width:100%;max-width:960px;margin:0 auto">
         <div class="table-toolbar">
-            <h2 style="margin:0">@(isAddMode ? "Add Page" : "Edit Page")</h2>
+            <h2 style="margin:0">@title</h2>
             <div>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
             </div>
@@ -23,6 +23,11 @@
         else
         {
             <div class="page-editor">
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <p role="alert" class="form-alert form-alert-danger">@message</p>
+                }
+
                 @if (isAddMode)
                 {
                     <label>Page Type
@@ -65,7 +70,6 @@
                     else
                     {
                         <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
-                            <button class="outline" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i>Add Section</button>
                             <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="layers"></i>Manage Sections</button>
                         </div>
                         <p class="pagination-info">@sectionCount section(s) on this page.</p>
@@ -76,10 +80,6 @@
                 <button @onclick="SavePage" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Page</button>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
 
-                @if (!string.IsNullOrWhiteSpace(message))
-                {
-                    <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-                }
             </div>
         }
     </article>
@@ -101,6 +101,10 @@
     private string editDescription = "";
     private string editKeywords = "";
     private string pageKind = "content";
+
+    private string title => PageId is null
+        ? "Add Page"
+        : string.IsNullOrWhiteSpace(editTitle) ? "Edit Page" : $"Edit {editTitle} Page";
 
     private bool IsBlogPage => editSlug.Equals("blog", StringComparison.OrdinalIgnoreCase);
 

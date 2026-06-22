@@ -1,4 +1,4 @@
-<section class="grid-section">
+<section id="@Section.AnchorId" class="grid-section">
     @if (!string.IsNullOrWhiteSpace(Section.Heading))
     {
         @if (HeadingLevel == 1)
@@ -25,7 +25,13 @@
                 }
                 @if (!string.IsNullOrWhiteSpace(col.ActionText) && !string.IsNullOrWhiteSpace(col.ActionUrl))
                 {
-                    <a href="@col.ActionUrl" role="button" class="outline">@col.ActionText</a>
+                    <a href="@col.ActionUrl" role="button" class="outline">
+                        @if (!string.IsNullOrWhiteSpace(col.ActionIcon))
+                        {
+                            <i class="site-icon" data-lucide="@col.ActionIcon"></i>
+                        }
+                        @col.ActionText
+                    </a>
                 }
             </div>
         }

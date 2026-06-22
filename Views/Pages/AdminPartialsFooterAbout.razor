@@ -4,7 +4,7 @@
 @inject SiteController Site
 @inject IJSRuntime Js
 
-<PageTitle>Admin — Footer About</PageTitle>
+<PageTitle>Footer About</PageTitle>
 
 <div class="login-page" style="width:100%">
 
@@ -20,20 +20,21 @@
             Edit the header and about text that appear in the footer About column.
         </p>
 
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <p role="alert" class="form-alert form-alert-success">@message</p>
+        }
+
         <label for="footer-about-header">Header</label>
         <input id="footer-about-header" @bind="footerAboutHeader" placeholder="e.g. About John Vicencio" />
 
         <label for="footer-about-text" style="margin-top:1rem">About Text</label>
-        <textarea id="footer-about-text" @bind="footerAbout" rows="6" placeholder="Write about yourself..."></textarea>
+        <RichTextEditor @bind-Value="footerAbout" MinHeight="220" Placeholder="Write about yourself..." />
 
         <div style="display:flex;gap:0.5rem;margin-top:1rem">
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(message))
-        {
-            <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-        }
     </article>
 
 </div>

@@ -4,7 +4,7 @@
 @inject SiteController Site
 @inject IJSRuntime Js
 
-<PageTitle>Admin — Footer Connect</PageTitle>
+<PageTitle>Footer Connect</PageTitle>
 
 <div class="login-page" style="width:100%">
 
@@ -17,9 +17,13 @@
         </div>
 
         <p style="font-size:0.9rem;color:var(--app-muted)">
-            Manage social media and connect links in the footer.
-            Common icon names: <code>github</code>, <code>linkedin</code>, <code>twitter</code>, <code>mail</code>, <code>facebook</code>, <code>instagram</code>.
+            Manage social media and connect links in the footer. Use the icon search button to choose from available Lucide icons.
         </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <p role="alert" class="form-alert form-alert-success">@message</p>
+        }
 
         <div class="table-wrap">
             <table>
@@ -38,7 +42,16 @@
                         <tr>
                             <td><input @bind="footerConnects[idx].Platform" placeholder="e.g. Twitter" /></td>
                             <td><input @bind="footerConnects[idx].Url" placeholder="https://twitter.com/..." /></td>
-                            <td><input @bind="footerConnects[idx].Icon" placeholder="e.g. twitter" /></td>
+                            <td>
+                                <div style="display:flex;gap:0.35rem;align-items:center">
+                                    <input @bind="footerConnects[idx].Icon" placeholder="icon-name" />
+                                    <button type="button" class="outline" title="Choose icon" aria-label="Choose icon" style="padding:0.35rem 0.5rem;min-height:auto" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
+                                    @if (!string.IsNullOrWhiteSpace(footerConnects[idx].Icon))
+                                    {
+                                        <i class="site-icon" data-lucide="@footerConnects[idx].Icon"></i>
+                                    }
+                                </div>
+                            </td>
                             <td>
                                 <button class="outline secondary" title="Remove" aria-label="Remove connect link" @onclick="() => RemoveConnect(idx)" style="padding:0.25rem 0.5rem;min-height:auto">
                                     <i class="site-icon" data-lucide="trash-2"></i>
@@ -57,18 +70,19 @@
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(message))
-        {
-            <p class="pagination-info" style="margin-top:0.5rem">@message</p>
-        }
     </article>
 
 </div>
+
+<IconPicker Open="showIconPicker" Value="@_pickIconValue" ValueChanged="OnIconPicked" OnClose="() => showIconPicker = false" />
 
 @code {
     private bool saving;
     private string message = "";
     private List<FooterConnect> footerConnects = [];
+    private int iconTarget;
+    private string? _pickIconValue;
+    private bool showIconPicker;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,6 +110,22 @@
     {
         if (index >= 0 && index < footerConnects.Count)
             footerConnects.RemoveAt(index);
+    }
+
+    private void OpenIconPicker(int index)
+    {
+        iconTarget = index;
+        _pickIconValue = footerConnects[index].Icon;
+        showIconPicker = true;
+    }
+
+    private void OnIconPicked(string? icon)
+    {
+        if (icon is not null && iconTarget >= 0 && iconTarget < footerConnects.Count)
+            footerConnects[iconTarget].Icon = icon;
+
+        _pickIconValue = icon;
+        showIconPicker = false;
     }
 
     private async Task Save()
