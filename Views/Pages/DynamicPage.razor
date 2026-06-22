@@ -1,7 +1,8 @@
 @page "/{Slug}"
 @inject PageController Pages
+@inject IJSRuntime Js
 
-<PageTitle>@(currentPage?.Title ?? "Not found")</PageTitle>
+<PageTitle>@(currentPage is not null ? $"{currentPage.Title} — John Vicencio" : "Not found — John Vicencio")</PageTitle>
 
 @if (loading)
 {
@@ -63,5 +64,21 @@ else
             ? null
             : await Pages.GetPageAsync(Slug);
         loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (currentPage is not null)
+        {
+            var desc = !string.IsNullOrWhiteSpace(currentPage.Description)
+                ? currentPage.Description
+                : $"{currentPage.Title} — John Vicencio";
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = $"{currentPage.Title} — John Vicencio",
+                description = desc
+            });
+        }
+        await Js.InvokeVoidAsync("lucide.createIcons");
     }
 }

@@ -1,7 +1,8 @@
 @page "/contact"
 @inject PageController Pages
+@inject IJSRuntime Js
 
-<PageTitle>Contact</PageTitle>
+<PageTitle>Contact — John Vicencio</PageTitle>
 
 @if (loading)
 {
@@ -57,5 +58,18 @@ else
     {
         currentPage = await Pages.GetPageAsync("contact");
         loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = "Contact — John Vicencio",
+                description = "Get in touch with John Vicencio. Send a message, ask a question, or discuss a project."
+            });
+        }
+        await Js.InvokeVoidAsync("lucide.createIcons");
     }
 }

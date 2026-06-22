@@ -1,8 +1,9 @@
 @page "/blog"
 @inject BlogController BlogController
 @inject RouterController Router
+@inject IJSRuntime Js
 
-<PageTitle>Blog</PageTitle>
+<PageTitle>Blog — John Vicencio</PageTitle>
 
 <h1>Blog</h1>
 
@@ -53,6 +54,19 @@ else
         posts = (await BlogController.GetPostsAsync())
             .OrderByDescending(post => post.PublishedOn)
             .ToList();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = "Blog — John Vicencio",
+                description = "Read the latest thoughts, projects, and insights from John Vicencio on C#, .NET, philosophy, and software craftsmanship."
+            });
+        }
+        await Js.InvokeVoidAsync("lucide.createIcons");
     }
 
     private static string Truncate(string value, int maxLength)

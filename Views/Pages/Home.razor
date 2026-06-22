@@ -3,8 +3,9 @@
 @inject PageController Pages
 @inject NavigationManager Nav
 @inject SiteController Site
+@inject IJSRuntime Js
 
-<PageTitle>Home</PageTitle>
+<PageTitle>John Vicencio — Web Technology Craftsmanship</PageTitle>
 
 @if (loading)
 {
@@ -66,5 +67,19 @@ else
 
         page = await Pages.GetPageAsync("home");
         loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = "John Vicencio — Web Technology Craftsmanship",
+                description = "John Vicencio — Web technology craftsmanship. C# / .NET developer, philosopher, and lifelong learner based in San Diego.",
+                image = "https://johnvicencio.com/images/johnvicencio-brand.png"
+            });
+        }
+        await Js.InvokeVoidAsync("lucide.createIcons");
     }
 }

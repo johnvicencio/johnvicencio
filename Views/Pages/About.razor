@@ -1,7 +1,8 @@
 @page "/about"
 @inject PageController Pages
+@inject IJSRuntime Js
 
-<PageTitle>About</PageTitle>
+<PageTitle>About — John Vicencio</PageTitle>
 
 @if (loading)
 {
@@ -57,5 +58,18 @@ else
     {
         currentPage = await Pages.GetPageAsync("about");
         loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("setPageMeta", new
+            {
+                title = "About — John Vicencio",
+                description = "Learn about John Vicencio — C# / .NET developer, philosopher, and lifelong learner blending software craftsmanship with depth and clarity."
+            });
+        }
+        await Js.InvokeVoidAsync("lucide.createIcons");
     }
 }
