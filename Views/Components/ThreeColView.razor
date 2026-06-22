@@ -10,7 +10,7 @@
             <h2>@Section.Heading</h2>
         }
     }
-    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:1.5rem">
+    <div class="grid">
         @for (var ci = 0; ci < Math.Min(Section.Columns.Count, 3); ci++)
         {
             var col = Section.Columns[ci];
