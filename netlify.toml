@@ -45,6 +45,16 @@
   status = 200
 
 [[redirects]]
+  from = "/experience"
+  to = "/#experience"
+  status = 301
+
+[[redirects]]
+  from = "/portfolio"
+  to = "/#portfolio"
+  status = 301
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
