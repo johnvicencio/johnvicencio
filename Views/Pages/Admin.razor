@@ -77,7 +77,11 @@ else
 
         <article class="admin-card">
             <h3>Settings</h3>
-            <p class="pagination-info" style="margin:0.25rem 0">—</p>
+            <p class="pagination-info" style="margin:0.25rem 0">
+                <a href="https://app.netlify.com/projects/johnvicencio/deploys" target="_blank" rel="noopener noreferrer">
+                    <img src="https://api.netlify.com/api/v1/badges/a990b9f4-0b90-4325-9054-5ab13fe29c75/deploy-status" alt="Netlify Deploy Status" style="display:block" />
+                </a>
+            </p>
             <hr />
             <button class="outline" title="Manage Settings" aria-label="Manage Settings" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/settings")'><i class="site-icon" data-lucide="settings"></i></button>
         </article>
