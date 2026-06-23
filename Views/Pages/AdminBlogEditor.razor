@@ -24,7 +24,7 @@
                     <p role="alert" class="form-alert form-alert-danger">@message</p>
                 }
 
-                <div class="grid" style="grid-template-columns:1fr 1fr">
+                <div class="grid grid-2col">
                     <label>Title
                         <input @bind="editPostTitle" @oninput="OnPostTitleChanged" />
                     </label>
@@ -33,7 +33,7 @@
                     </label>
                 </div>
 
-                <div class="grid" style="grid-template-columns:1fr 1fr">
+                <div class="grid grid-2col">
                     <label>Description (SEO)
                         <input @bind="editPostDescription" />
                     </label>

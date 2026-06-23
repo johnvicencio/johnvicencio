@@ -1,12 +1,11 @@
 @page "/admin/partials/footerconnect"
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject SiteController Site
 
 <PageTitle>Footer Connect</PageTitle>
 <AdminPageLayout>
         <div class="table-toolbar">
-            <h2 style="margin:0">Footer Connect</h2>
+            <h2>Footer Connect</h2>
             <div>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
         </div>
@@ -87,14 +86,7 @@
 
         var settings = await Site.GetSettingsAsync();
         footerConnects = [..(settings.FooterConnects ?? [])];
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
-
-    private void AddConnect()
+    }private void AddConnect()
     {
         footerConnects.Add(new FooterConnect());
     }

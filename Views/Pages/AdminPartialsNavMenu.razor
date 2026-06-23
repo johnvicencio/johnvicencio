@@ -2,7 +2,6 @@
 @inject NavigationManager Nav
 @inject SiteController Site
 @inject PageController Pages
-@inject IJSRuntime Js
 
 <PageTitle>Nav Bar</PageTitle>
 
@@ -134,14 +133,7 @@
         {
             await SyncNavFromPages();
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
-
-    private async Task SyncNavFromPages()
+    }private async Task SyncNavFromPages()
     {
         var pages = await Pages.GetPagesAsync();
         navLinks = pages

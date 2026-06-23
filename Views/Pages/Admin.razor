@@ -4,7 +4,6 @@
 @inject BlogController Blog
 @inject ContactMessageController Messages
 @inject DataStore Store
-@inject IJSRuntime Js
 
 <PageTitle>Admin</PageTitle>
 
@@ -123,12 +122,5 @@ else
         {
             loading = false;
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
-
-}
+    }}
 

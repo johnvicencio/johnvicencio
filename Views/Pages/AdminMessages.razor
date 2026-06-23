@@ -1,7 +1,6 @@
 @page "/admin/messages"
 @inject NavigationManager Nav
 @inject ContactMessageController Messages
-@inject IJSRuntime Js
 
 <PageTitle>Messages</PageTitle>
 
@@ -77,14 +76,7 @@
         {
             loading = false;
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
-
-    private void OnSearchInput(ChangeEventArgs e)
+    }private void OnSearchInput(ChangeEventArgs e)
     {
         search = e.Value?.ToString() ?? "";
         ApplyFilter();

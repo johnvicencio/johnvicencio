@@ -21,7 +21,7 @@
                 <p role="alert" class="form-alert form-alert-success">@message</p>
             }
 
-            <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div class="grid grid-2col">
                 <label>Site Name
                     <input @bind="settings.SiteName" />
                 </label>
@@ -30,7 +30,7 @@
                 </label>
             </div>
 
-            <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div class="grid grid-2col">
                 <label>Author Name
                     <input @bind="settings.AuthorName" />
                 </label>
@@ -54,7 +54,7 @@
             <h3>Email / SMTP</h3>
             <p style="font-size:0.9rem">Google app passwords are encrypted by the Netlify Function before saving to Blobs. Set <code>SETTINGS_ENCRYPTION_KEY</code> in Netlify first.</p>
 
-            <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div class="grid grid-2col">
                 <label>SMTP Host
                     <input @bind="settings.SmtpHost" placeholder="smtp.example.com" />
                 </label>
@@ -63,7 +63,7 @@
                 </label>
             </div>
 
-            <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div class="grid grid-2col">
                 <label>SMTP Username
                     <input @bind="settings.SmtpUsername" />
                 </label>
@@ -80,7 +80,7 @@
                 <p class="pagination-info"><i class="site-icon" data-lucide="circle-alert"></i>No Google app password is saved yet.</p>
             }
 
-            <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div class="grid grid-2col">
                 <label>From Email
                     <input type="email" @bind="settings.FromEmail" placeholder="noreply@example.com" />
                 </label>

@@ -1,5 +1,4 @@
 @page "/admin/messages/{MessageId}"
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject ContactMessageController Messages
 
@@ -84,14 +83,7 @@
         }
         if (string.IsNullOrWhiteSpace(errorMessage))
             Nav.NavigateTo("/admin/messages", replace: true);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
-
-    private static string FormatDate(DateTimeOffset dto)
+    }private static string FormatDate(DateTimeOffset dto)
     {
         var local = dto.ToLocalTime();
         return local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt").ToLowerInvariant();

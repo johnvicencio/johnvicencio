@@ -46,10 +46,4 @@
 </AdminPageLayout>
 
 @code {
-    @inject IJSRuntime Js
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
 }

@@ -3,7 +3,6 @@
 @inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject PageController Pages
-@inject IJSRuntime Js
 
 <PageTitle>@title</PageTitle>
 
@@ -75,7 +74,7 @@
                             var btn = sec.Buttons[bi];
                             var localBi = bi;
                             <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Button Icon
                                         <div class="flex-group">
                                             <input @bind="btn.Icon" placeholder="icon-name" />
@@ -87,7 +86,7 @@
                                         <input @bind="btn.Text" />
                                     </label>
                                 </div>
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Button URL
                                         <input @bind="btn.Url" />
                                     </label>
@@ -119,7 +118,7 @@
                                 </div>
                                 @if (!string.IsNullOrWhiteSpace(col.ActionText) || !string.IsNullOrWhiteSpace(col.ActionUrl))
                                 {
-                                    <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <div class="grid grid-2col">
                                         <label>Button Icon
                                             <div class="flex-group">
                                                 <input @bind="col.ActionIcon" placeholder="icon-name" />
@@ -131,7 +130,7 @@
                                             <input @bind="col.ActionText" />
                                         </label>
                                     </div>
-                                    <div class="grid" style="grid-template-columns:1fr 1fr">
+                                    <div class="grid grid-2col">
                                         <label>Button URL
                                             <input @bind="col.ActionUrl" />
                                         </label>
@@ -161,7 +160,7 @@
                                 </label>
                                 <label>Body</label>
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="220" />
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Action Text
                                         <input @bind="col.ActionText" />
                                     </label>
@@ -198,7 +197,7 @@
                                     <h5 style="margin:0">Card @(localCi + 1)</h5>
                                     <button type="button" class="outline danger" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Image URL
                                         <input @bind="col.ImageUrl" />
                                     </label>
@@ -211,7 +210,7 @@
                                 {
                                     <p class="pagination-info">Selected: <code>@col.ImageUrl</code></p>
                                 }
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Image Link
                                         <input @bind="col.ImageLink" />
                                     </label>
@@ -227,7 +226,7 @@
                                 </label>
                                 <label>Description</label>
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="180" />
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Bottom Link Text
                                         <input @bind="col.ActionText" />
                                     </label>
@@ -271,7 +270,7 @@
                                     <h5 style="margin:0">Card @(localCi + 1)</h5>
                                     <button type="button" class="outline danger" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Avatar Image URL
                                         <input @bind="col.ImageUrl" />
                                     </label>
@@ -284,7 +283,7 @@
                                 {
                                     <p class="pagination-info">Selected: <code>@col.ImageUrl</code></p>
                                 }
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Image Link
                                         <input @bind="col.ImageLink" />
                                     </label>
@@ -295,7 +294,7 @@
                                         </select>
                                     </label>
                                 </div>
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Title
                                         <input @bind="col.Title" />
                                     </label>
@@ -305,7 +304,7 @@
                                 </div>
                                 <label>Description</label>
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="180" />
-                                <div class="grid" style="grid-template-columns:1fr 1fr">
+                                <div class="grid grid-2col">
                                     <label>Right Icon
                                         <div class="flex-group">
                                             <input @bind="col.ActionIcon" placeholder="icon-name" />
@@ -397,14 +396,7 @@
     {
         if (Session.IsLoggedIn)
             await InitAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
-
-    private async Task InitAsync()
+    }private async Task InitAsync()
     {
         loading = true;
         isAddMode = false;
