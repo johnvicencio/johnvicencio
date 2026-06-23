@@ -1,5 +1,4 @@
 @page "/admin/partials/navmenu"
-@inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject SiteController Site
 @inject PageController Pages
@@ -7,15 +6,7 @@
 
 <PageTitle>Nav Bar</PageTitle>
 
-<div class="login-page" style="width:100%">
-
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">Nav Bar</h2>
-            <div>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
-            </div>
-        </div>
+<AdminPageLayout Title="Nav Bar">
 
         <p class="muted-text">
             Manage all nav bar links. Reorder with arrows, edit inline, delete, or add new links.
@@ -120,10 +111,7 @@
         <div style="display:flex;gap:0.5rem;margin-top:1rem">
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
-
-    </article>
-
-</div>
+</AdminPageLayout>
 
 <IconPicker Open="showIconPicker" Value="@_pickIconValue" ValueChanged="OnIconPicked" OnClose="() => showIconPicker = false" />
 
@@ -140,13 +128,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         var settings = await Site.GetSettingsAsync();
         navLinks = [..(settings.NavLinks ?? [])];
         if (navLinks.Count == 0)

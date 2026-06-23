@@ -1,5 +1,4 @@
 @page "/admin"
-@inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject PageController Pages
 @inject BlogController Blog
@@ -9,7 +8,7 @@
 
 <PageTitle>Admin</PageTitle>
 
-<div class="login-page" style="width:100%">
+<AdminPageLayout>
 
 @if (loading)
 {
@@ -88,7 +87,7 @@ else
 
     </div>
 }
-</div>
+</AdminPageLayout>
 
 @code {
     private bool loading = true;
@@ -101,13 +100,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         try
         {
             var pageList = await Pages.GetPagesAsync();

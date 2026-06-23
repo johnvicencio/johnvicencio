@@ -1,19 +1,11 @@
 @page "/admin/messages"
-@inject VaultSessionService Session
 @inject NavigationManager Nav
 @inject ContactMessageController Messages
 @inject IJSRuntime Js
 
 <PageTitle>Messages</PageTitle>
 
-<div class="login-page" style="width:100%">
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">Messages</h2>
-            <div>
-                <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
-            </div>
-        </div>
+<AdminPageLayout Title="Messages">
 
         <div style="margin-bottom:0.75rem">
             <input value="@search" @oninput="OnSearchInput" placeholder="Search name, email, or message..." />
@@ -60,8 +52,7 @@
                 </tbody>
             </table></div>
         }
-    </article>
-</div>
+</AdminPageLayout>
 
 @code {
     private bool loading = true;
@@ -73,13 +64,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         try
         {
             messageList = await Messages.GetMessagesAsync();
