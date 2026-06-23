@@ -1,0 +1,32 @@
+@if (!string.IsNullOrWhiteSpace(Heading))
+{
+    @if (!string.IsNullOrWhiteSpace(Icon) || !string.IsNullOrWhiteSpace(Class))
+    {
+        <header class="@Class">
+            @if (!string.IsNullOrWhiteSpace(Icon))
+            {
+                <i class="site-icon" data-lucide="@Icon"></i>
+            }
+            @HeadingMarkup
+        </header>
+    }
+    else
+    {
+        @HeadingMarkup
+    }
+}
+
+@code {
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string Heading { get; set; } = "";
+    [Parameter] public int HeadingLevel { get; set; } = 2;
+    [Parameter] public string? Icon { get; set; }
+
+    private RenderFragment HeadingMarkup => __builder =>
+    {
+        var level = Math.Clamp(HeadingLevel, 1, 6);
+        __builder.OpenElement(0, $"h{level}");
+        __builder.AddContent(1, Heading);
+        __builder.CloseElement();
+    };
+}

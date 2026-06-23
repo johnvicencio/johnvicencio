@@ -1,28 +1,12 @@
 @inject IJSRuntime Js
 
 <section id="@Section.AnchorId" class="card-collection @(IsGridCard ? "grid-card-section" : "row-card-section")">
-    @if (!string.IsNullOrWhiteSpace(Section.Heading))
-    {
-        <div class="row-card-heading">
-        @if (!string.IsNullOrWhiteSpace(Section.Icon))
-        {
-            <i class="site-icon" data-lucide="@Section.Icon"></i>
-        }
-        @if (HeadingLevel == 1)
-        {
-            <h1>@Section.Heading</h1>
-        }
-        else
-        {
-            <h2>@Section.Heading</h2>
-        }
-        </div>
-    }
+    <SectionHeading Class="row-card-heading" Heading="@Section.Heading" HeadingLevel="@HeadingLevel" Icon="@Section.Icon" />
     @if (Section.Columns.Count > 0)
     {
         @if (IsGridCard)
         {
-            <div class="grid-card-grid">
+            <div class="grid grid-card-grid">
                 @foreach (var item in Section.Columns)
                 {
                     <article class="portfolio-card">
@@ -129,6 +113,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Js.InvokeVoidAsync("lucide.createIcons");
+        await LucideInterop.RefreshIconsAsync(Js);
     }
 }

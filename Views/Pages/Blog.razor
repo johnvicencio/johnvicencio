@@ -8,14 +8,7 @@
 
 <div class="page-header">
     <h1>Blog</h1>
-    <div class="table-search">
-        <i class="site-icon" data-lucide="search"></i>
-        <input type="text" placeholder="Search posts..." @bind="searchQuery" @bind:event="oninput" aria-label="Search posts" />
-        @if (!string.IsNullOrWhiteSpace(searchQuery))
-        {
-            <button class="outline secondary btn-action" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
-        }
-    </div>
+    <SearchFilter SearchQuery="@searchQuery" SearchQueryChanged="HandleSearch" Placeholder="Search posts..." />
 </div>
 
 @if (FilteredPosts.Count == 0)
@@ -80,9 +73,9 @@ else
         return $"/blog?page={p}";
     }
 
-    private void ClearSearch()
+    private void HandleSearch(string val)
     {
-        searchQuery = "";
+        searchQuery = val;
     }
 
     protected override async Task OnInitializedAsync()

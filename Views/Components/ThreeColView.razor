@@ -1,15 +1,5 @@
 <section id="@Section.AnchorId" class="grid-section three-col-section">
-    @if (!string.IsNullOrWhiteSpace(Section.Heading))
-    {
-        @if (HeadingLevel == 1)
-        {
-            <h1>@Section.Heading</h1>
-        }
-        else
-        {
-            <h2>@Section.Heading</h2>
-        }
-    }
+    <SectionHeading Heading="@Section.Heading" HeadingLevel="@HeadingLevel" />
     <div class="grid">
         @for (var ci = 0; ci < Math.Min(Section.Columns.Count, 3); ci++)
         {
@@ -19,17 +9,7 @@
                 {
                     <div class="three-col-icon"><i class="site-icon" data-lucide="@col.ActionIcon"></i></div>
                 }
-                @if (!string.IsNullOrWhiteSpace(col.Title))
-                {
-                    @if (HeadingLevel == 1)
-                    {
-                        <h2>@col.Title</h2>
-                    }
-                    else
-                    {
-                        <h3>@col.Title</h3>
-                    }
-                }
+                <SectionHeading Heading="@col.Title" HeadingLevel="@(HeadingLevel == 1 ? 2 : 3)" />
                 @if (!string.IsNullOrWhiteSpace(col.Body))
                 {
                     <div class="content-body">@((MarkupString)col.Body)</div>

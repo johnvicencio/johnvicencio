@@ -1,11 +1,14 @@
 @namespace johnvicencio.Views.Shared
+@inject IJSRuntime Js
 
 <div class="table-search">
-    <i class="site-icon" data-lucide="search"></i>
-    <input type="text" placeholder="@Placeholder" value="@SearchQuery" @oninput="OnInput" aria-label="@Placeholder" />
+    <div class="table-search-field">
+        <i class="site-icon" data-lucide="search"></i>
+        <input type="text" placeholder="@Placeholder" value="@SearchQuery" @oninput="OnInput" aria-label="@Placeholder" autocomplete="off" />
+    </div>
     @if (!string.IsNullOrWhiteSpace(SearchQuery))
     {
-        <button class="outline secondary btn-action" @onclick="Clear"><i class="site-icon" data-lucide="x"></i></button>
+        <button type="button" class="outline secondary btn-action search-clear" title="Clear search" aria-label="Clear search" @onclick="Clear"><i class="site-icon" data-lucide="x"></i></button>
     }
 </div>
 
@@ -13,6 +16,11 @@
     [Parameter] public string SearchQuery { get; set; } = "";
     [Parameter] public string Placeholder { get; set; } = "Search...";
     [Parameter] public EventCallback<string> SearchQueryChanged { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await LucideInterop.RefreshIconsAsync(Js);
+    }
 
     private async Task OnInput(ChangeEventArgs e)
     {
