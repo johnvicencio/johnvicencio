@@ -12,7 +12,12 @@
   functionsPort = 9999
 
 [[headers]]
-  for = "/css/*"
+  for = "/css/app.css"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/css/pico.min.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
