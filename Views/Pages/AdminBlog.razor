@@ -43,17 +43,13 @@
         {
             <table style="table-layout:fixed">
                 <colgroup>
-                    <col style="width:6rem" />
                     <col />
-                    <col style="width:8rem" />
                     <col style="width:7rem" />
-                    <col style="width:7rem" />
+                    <col style="width:10rem" />
                 </colgroup>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Title <span tabindex="0" class="sort-icon" @onclick="SortByTitle" @onkeydown="KeySortByTitle">@SortIcon("title")</span></th>
-                        <th>Slug</th>
                         <th>Date <span tabindex="0" class="sort-icon" @onclick="SortByPublished" @onkeydown="KeySortByPublished">@SortIcon("published")</span></th>
                         <th>Actions</th>
                     </tr>
@@ -62,11 +58,10 @@
                     @foreach (var pt in PagedPosts)
                     {
                         <tr>
-                            <td style="font-family:monospace;font-size:0.75rem">@pt.Id</td>
                             <td><strong>@pt.Title</strong></td>
-                            <td>@pt.Slug</td>
                             <td>@pt.PublishedOn.ToString("M/d/yyyy")</td>
                             <td>
+                                <button class="outline" title="Preview" aria-label="Preview" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => PreviewPost(pt)"><i class="site-icon" data-lucide="eye"></i></button>
                                 <button class="outline" title="Edit" aria-label="Edit" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
                                 <button class="outline danger" title="Delete" aria-label="Delete" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
                             </td>
@@ -76,6 +71,34 @@
             </table>
 
             <PaginationBar CurrentPage="currentPage" TotalPages="TotalPages" PageUrl="GetAdminPageUrl" />
+        }
+
+        @if (previewPost is not null)
+        {
+            <div class="image-picker-backdrop" @onclick="ClosePreview">
+                <div class="image-picker-modal" @onclick:stopPropagation style="max-width:720px;max-height:85vh;overflow-y:auto">
+                    <div class="table-toolbar">
+                        <h3 style="margin:0">@previewPost.Title</h3>
+                        <button class="outline secondary" title="Close" aria-label="Close" @onclick="ClosePreview"><i class="site-icon" data-lucide="x"></i></button>
+                    </div>
+                    <div style="padding:1rem">
+                        <p style="color:var(--app-muted);font-size:0.85rem;margin-bottom:0.5rem">@previewPost.PublishedOn.ToString("MMMM d, yyyy")</p>
+                        @if (!string.IsNullOrWhiteSpace(previewPost.ImageUrl))
+                        {
+                            <img src="@previewPost.ImageUrl" alt="@previewPost.Title" style="width:100%;max-height:280px;object-fit:cover;border-radius:0.5rem;margin-bottom:1rem" />
+                        }
+                        <div class="content-body">@((MarkupString)previewPost.Content)</div>
+                        <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--app-border-soft);font-size:0.85rem;color:var(--app-muted)">
+                            <p>Slug: <code>@previewPost.Slug</code></p>
+                            <p>Description: @previewPost.Description</p>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;justify-content:flex-end;padding:0.75rem 1rem;border-top:1px solid var(--app-border-soft)">
+                        <button class="outline" @onclick='() => { var id = previewPost.Id; ClosePreview(); Nav.NavigateTo($"/admin/blog/edit/{id}"); }'><i class="site-icon" data-lucide="pencil"></i> Edit</button>
+                        <button class="outline secondary" @onclick="ClosePreview">Close</button>
+                    </div>
+                </div>
+            </div>
         }
     </article>
 
@@ -92,6 +115,7 @@
     private string search = "";
     private int currentPage => page ?? 1;
     private int prevPage = 0;
+    private johnvicencio.Models.BlogPost? previewPost;
     private const int PageSize = 10;
     private string sortBy = "published";
     private bool sortDesc = true;
@@ -178,6 +202,16 @@
     {
         if (sortBy != column) return "\u25B2";
         return sortDesc ? "\u25BC" : "\u25B2";
+    }
+
+    private void PreviewPost(johnvicencio.Models.BlogPost post)
+    {
+        previewPost = post;
+    }
+
+    private void ClosePreview()
+    {
+        previewPost = null;
     }
 
     private void ClearSearch()
