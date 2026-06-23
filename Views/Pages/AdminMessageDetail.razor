@@ -4,7 +4,7 @@
 
 <PageTitle>Message</PageTitle>
 
-<AdminPageLayout Title="Message">
+<AdminPageLayout Title="Message" ToolbarItems="@DetailToolbar">
     @if (loading)
     {
         <p class="loading-state">Loading...</p>
@@ -83,7 +83,14 @@
         }
         if (string.IsNullOrWhiteSpace(errorMessage))
             Nav.NavigateTo("/admin/messages", replace: true);
-    }private static string FormatDate(DateTimeOffset dto)
+    }
+
+    private RenderFragment DetailToolbar => __builder =>
+    {
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+    };
+
+    private static string FormatDate(DateTimeOffset dto)
     {
         var local = dto.ToLocalTime();
         return local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt").ToLowerInvariant();
