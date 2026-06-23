@@ -64,7 +64,6 @@
     };
 
     private bool loading = true;
-    private bool savingOrder;
     private string errorMessage = "";
     private Page? page;
 
@@ -72,33 +71,5 @@
     {
         page = await Pages.GetPageByIdAsync(PageId);
         loading = false;
-    }
-
-    private async Task MoveSectionAsync(int index, int direction)
-    {
-        if (page is null) return;
-        var newIndex = index + direction;
-        if (newIndex < 0 || newIndex >= page.Sections.Count) return;
-
-        errorMessage = "";
-        savingOrder = true;
-        var moved = page.Sections[index];
-        page.Sections.RemoveAt(index);
-        page.Sections.Insert(newIndex, moved);
-
-        try
-        {
-            await Pages.UpdatePageAsync(page);
-        }
-        catch (Exception ex)
-        {
-            page.Sections.RemoveAt(newIndex);
-            page.Sections.Insert(index, moved);
-            errorMessage = ex.Message;
-        }
-        finally
-        {
-            savingOrder = false;
-        }
     }
 }

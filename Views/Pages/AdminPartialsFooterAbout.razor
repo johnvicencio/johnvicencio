@@ -5,24 +5,24 @@
 <PageTitle>Footer About</PageTitle>
 <AdminPageLayout Title="Footer About">
 
-        <p class="muted-text">
-            Edit the header and about text that appear in the footer About column.
-        </p>
+    <p class="muted-text">
+        Edit the header and about text that appear in the footer About column.
+    </p>
 
-        @if (!string.IsNullOrWhiteSpace(message))
-        {
-            <p role="alert" class="form-alert form-alert-success">@message</p>
-        }
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <p role="alert" class="form-alert form-alert-success">@message</p>
+    }
 
-        <label for="footer-about-header">Header</label>
-        <input id="footer-about-header" @bind="footerAboutHeader" placeholder="e.g. About John Vicencio" />
+    <label for="footer-about-header">Header</label>
+    <input id="footer-about-header" @bind="footerAboutHeader" placeholder="e.g. About John Vicencio" />
 
-        <label for="footer-about-text" class="field-top-spacing">About Text</label>
-        <RichTextEditor @bind-Value="footerAbout" MinHeight="220" Placeholder="Write about yourself..." />
+    <label for="footer-about-text" class="field-top-spacing">About Text</label>
+    <RichTextEditor @bind-Value="footerAbout" MinHeight="220" Placeholder="Write about yourself..." />
 
-        <div class="btn-group btn-group-top">
-            <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
-        </div>
+    <div class="btn-group btn-group-top">
+        <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
+    </div>
 
 @code {
     private bool saving;
@@ -32,15 +32,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         var settings = await Site.GetSettingsAsync();
         footerAboutHeader = settings.FooterAboutHeader ?? "";
         footerAbout = settings.FooterAbout ?? "";
-    }private async Task Save()
+    }
+
+    private async Task Save()
     {
         saving = true;
         message = "";

@@ -5,47 +5,43 @@
 <PageTitle>Footer Sections</PageTitle>
 <AdminPageLayout Title="Footer Sections">
 
-        <p class="muted-text">
-            Footer sections follow the Nav Bar menu order. Edit links in
-            <a href="/admin/partials/navmenu">Nav Bar</a> to update footer sections.
-        </p>
+    <p class="muted-text">
+        Footer sections follow the Nav Bar menu order. Edit links in
+        <a href="/admin/partials/navmenu">Nav Bar</a> to update footer sections.
+    </p>
 
-        <div class="table-wrap">
-            <table>
-                <thead>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th class="nav-index">#</th>
+                    <th>Label</th>
+                    <th>URL</th>
+                    <th>Icon</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < footerSections.Count; i++)
+                {
+                    var idx = i;
                     <tr>
-                        <th class="nav-index">#</th>
-                        <th>Label</th>
-                        <th>URL</th>
-                        <th>Icon</th>
+                        <td class="nav-index">@(idx + 1)</td>
+                        <td><strong>@footerSections[idx].Label</strong></td>
+                        <td><code class="muted-sm">@footerSections[idx].Url</code></td>
+                        <td><code class="muted-sm">@footerSections[idx].Icon</code></td>
                     </tr>
-                </thead>
-                <tbody>
-                    @for (var i = 0; i < footerSections.Count; i++)
-                    {
-                        var idx = i;
-                        <tr>
-                            <td class="nav-index">@(idx + 1)</td>
-                            <td><strong>@footerSections[idx].Label</strong></td>
-                            <td><code class="muted-sm">@footerSections[idx].Url</code></td>
-                            <td><code class="muted-sm">@footerSections[idx].Icon</code></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
+    </div>
 
 @code {
     private List<CustomNavLink> footerSections = [];
 
     protected override async Task OnInitializedAsync()
     {
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         var settings = await Site.GetSettingsAsync();
         footerSections = [..(settings.NavLinks ?? [])];
-    }}
+    }
+}
 </AdminPageLayout>

@@ -5,59 +5,59 @@
 <PageTitle>Footer Connect</PageTitle>
 <AdminPageLayout Title="Footer Connect">
 
-        <p class="muted-text">
-            Manage social media and connect links in the footer. Use the icon search button to choose from available Lucide icons.
-        </p>
+    <p class="muted-text">
+        Manage social media and connect links in the footer. Use the icon search button to choose from available Lucide icons.
+    </p>
 
-        @if (!string.IsNullOrWhiteSpace(message))
-        {
-            <p role="alert" class="form-alert form-alert-success">@message</p>
-        }
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <p role="alert" class="form-alert form-alert-success">@message</p>
+    }
 
-        <div class="table-wrap">
-            <table>
-                <thead>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Platform</th>
+                    <th>URL</th>
+                    <th>Icon</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < footerConnects.Count; i++)
+                {
+                    var idx = i;
                     <tr>
-                        <th>Platform</th>
-                        <th>URL</th>
-                        <th>Icon</th>
-                        <th>Action</th>
+                        <td><input @bind="footerConnects[idx].Platform" placeholder="e.g. Twitter" /></td>
+                        <td><input @bind="footerConnects[idx].Url" placeholder="https://twitter.com/..." /></td>
+                        <td>
+                            <div class="icon-input-group">
+                                <input @bind="footerConnects[idx].Icon" placeholder="icon-name" />
+                                <button type="button" class="outline btn-icon" title="Choose icon" aria-label="Choose icon" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
+                                @if (!string.IsNullOrWhiteSpace(footerConnects[idx].Icon))
+                                {
+                                    <i class="site-icon" data-lucide="@footerConnects[idx].Icon"></i>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <button class="outline secondary btn-icon" title="Remove" aria-label="Remove connect link" @onclick="() => RemoveConnect(idx)">
+                                <i class="site-icon" data-lucide="trash-2"></i>
+                            </button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @for (var i = 0; i < footerConnects.Count; i++)
-                    {
-                        var idx = i;
-                        <tr>
-                            <td><input @bind="footerConnects[idx].Platform" placeholder="e.g. Twitter" /></td>
-                            <td><input @bind="footerConnects[idx].Url" placeholder="https://twitter.com/..." /></td>
-                            <td>
-                                <div class="icon-input-group">
-                                    <input @bind="footerConnects[idx].Icon" placeholder="icon-name" />
-                                    <button type="button" class="outline btn-icon" title="Choose icon" aria-label="Choose icon" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
-                                    @if (!string.IsNullOrWhiteSpace(footerConnects[idx].Icon))
-                                    {
-                                        <i class="site-icon" data-lucide="@footerConnects[idx].Icon"></i>
-                                    }
-                                </div>
-                            </td>
-                            <td>
-                                <button class="outline secondary btn-icon" title="Remove" aria-label="Remove connect link" @onclick="() => RemoveConnect(idx)">
-                                    <i class="site-icon" data-lucide="trash-2"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <div class="table-toolbar-footer">
-                <button class="outline" @onclick="AddConnect"><i class="site-icon" data-lucide="plus"></i>Add Connect Link</button>
-            </div>
+                }
+            </tbody>
+        </table>
+        <div class="table-toolbar-footer">
+            <button class="outline" @onclick="AddConnect"><i class="site-icon" data-lucide="plus"></i>Add Connect Link</button>
         </div>
+    </div>
 
-        <div class="btn-group btn-group-top">
-            <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
-        </div>
+    <div class="btn-group btn-group-top">
+        <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
+    </div>
 
 <IconPicker Open="showIconPicker" Value="@_pickIconValue" ValueChanged="OnIconPicked" OnClose="() => showIconPicker = false" />
 
@@ -71,14 +71,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         var settings = await Site.GetSettingsAsync();
         footerConnects = [..(settings.FooterConnects ?? [])];
-    }private void AddConnect()
+    }
+
+    private void AddConnect()
     {
         footerConnects.Add(new FooterConnect());
     }

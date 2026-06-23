@@ -126,7 +126,7 @@
         editTitle = e.Value?.ToString() ?? "";
         if (isAddMode)
         {
-            editSlug = ToSlug(editTitle);
+            editSlug = SlugHelper.ToSlug(editTitle);
         }
     }
 
@@ -156,11 +156,11 @@
                 break;
             case "content":
                 editTitle = string.IsNullOrWhiteSpace(editTitle) ? "Content Page" : editTitle;
-                editSlug = string.IsNullOrWhiteSpace(editSlug) ? ToSlug(editTitle) : editSlug;
+                editSlug = string.IsNullOrWhiteSpace(editSlug) ? SlugHelper.ToSlug(editTitle) : editSlug;
                 break;
             case "sections":
                 editTitle = string.IsNullOrWhiteSpace(editTitle) ? "Section Page" : editTitle;
-                editSlug = string.IsNullOrWhiteSpace(editSlug) ? ToSlug(editTitle) : editSlug;
+                editSlug = string.IsNullOrWhiteSpace(editSlug) ? SlugHelper.ToSlug(editTitle) : editSlug;
                 break;
         }
     }
@@ -207,8 +207,6 @@
             saving = false;
         }
     }
-
-    static string ToSlug(string title) => SlugHelper.ToSlug(title);
 
     private List<PageSection> CreateInitialSections() => pageKind switch
     {

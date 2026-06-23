@@ -364,14 +364,12 @@
         {
             var action = isAddMode ? "Add" : "Edit";
             var pageName = page?.Title ?? "Page";
-            var typeName = TypeDisplayName(sec?.Type);
+            var typeName = SlugHelper.SectionTypeDisplayName(sec?.Type);
             return string.IsNullOrWhiteSpace(typeName)
                 ? $"{action} {pageName} Section"
                 : $"{action} {pageName} {typeName} Section";
         }
     }
-
-    private static string TypeDisplayName(string? type) => SlugHelper.SectionTypeDisplayName(type);
 
     private bool loading = true;
     private bool saving;
