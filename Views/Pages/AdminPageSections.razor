@@ -23,7 +23,7 @@
         {
             <p role="alert" class="form-alert form-alert-danger">@errorMessage</p>
         }
-        <table>
+        <div class="table-wrap"><table>
             <thead>
                 <tr>
                     <th>Type</th>
@@ -39,15 +39,13 @@
                         <td>@SlugHelper.SectionTypeDisplayName(sec.Type)</td>
                         <td>@sec.Heading</td>
                         <td>
-                            <button class="outline secondary btn-action" title="Move Up" aria-label="Move Up" disabled="@(savingOrder || idx == 0)" @onclick="() => MoveSectionAsync(idx, -1)"><i class="site-icon" data-lucide="arrow-up"></i></button>
-                            <button class="outline secondary btn-action" title="Move Down" aria-label="Move Down" disabled="@(savingOrder || idx == page.Sections.Count - 1)" @onclick="() => MoveSectionAsync(idx, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
                             <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/edit/{sec.SectionId}")'><i class="site-icon" data-lucide="pencil"></i></button>
                             <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/delete/{sec.SectionId}")'><i class="site-icon" data-lucide="trash-2"></i></button>
                         </td>
                     </tr>
                 }
             </tbody>
-        </table>
+        </table></div>
     }
 </AdminPageLayout>
 

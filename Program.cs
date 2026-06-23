@@ -7,17 +7,17 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddScoped<DataStore>();
-builder.Services.AddScoped<PageController>();
-builder.Services.AddScoped<BlogController>();
-builder.Services.AddScoped<ContactMessageController>();
-builder.Services.AddScoped<ImageAssetController>();
-builder.Services.AddScoped<SiteController>();
-builder.Services.AddScoped<RouterController>();
-builder.Services.AddScoped<JsonContentService>();
-builder.Services.AddScoped<VaultCryptoService>();
-builder.Services.AddScoped<VaultController>();
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddSingleton<DataStore>();
+builder.Services.AddSingleton<PageController>();
+builder.Services.AddSingleton<BlogController>();
+builder.Services.AddSingleton<ContactMessageController>();
+builder.Services.AddSingleton<ImageAssetController>();
+builder.Services.AddSingleton<SiteController>();
+builder.Services.AddSingleton<RouterController>();
+builder.Services.AddSingleton<JsonContentService>();
+builder.Services.AddSingleton<VaultCryptoService>();
+builder.Services.AddSingleton<VaultController>();
 builder.Services.AddSingleton<VaultSessionService>();
 
 

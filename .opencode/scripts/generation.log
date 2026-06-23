@@ -490,3 +490,35 @@ Batch 161/170 (posts 801-805)...
   Progress: 805 updated, 0 skipped, 0 failed so far
 
 Batch 162/170 (posts 806-810)...
+  Progress: 810 updated, 0 skipped, 0 failed so far
+
+Batch 163/170 (posts 811-815)...
+  Progress: 815 updated, 0 skipped, 0 failed so far
+
+Batch 164/170 (posts 816-820)...
+  Progress: 820 updated, 0 skipped, 0 failed so far
+
+Batch 165/170 (posts 821-825)...
+  Progress: 825 updated, 0 skipped, 0 failed so far
+
+Batch 166/170 (posts 826-830)...
+  Progress: 830 updated, 0 skipped, 0 failed so far
+
+Batch 167/170 (posts 831-835)...
+  Progress: 835 updated, 0 skipped, 0 failed so far
+
+Batch 168/170 (posts 836-840)...
+  Progress: 840 updated, 0 skipped, 0 failed so far
+
+Batch 169/170 (posts 841-845)...
+  Progress: 845 updated, 0 skipped, 0 failed so far
+
+Batch 170/170 (posts 846-850)...
+  Progress: 850 updated, 0 skipped, 0 failed so far
+
+
+Done. 850 updated, 0 skipped, 0 failed.
+CSV written to /Users/johnvicencio/Documents/OpenCode/JV/codeprojects/johnvicencio/blazorwebassemblystandaloneapp/New/johnvicencio/johnvicencio/.opencode/scripts/post-titles.csv
+
+Run: node .opencode/scripts/apply-titles.mjs
+to push the updated titles to Netlify Blobs.

@@ -1,0 +1,39 @@
+@namespace johnvicencio.Views.Components
+
+@{
+    var hasPageH1 = false;
+    foreach (var section in Sections)
+    {
+        var headingLevel = !hasPageH1 && !string.IsNullOrWhiteSpace(section.Heading) ? 1 : 2;
+        if (headingLevel == 1) { hasPageH1 = true; }
+
+        if (section.Type.Equals("hero", StringComparison.OrdinalIgnoreCase))
+        {
+            <HeroView Section="section" HeadingLevel="headingLevel" />
+        }
+        else if (section.Type.Equals("2-col", StringComparison.OrdinalIgnoreCase))
+        {
+            <TwoColView Section="section" HeadingLevel="headingLevel" />
+        }
+        else if (section.Type.Equals("3-col", StringComparison.OrdinalIgnoreCase))
+        {
+            <ThreeColView Section="section" HeadingLevel="headingLevel" />
+        }
+        else if (section.Type is "cards" or "cardcollection" or "row-card" or "grid-card" or "portfolio")
+        {
+            <CardCollectionView Section="section" HeadingLevel="headingLevel" />
+        }
+        else if (section.Type.Equals("contact", StringComparison.OrdinalIgnoreCase))
+        {
+            <ContactView Section="section" HeadingLevel="headingLevel" />
+        }
+        else
+        {
+            <ContentView Section="section" HeadingLevel="headingLevel" />
+        }
+    }
+}
+
+@code {
+    [Parameter] public List<PageSection> Sections { get; set; } = [];
+}

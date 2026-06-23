@@ -22,7 +22,10 @@ public sealed class DataStore
             var fromBlob = await http.GetFromJsonAsync<List<T>>(NetlifyContentUrl(contentName));
             if (fromBlob is not null) return fromBlob;
         }
-        catch { }
+        catch
+        {
+            return [];
+        }
 
         return [];
     }
@@ -34,7 +37,10 @@ public sealed class DataStore
             var fromBlob = await http.GetFromJsonAsync<T>(NetlifyContentUrl(contentName));
             if (fromBlob is not null) return fromBlob;
         }
-        catch { }
+        catch
+        {
+            return null;
+        }
 
         return null;
     }

@@ -159,8 +159,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-
         if (!firstRender) return;
 
         contentToken = await Js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token") ?? string.Empty;

@@ -32,7 +32,7 @@
 
     @if (hasBlogPage && filteredList.Count > 0)
     {
-        <table>
+        <div class="table-wrap"><table>
             <colgroup>
                 <col />
                 <col style="width:7rem" />
@@ -59,8 +59,7 @@
                     </tr>
                 }
             </tbody>
-        </table>
-
+        </table></div>
         <PaginationBar CurrentPage="currentPage" TotalPages="TotalPages" PageUrl="GetAdminPageUrl" />
     }
 </AdminPageLayout>
@@ -173,7 +172,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Js.InvokeVoidAsync("lucide.createIcons");
         if (currentPage > 1 && currentPage != prevPage)
         {
             prevPage = currentPage;
