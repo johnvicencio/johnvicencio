@@ -41,7 +41,7 @@
                     var isHome = pg.Slug.Equals("home", StringComparison.OrdinalIgnoreCase);
                     var isLegalPage = IsLegalPage(pg.Slug);
                     <tr>
-                        <td style="font-family:monospace;font-size:0.75rem">@pg.Id</td>
+                        <td class="mono-text">@pg.Id</td>
                         <td><strong>@pg.Title</strong></td>
                         <td>@pg.Slug</td>
                         <td>@pg.Sections.Count</td>
@@ -53,7 +53,7 @@
                             else
                             {
                                 <div style="display:flex;gap:0.25rem;align-items:center">
-                                    <span style="font-family:monospace;font-size:0.75rem">@pg.SortOrder</span>
+                                    <span class="mono-text">@pg.SortOrder</span>
                                     <button class="outline secondary" title="Move Up" aria-label="Move Up" disabled="@(savingOrder || orderIndex == 0)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MovePageAsync(pg.Id, -1)"><i class="site-icon" data-lucide="arrow-up"></i></button>
                                     <button class="outline secondary" title="Move Down" aria-label="Move Down" disabled="@(savingOrder || orderIndex == movablePages.Count - 1)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MovePageAsync(pg.Id, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
                                 </div>

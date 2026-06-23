@@ -58,12 +58,12 @@
                         var sec = page.Sections[i];
                         var index = i;
                         <tr>
-                            <td style="font-family:monospace;font-size:0.75rem">@sec.SectionId</td>
+                            <td class="mono-text">@sec.SectionId</td>
                             <td>@sec.Type</td>
                             <td><strong>@(string.IsNullOrWhiteSpace(sec.Heading) ? "(no heading)" : sec.Heading)</strong></td>
                             <td>
                                 <div style="display:flex;gap:0.25rem;align-items:center">
-                                    <span style="font-family:monospace;font-size:0.75rem">@(index + 1)</span>
+                                    <span class="mono-text">@(index + 1)</span>
                                     <button class="outline secondary" title="Move Up" aria-label="Move Up" disabled="@(index == 0 || savingOrder)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MoveSectionAsync(index, -1)"><i class="site-icon" data-lucide="arrow-up"></i></button>
                                     <button class="outline secondary" title="Move Down" aria-label="Move Down" disabled="@(index == page.Sections.Count - 1 || savingOrder)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MoveSectionAsync(index, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
                                 </div>

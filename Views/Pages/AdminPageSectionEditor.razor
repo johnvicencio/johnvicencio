@@ -86,7 +86,7 @@
                             <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <div class="grid" style="grid-template-columns:1fr 1fr">
                                     <label>Button Icon
-                                        <div style="display:flex;gap:0.5rem;align-items:center">
+                                        <div class="flex-group">
                                             <input @bind="btn.Icon" placeholder="icon-name" />
                                             <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenIconPicker(localBi)"><i class="site-icon" data-lucide="search"></i></button>
                                             @if (!string.IsNullOrWhiteSpace(btn.Icon)) { <i class="site-icon" data-lucide="@btn.Icon"></i> }
@@ -130,7 +130,7 @@
                                 {
                                     <div class="grid" style="grid-template-columns:1fr 1fr">
                                         <label>Button Icon
-                                            <div style="display:flex;gap:0.5rem;align-items:center">
+                                            <div class="flex-group">
                                                 <input @bind="col.ActionIcon" placeholder="icon-name" />
                                                 <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                                 @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
@@ -159,7 +159,7 @@
                             <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <h5>Column @(localCi + 1)</h5>
                                 <label>Icon
-                                    <div style="display:flex;gap:0.5rem;align-items:center">
+                                    <div class="flex-group">
                                         <input @bind="col.ActionIcon" placeholder="icon-name" />
                                         <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                         @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
@@ -185,7 +185,7 @@
                     case "grid-card":
                     case "portfolio":
                         <label>Section Icon
-                            <div style="display:flex;gap:0.5rem;align-items:center">
+                            <div class="flex-group">
                                 <input @bind="sec.Icon" placeholder="icon-name" />
                                 <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
                                 @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
@@ -258,7 +258,7 @@
                     case "cardcollection":
                     case "row-card":
                         <label>Section Icon
-                            <div style="display:flex;gap:0.5rem;align-items:center">
+                            <div class="flex-group">
                                 <input @bind="sec.Icon" placeholder="icon-name" />
                                 <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
                                 @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
@@ -316,7 +316,7 @@
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="180" />
                                 <div class="grid" style="grid-template-columns:1fr 1fr">
                                     <label>Right Icon
-                                        <div style="display:flex;gap:0.5rem;align-items:center">
+                                        <div class="flex-group">
                                             <input @bind="col.ActionIcon" placeholder="icon-name" />
                                             <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                             @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }

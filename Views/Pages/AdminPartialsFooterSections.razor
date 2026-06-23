@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <p style="font-size:0.9rem;color:var(--app-muted)">
+        <p class="muted-text">
             Footer sections follow the Nav Bar menu order. Edit links in
             <a href="/admin/partials/navmenu">Nav Bar</a> to update footer sections.
         </p>
@@ -39,7 +39,7 @@
                             <td style="text-align:center;color:var(--app-muted)">@(idx + 1)</td>
                             <td><span style="font-weight:600">@footerSections[idx].Label</span></td>
                             <td><code style="font-size:0.85rem">@footerSections[idx].Url</code></td>
-                            <td><code style="font-size:0.85rem;color:var(--app-muted)">@footerSections[idx].Icon</code></td>
+                            <td><code class="muted-sm">@footerSections[idx].Icon</code></td>
                         </tr>
                     }
                 </tbody>

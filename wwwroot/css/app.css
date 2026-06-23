@@ -1314,13 +1314,31 @@ hr {
     font-size: 0.75rem;
 }
 
+.btn-icon {
+    padding: 0.35rem 0.5rem;
+    min-height: auto;
+}
+
+.btn-tiny {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+}
+
 .empty-state {
     padding: 1rem;
     text-align: center;
 }
 
-.loading-state {
-    text-align: center;
+.flex-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.flex-group-lg {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 .grid-2col {
@@ -1331,8 +1349,22 @@ hr {
     grid-template-columns: 1fr 1fr 1fr;
 }
 
+.loading-state {
+    text-align: center;
+}
+
+.mono-text {
+    font-family: monospace;
+    font-size: 0.75rem;
+}
+
 .muted-text {
     font-size: 0.9rem;
+    color: var(--app-muted);
+}
+
+.muted-sm {
+    font-size: 0.85rem;
     color: var(--app-muted);
 }
 

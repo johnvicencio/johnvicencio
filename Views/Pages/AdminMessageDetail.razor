@@ -1,48 +1,39 @@
 @page "/admin/messages/{MessageId}"
-@inject VaultSessionService Session
+@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject ContactMessageController Messages
-@inject IJSRuntime Js
 
 <PageTitle>Message</PageTitle>
 
-<div class="login-page" style="width:100%">
-    <article style="width:100%;max-width:760px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">Message</h2>
-            <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="arrow-left"></i></button>
-        </div>
-
-        @if (loading)
-        {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
-        }
-        else if (!string.IsNullOrWhiteSpace(errorMessage))
-        {
-            <p class="pagination-info" style="padding:1rem;color:var(--pico-del-color)">@errorMessage</p>
-        }
-        else if (message is null)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Message not found.</p>
-        }
-        else
-        {
-            <p class="pagination-info" style="margin:0.25rem 0">From</p>
-            <h3 style="margin-top:0">@message.Name</h3>
-            <p><a href="mailto:@message.Email">@message.Email</a></p>
-            <p class="pagination-info">@FormatDate(message.SubmittedUtc)</p>
-            <p style="font-size:0.85rem;color:var(--app-muted)">Ticket #@ticketNumber</p>
-            <hr />
-            <div style="white-space:pre-wrap">@message.Message</div>
-            <hr />
-            <button class="outline danger" @onclick="DeleteMessageAsync" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Delete</button>
-        }
-    </article>
-</div>
+<AdminPageLayout Title="Message">
+    @if (loading)
+    {
+        <p class="loading-state">Loading...</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <p class="empty-state" style="color:var(--pico-del-color)">@errorMessage</p>
+    }
+    else if (message is null)
+    {
+        <p class="empty-state">Message not found.</p>
+    }
+    else
+    {
+        <p class="muted-sm" style="margin:0.25rem 0">From</p>
+        <h3 style="margin-top:0">@message.Name</h3>
+        <p><a href="mailto:@message.Email">@message.Email</a></p>
+        <p class="muted-sm">@FormatDate(message.SubmittedUtc)</p>
+        <p class="muted-sm">Ticket #@ticketNumber</p>
+        <hr />
+        <div style="white-space:pre-wrap">@message.Message</div>
+        <hr />
+        <button class="outline danger" @onclick="DeleteMessageAsync" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Delete</button>
+    }
+</AdminPageLayout>
 
 @code {
-    [Parameter]
-    public string MessageId { get; set; } = "";
+    [Parameter] public string MessageId { get; set; } = "";
 
     private bool loading = true;
     private bool deleting;
@@ -52,13 +43,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         try
         {
             message = await Messages.GetMessageAsync(MessageId);
@@ -89,7 +73,6 @@
         try
         {
             await Messages.DeleteMessageAsync(MessageId);
-            Nav.NavigateTo("/admin/messages", replace: true);
         }
         catch (Exception ex)
         {
@@ -99,6 +82,8 @@
         {
             deleting = false;
         }
+        if (string.IsNullOrWhiteSpace(errorMessage))
+            Nav.NavigateTo("/admin/messages", replace: true);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -112,4 +97,3 @@
         return local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt").ToLowerInvariant();
     }
 }
-
