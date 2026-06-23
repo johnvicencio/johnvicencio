@@ -1,5 +1,4 @@
 @page "/admin"
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject PageController Pages
 @inject BlogController Blog
@@ -133,8 +132,4 @@ else
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Js.InvokeVoidAsync("lucide.createIcons");
-    }
 }
