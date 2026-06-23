@@ -53,7 +53,8 @@ body {
     padding-block: clamp(1rem, 2.5vw, 2rem);
 }
 
-.site-header nav a {
+.site-header nav a,
+.site-header nav ul li button[type="button"]:not([class]) {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -583,7 +584,8 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     align-items: center;
 }
 
-.site-header nav ul li a {
+.site-header nav ul li a,
+.site-header nav ul li button[type="button"]:not([class]) {
     --pico-nav-link-spacing-vertical: 0.15rem;
     border-radius: 999px;
     color: var(--app-text);
@@ -591,8 +593,19 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     transition: background-color var(--pico-transition), color var(--pico-transition);
 }
 
+.site-header nav ul li button[type="button"]:not([class]) {
+    margin: 0;
+    padding: var(--pico-nav-link-spacing-vertical) var(--pico-nav-link-spacing-horizontal);
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    font: inherit;
+    cursor: pointer;
+}
+
 .site-header nav ul li a:hover,
-.site-header nav ul li a[aria-current="page"] {
+.site-header nav ul li a[aria-current="page"],
+.site-header nav ul li button[type="button"]:not([class]):hover {
     background: rgba(31, 111, 235, 0.08);
     color: var(--app-primary);
     text-decoration: none;
@@ -913,7 +926,8 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
         margin: 0;
     }
 
-    .site-header nav[aria-label="Mobile navigation"] a {
+    .site-header nav[aria-label="Mobile navigation"] a,
+    .site-header nav[aria-label="Mobile navigation"] ul li button[type="button"]:not([class]) {
         min-height: auto;
         padding: 0.65rem 0.25rem;
         color: var(--app-text);
@@ -922,7 +936,8 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     }
 
     .site-header nav[aria-label="Mobile navigation"] a:hover,
-    .site-header nav[aria-label="Mobile navigation"] a[aria-current="page"] {
+    .site-header nav[aria-label="Mobile navigation"] a[aria-current="page"],
+    .site-header nav[aria-label="Mobile navigation"] ul li button[type="button"]:not([class]):hover {
         color: var(--app-primary);
         text-decoration: none;
     }

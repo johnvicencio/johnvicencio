@@ -24,7 +24,7 @@
                     @if (Session.IsLoggedIn)
                     {
                         <li><a href="/admin" aria-current="@NavAriaCurrent("/admin")"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
-                        <li><a href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
+                        <li><button type="button" @onclick="LogOut"><i class="site-icon" data-lucide="log-out"></i>Logout</button></li>
                     }
                 </ul>
             </nav>
@@ -39,7 +39,7 @@
                         @if (Session.IsLoggedIn)
                         {
                             <li><a href="/admin" aria-current="@NavAriaCurrent("/admin")" @onclick="CloseMobileMenu"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
-                            <li><a href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
+                            <li><button type="button" @onclick="LogOut"><i class="site-icon" data-lucide="log-out"></i>Logout</button></li>
                         }
                     </ul>
                 </nav>
