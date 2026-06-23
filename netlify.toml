@@ -7,7 +7,9 @@
   framework = "#static"
   command = "dotnet watch publish -c Release"
   publish = "bin/Release/net8.0/publish/wwwroot"
-  port = 8888
+  port = 8889
+  staticServerPort = 4001
+  functionsPort = 9999
 
 [[headers]]
   for = "/css/*"

@@ -37,6 +37,18 @@ body {
     margin-block: 0;
 }
 
+.site-main > :is(.hero, .content-section, .grid-section, .card-collection, .contact-section) {
+    margin-block: 0;
+}
+
+.site-main > .hero {
+    padding-block: 0;
+}
+
+.site-main > :is(.content-section, .grid-section, .card-collection, .contact-section) {
+    padding: clamp(1rem, 2.5vw, 2rem) 0.5rem;
+}
+
 .site-nav-link {
     display: inline-flex;
     align-items: center;
@@ -72,9 +84,17 @@ body {
     margin-top: auto;
 }
 
-.site-icon {
+.site-icon,
+svg.site-icon,
+svg.lucide {
+    display: inline-block;
     width: 1rem;
     height: 1rem;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.site-icon {
     stroke-width: 2;
 }
 
@@ -388,8 +408,6 @@ table tbody tr:hover {
     background: color-mix(in srgb, var(--app-primary) 4%, var(--app-surface));
 }
 
-table th
-
 .table-wrap {
     background: var(--app-surface);
     border: 1px solid var(--app-border-soft);
@@ -410,30 +428,50 @@ table th
 
 /* Rounded search input-group */
 .table-search {
-    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
+    width: min(18rem, 100%);
 }
 
-.table-search .site-icon:first-child {
+.table-search-field {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.table-search-field .site-icon {
     position: absolute;
     left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
     z-index: 2;
     pointer-events: none;
     opacity: 0.5;
-    flex-shrink: 0;
 }
 
-.table-search input {
+.table-search-field input {
+    width: 100%;
     padding-left: 2.25rem;
-    padding-right: 0.25rem;
-    max-width: 18rem;
+    padding-right: 0.75rem;
+    max-width: none;
     margin: 0;
+}
+
+.table-search .search-clear {
+    flex-shrink: 0;
+    align-self: center;
+    min-height: auto;
+    padding: 0.2rem 0.35rem;
 }
 
 .table-search .btn-action {
     flex-shrink: 0;
+}
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    display: none;
 }
 
 .table-pagination {
@@ -589,8 +627,6 @@ h3 { font-size: clamp(1.1rem, 1.5vw, 1.3rem); }
 h4 { font-size: 1rem; }
 h5 { font-size: 0.9rem; }
 h6 { font-size: 0.8rem; }
-
-small, 
 
 small a, .chip a {
     color: inherit;
@@ -1175,6 +1211,12 @@ hr {
     content: "";
 }
 
+.footer-section-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
 .footer-sections li a,
 .footer-connect-list li a {
     display: inline-flex;
@@ -1240,12 +1282,19 @@ hr {
     align-items: center;
     flex-wrap: wrap;
     gap: 0.75rem;
-    padding: 0 0 0.75rem 0;
+}
+
+.site-main > .page-header {
+    padding: clamp(1rem, 2.5vw, 2rem) 0.5rem 0.75rem;
 }
 
 .page-header h1,
 .page-header h2 {
     margin: 0;
+}
+
+.page-header .table-search {
+    align-self: center;
 }
 
 /* Card grid for admin dashboards */
@@ -1390,7 +1439,6 @@ hr {
 }
 
 /* Fieldset[role=search] */
-[role="search"] .site-icon {
 [role="search"] .site-icon {
     flex-shrink: 0;
     opacity: 0.5;
@@ -1551,10 +1599,30 @@ hr {
 }
 
 /* Blazor loading bar (Pico CSS native progress) */
+.blazor-loading-shell {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 1rem;
+}
+
+.blazor-loading-panel {
+    animation: show-blazor-loader 160ms ease-out 450ms forwards;
+    opacity: 0;
+    width: min(32rem, 90vw);
+    text-align: center;
+}
+
 #blazor-loading-bar {
     display: block;
-    width: min(24rem, 80%);
-    margin: 20vh auto 1rem auto;
+    width: 50%;
+    min-width: 12rem;
+    max-width: 18rem;
+    margin: 0 auto 1rem auto;
+}
+
+@keyframes show-blazor-loader {
+    to { opacity: 1; }
 }
 
 #blazor-loading-text {
@@ -1680,5 +1748,9 @@ hr {
     .footer-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+
+    .footer-section-columns {
+        grid-template-columns: 1fr;
     }
 }

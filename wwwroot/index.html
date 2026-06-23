@@ -16,6 +16,33 @@
 
     <link rel="stylesheet" href="css/pico.min.css" />
     <link rel="stylesheet" href="css/app.css" />
+    <style>
+        .blazor-loading-shell {
+            display: grid;
+            min-height: 100vh;
+            place-items: center;
+            padding: 1rem;
+        }
+
+        .blazor-loading-panel {
+            animation: show-blazor-loader 160ms ease-out 450ms forwards;
+            opacity: 0;
+            width: min(32rem, 90vw);
+            text-align: center;
+        }
+
+        #blazor-loading-bar {
+            display: block;
+            width: 50%;
+            min-width: 12rem;
+            max-width: 18rem;
+            margin: 0 auto 1rem auto;
+        }
+
+        @keyframes show-blazor-loader {
+            to { opacity: 1; }
+        }
+    </style>
     <link rel="icon" type="image/png" href="/images/favicon/favicon.png" />
     <link href="johnvicencio.styles.css" rel="stylesheet" />
     <link href="manifest.webmanifest" rel="manifest" />
@@ -44,8 +71,12 @@
 
 <body>
     <div id="app">
-        <progress id="blazor-loading-bar" max="100" value="0"></progress>
-        <div id="blazor-loading-text">Loading the application...</div>
+        <div class="blazor-loading-shell">
+            <div class="blazor-loading-panel">
+                <progress id="blazor-loading-bar" max="100" value="0"></progress>
+                <div id="blazor-loading-text">Loading the application...</div>
+            </div>
+        </div>
     </div>
 
     <div id="blazor-error-ui">
@@ -56,8 +87,10 @@
     <script src="js/vaultCrypto.js"></script>
     <script src="js/richEditor.js"></script>
     <script src="js/seo.js"></script>
-    <script defer src="js/lucide.min.js"></script>
+    <script src="js/errorLogger.js"></script>
+    <script src="js/lucide.min.js"></script>
     <script>window.ensureCustomLucideIcons && window.ensureCustomLucideIcons();</script>
+    <script src="js/lucide-init.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
         if ('serviceWorker' in navigator) {

@@ -9,7 +9,7 @@
                 <button class="outline secondary picker-close" @onclick="Close"><i class="site-icon" data-lucide="x"></i></button>
             </div>
 
-            <input type="search" @bind="search" @bind:event="oninput" placeholder="Search icons..." class="picker-search-gap" />
+            <input type="text" @bind="search" @bind:event="oninput" placeholder="Search icons..." class="picker-search-gap" autocomplete="off" />
 
             @if (icons.Count == 0)
             {
@@ -67,7 +67,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (Open)
-            await Js.InvokeVoidAsync("lucide.createIcons");
+            await LucideInterop.RefreshIconsAsync(Js);
     }
 
     private void Close()

@@ -4,6 +4,7 @@
 @inject BlogController Blog
 @inject ContactMessageController Messages
 @inject DataStore Store
+@inject LogService Log
 
 <PageTitle>Admin</PageTitle>
 
@@ -71,7 +72,15 @@ else
         <article class="admin-card">
             <header>
                 <h3>Logs</h3>
-                <p class="muted-text">Application events and errors</p>
+                @if (!string.IsNullOrWhiteSpace(logError))
+                {
+                    <p class="text-danger">Counts unavailable</p>
+                }
+                else
+                {
+                    <p class="muted-text">@totalLogs total</p>
+                    <p class="muted-text">@totalErrors error(s)</p>
+                }
             </header>
             <footer>
                 <button class="outline btn-block" title="View Logs" aria-label="View Logs" @onclick='() => Nav.NavigateTo("/admin/logs")'><i class="site-icon" data-lucide="scroll-text"></i></button>
@@ -113,7 +122,10 @@ else
     private int totalPosts;
     private int totalMessages;
     private int newMessages;
+    private int totalLogs;
+    private int totalErrors;
     private string messageError = "";
+    private string logError = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -134,6 +146,17 @@ else
             catch (Exception ex)
             {
                 messageError = ex.Message;
+            }
+
+            try
+            {
+                var logs = await Log.GetLogsAsync();
+                totalLogs = logs.Count;
+                totalErrors = logs.Count(l => l.Level.Equals("error", StringComparison.OrdinalIgnoreCase));
+            }
+            catch (Exception ex)
+            {
+                logError = ex.Message;
             }
         }
         finally

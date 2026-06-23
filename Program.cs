@@ -18,7 +18,9 @@ builder.Services.AddSingleton<RouterController>();
 builder.Services.AddSingleton<JsonContentService>();
 builder.Services.AddSingleton<VaultCryptoService>();
 builder.Services.AddSingleton<VaultController>();
-builder.Services.AddSingleton<LogService>();
+builder.Services.AddSingleton<LogService>(sp => new LogService(
+    sp.GetRequiredService<HttpClient>(),
+    sp.GetRequiredService<IJSRuntime>()));
 builder.Services.AddSingleton<VaultSessionService>();
 
 await builder.Build().RunAsync();

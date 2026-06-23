@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.JSInterop;
 
 namespace johnvicencio.Controllers;
 
@@ -8,10 +9,12 @@ public sealed class LogService
     private const int MaxLogLength = 2000;
 
     private readonly HttpClient http;
+    private readonly IJSRuntime? js;
 
-    public LogService(HttpClient http)
+    public LogService(HttpClient http, IJSRuntime? js = null)
     {
         this.http = http;
+        this.js = js;
     }
 
     public async Task LogAsync(string level, string source, string message, object? context = null)
@@ -33,6 +36,10 @@ public sealed class LogService
                 "application/json"
             );
 
+            var token = await GetContentTokenAsync();
+            if (!string.IsNullOrWhiteSpace(token))
+                request.Headers.Add("x-content-token", token);
+
             using var response = await http.SendAsync(request);
         }
         catch
@@ -53,7 +60,15 @@ public sealed class LogService
     {
         try
         {
-            var logs = await http.GetFromJsonAsync<List<LogEntry>>("/.netlify/functions/logs");
+            using var request = new HttpRequestMessage(HttpMethod.Get, "/.netlify/functions/logs");
+            var token = await GetContentTokenAsync();
+            if (!string.IsNullOrWhiteSpace(token))
+                request.Headers.Add("x-content-token", token);
+
+            using var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return [];
+
+            var logs = await response.Content.ReadFromJsonAsync<List<LogEntry>>();
             return logs ?? [];
         }
         catch
@@ -77,6 +92,19 @@ public sealed class LogService
         catch
         {
             return context.ToString();
+        }
+    }
+
+    private async Task<string?> GetContentTokenAsync()
+    {
+        if (js is null) return null;
+        try
+        {
+            return await js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token");
+        }
+        catch
+        {
+            return null;
         }
     }
 }

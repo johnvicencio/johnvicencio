@@ -68,12 +68,20 @@
                 </div>
                 <div class="footer-col footer-sections">
                     <h4>Sections</h4>
-                    <ul>
-                        @foreach (var sec in footerSectionLinks)
-                        {
-                            <li><a href="@sec.Url"><i class="site-icon" data-lucide="@sec.Icon"></i>@sec.Label</a></li>
-                        }
-                    </ul>
+                    <div class="footer-section-columns">
+                        <ul>
+                            @foreach (var sec in footerLeftSectionLinks)
+                            {
+                                <li><a href="@sec.Url"><i class="site-icon" data-lucide="@sec.Icon"></i>@sec.Label</a></li>
+                            }
+                        </ul>
+                        <ul>
+                            @foreach (var sec in footerRightSectionLinks)
+                            {
+                                <li><a href="@sec.Url"><i class="site-icon" data-lucide="@sec.Icon"></i>@sec.Label</a></li>
+                            }
+                        </ul>
+                    </div>
                 </div>
                 <div class="footer-col footer-connect">
                     <h4>Connect</h4>
@@ -97,6 +105,8 @@
 @code {
     private List<CustomNavLink> allNavLinks = [];
     private List<CustomNavLink> footerSectionLinks = [];
+    private List<CustomNavLink> footerLeftSectionLinks = [];
+    private List<CustomNavLink> footerRightSectionLinks = [];
     private string footerAboutHeader = "";
     private string footerAbout = "";
     private List<FooterConnect> footerConnects = [];
@@ -142,7 +152,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try { await Js.InvokeVoidAsync("lucide.createIcons"); } catch { }
+        try { await LucideInterop.RefreshIconsAsync(Js); } catch { }
     }
 
     private async Task LoadNavAsync()
@@ -192,6 +202,12 @@
                 new CustomNavLink { Label = "Privacy", Url = "/privacy-policy", Icon = "fingerprint" },
             ])
             .ToList();
+        footerLeftSectionLinks = footerSectionLinks
+            .Where(link => IsFooterLeftSection(link.Label))
+            .ToList();
+        footerRightSectionLinks = footerSectionLinks
+            .Where(link => IsFooterRightSection(link.Label))
+            .ToList();
 
         footerAboutHeader = string.IsNullOrWhiteSpace(settings.FooterAboutHeader)
             ? "About John Vicencio"
@@ -214,6 +230,17 @@
         slug.Equals("terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
         slug.Equals("privacy-policy", StringComparison.OrdinalIgnoreCase);
 
+    private static bool IsFooterLeftSection(string label) =>
+        label.Equals("About", StringComparison.OrdinalIgnoreCase) ||
+        label.Equals("Experience", StringComparison.OrdinalIgnoreCase) ||
+        label.Equals("Portfolio", StringComparison.OrdinalIgnoreCase) ||
+        label.Equals("Blog", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsFooterRightSection(string label) =>
+        label.Equals("Contact", StringComparison.OrdinalIgnoreCase) ||
+        label.Equals("Terms & Conditions", StringComparison.OrdinalIgnoreCase) ||
+        label.Equals("Privacy", StringComparison.OrdinalIgnoreCase);
+
     private static bool IsLegalUrl(string url)
     {
         var path = url.Split('#', '?')[0].TrimEnd('/');
@@ -227,7 +254,7 @@
         {
             await LoadNavAsync();
             StateHasChanged();
-            try { await Js.InvokeVoidAsync("lucide.createIcons"); } catch { }
+            try { await LucideInterop.RefreshIconsAsync(Js); } catch { }
         });
     }
 
@@ -235,7 +262,7 @@
     {
         await LoadNavAsync();
         StateHasChanged();
-        try { await Js.InvokeVoidAsync("lucide.createIcons"); } catch { }
+        try { await LucideInterop.RefreshIconsAsync(Js); } catch { }
     }
 
     public void Dispose()
