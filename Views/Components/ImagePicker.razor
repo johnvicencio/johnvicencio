@@ -1,57 +1,55 @@
+@inject IJSRuntime Js
 @inject ImageAssetController Images
 
-@if (Open)
-{
-    <div class="image-picker-backdrop" @onclick="Cancel">
-        <div class="image-picker-modal" @onclick:stopPropagation>
-            <div class="table-toolbar">
-                <h3 class="picker-heading">Select Image</h3>
-                <button class="outline secondary" title="Close" aria-label="Close" @onclick="Cancel"><i class="site-icon" data-lucide="x"></i></button>
+<dialog @ref="dialogRef" class="picker-dialog" aria-labelledby="image-picker-title" @oncancel="Cancel" @oncancel:preventDefault="true">
+    <article>
+        <header>
+            <h3 id="image-picker-title">Select Image</h3>
+            <button type="button" class="outline secondary" title="Close" aria-label="Close" @onclick="Cancel"><i class="site-icon" data-lucide="x"></i></button>
+        </header>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <p role="alert" data-variant="danger">@errorMessage</p>
+        }
+        else if (loading)
+        {
+            <p><small>Loading images...</small></p>
+        }
+        else
+        {
+            <label>Folder
+                <select @bind="selectedFolder">
+                    <option value="">All images</option>
+                    @foreach (var folder in folders)
+                    {
+                        <option value="@folder">@folder</option>
+                    }
+                </select>
+            </label>
+
+            <div class="grid picker-tiles">
+                @foreach (var image in VisibleImages)
+                {
+                    <button type="button" class="outline" aria-pressed="@(image.Url == selectedPath)" @onclick="() => Select(image.Url)">
+                        <img src="@image.Url" alt="@image.FileName" />
+                        <small>@image.Url</small>
+                    </button>
+                }
             </div>
 
-            @if (!string.IsNullOrWhiteSpace(errorMessage))
-            {
-                <p role="alert" class="form-alert form-alert-danger">@errorMessage</p>
-            }
-            else if (loading)
-            {
-                <p class="pagination-info">Loading images...</p>
-            }
-            else
-            {
-                <label>Folder
-                    <select @bind="selectedFolder">
-                        <option value="">All images</option>
-                        @foreach (var folder in folders)
-                        {
-                            <option value="@folder">@folder</option>
-                        }
-                    </select>
-                </label>
+            <label>Selected Relative Path
+                <input readonly value="@selectedPath" />
+            </label>
 
-                <div class="image-picker-grid">
-                    @foreach (var image in VisibleImages)
-                    {
-                        <button type="button" class="image-picker-tile @(image.Url == selectedPath ? "selected" : "")" @onclick="() => Select(image.Url)">
-                            <img src="@image.Url" alt="@image.FileName" />
-                            <span>@image.Url</span>
-                        </button>
-                    }
-                </div>
-
-                <label>Selected Relative Path
-                    <input readonly value="@selectedPath" />
-                </label>
-
-                <div class="picker-actions">
-                    <button class="outline secondary" disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="ClearSelection"><i class="site-icon" data-lucide="image-off"></i>Clear Image</button>
-                    <button class="outline secondary" @onclick="Cancel">Cancel</button>
-                    <button disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="Confirm"><i class="site-icon" data-lucide="check"></i>OK</button>
-                </div>
-            }
-        </div>
-    </div>
-}
+            <footer role="group">
+                    <button type="button" class="outline secondary" disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="ClearSelection"><i class="site-icon" data-lucide="image-off"></i>Clear Image</button>
+                    <button type="button" class="outline secondary" @onclick="Cancel">Cancel</button>
+                    <button type="button" disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="Confirm"><i class="site-icon" data-lucide="check"></i>OK</button>
+            </footer>
+        }
+    </article>
+</dialog>
 
 @code {
     [Parameter]
@@ -66,6 +64,8 @@
     [Parameter]
     public EventCallback OnClose { get; set; }
 
+    private ElementReference dialogRef;
+    private bool lastOpen;
     private bool loading;
     private string errorMessage = "";
     private string selectedFolder = "";
@@ -84,6 +84,16 @@
         {
             await LoadImagesAsync();
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Open == lastOpen) return;
+        lastOpen = Open;
+        if (Open)
+            await DialogInterop.OpenAsync(Js, dialogRef);
+        else
+            await DialogInterop.CloseAsync(Js, dialogRef);
     }
 
     private async Task LoadImagesAsync()

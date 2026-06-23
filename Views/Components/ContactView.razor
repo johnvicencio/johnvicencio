@@ -9,23 +9,23 @@
 
     @if (!string.IsNullOrWhiteSpace(statusMessage))
     {
-        <p role="alert" class="form-alert @ContactAlertClass">@statusMessage</p>
+        <p role="alert" data-variant="@ContactAlertVariant">@statusMessage</p>
     }
 
-    <form class="contact-form" @onsubmit="HandleSubmit" @onsubmit:preventDefault @onkeydown="TrackKeyboard" @onpaste="TrackPaste" @oninput="TrackInput">
+    <form @onsubmit="HandleSubmit" @onsubmit:preventDefault @onkeydown="TrackKeyboard" @onpaste="TrackPaste" @oninput="TrackInput">
         <label class="sr-only-field" aria-hidden="true">Website
             <input tabindex="-1" autocomplete="off" @bind="website" />
         </label>
         <input @bind="contactName" aria-label="Your name" placeholder="Your name" maxlength="120" />
         <input type="email" @bind="contactEmail" aria-label="Your email" placeholder="your@email.com" maxlength="180" />
         <textarea @bind="contactMessage" rows="4" aria-label="Your message" placeholder="Your message..." maxlength="4000"></textarea>
-        <label class="contact-consent">
-            <input type="checkbox" @bind="consentAccepted" />
-            <span>I agree to the <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+        <label for="consent-switch">
+            <input type="checkbox" id="consent-switch" name="consent" role="switch" @bind="consentAccepted" />
+            I agree to the <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
         </label>
-        <div class="contact-actions">
+        <footer>
             <button type="submit" aria-busy="@sending">Send Message</button>
-        </div>
+        </footer>
     </form>
 
 </section>
@@ -49,9 +49,9 @@
     private bool sending;
     private string statusMessage = "";
 
-    private string ContactAlertClass => statusMessage.StartsWith("Message sent", StringComparison.OrdinalIgnoreCase)
-        ? "form-alert-success"
-        : "form-alert-danger";
+    private string ContactAlertVariant => statusMessage.StartsWith("Message sent", StringComparison.OrdinalIgnoreCase)
+        ? "success"
+        : "danger";
 
     private async Task HandleSubmit()
     {

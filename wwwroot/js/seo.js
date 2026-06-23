@@ -26,11 +26,11 @@ window.setPageMeta = function (opts) {
 };
 
 window.scrollToPagination = function () {
-  var nav = document.querySelector('.table-pagination');
+  var nav = document.querySelector('nav[aria-label="Pagination"]');
   if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 window.scrollToNav = function () {
-  var nav = document.querySelector('.post-navigation');
+  var nav = document.querySelector('nav[aria-label="Post navigation"]');
   if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };

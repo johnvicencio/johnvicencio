@@ -4,21 +4,31 @@
         @for (var ci = 0; ci < Math.Min(Section.Columns.Count, 3); ci++)
         {
             var col = Section.Columns[ci];
-            <div class="grid-col three-col-icon-block">
+            <article>
                 @if (!string.IsNullOrWhiteSpace(col.ActionIcon))
                 {
-                    <div class="three-col-icon"><i class="site-icon" data-lucide="@col.ActionIcon"></i></div>
+                    <header>
+                        <i class="site-icon" data-lucide="@col.ActionIcon"></i>
+                        <SectionHeading Heading="@col.Title" HeadingLevel="@(HeadingLevel == 1 ? 2 : 3)" />
+                    </header>
                 }
-                <SectionHeading Heading="@col.Title" HeadingLevel="@(HeadingLevel == 1 ? 2 : 3)" />
+                else
+                {
+                    <header>
+                        <SectionHeading Heading="@col.Title" HeadingLevel="@(HeadingLevel == 1 ? 2 : 3)" />
+                    </header>
+                }
                 @if (!string.IsNullOrWhiteSpace(col.Body))
                 {
-                    <div class="content-body">@((MarkupString)col.Body)</div>
+                    <div>@((MarkupString)col.Body)</div>
                 }
                 @if (!string.IsNullOrWhiteSpace(col.ActionText) && !string.IsNullOrWhiteSpace(col.ActionUrl))
                 {
-                    <a href="@col.ActionUrl" role="button" class="outline">@col.ActionText</a>
+                    <footer>
+                        <a href="@col.ActionUrl" role="button" class="outline">@col.ActionText</a>
+                    </footer>
                 }
-            </div>
+            </article>
         }
     </div>
 </section>

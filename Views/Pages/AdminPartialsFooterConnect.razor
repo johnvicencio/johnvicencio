@@ -5,16 +5,16 @@
 <PageTitle>Footer Connect</PageTitle>
 <AdminPageLayout Title="Footer Connect">
 
-    <p class="muted-text">
+    <small>
         Manage social media and connect links in the footer. Use the icon search button to choose from available Lucide icons.
-    </p>
+    </small>
 
     @if (!string.IsNullOrWhiteSpace(message))
     {
-        <p role="alert" class="form-alert form-alert-success">@message</p>
+        <p role="alert">@message</p>
     }
 
-    <div class="table-wrap">
+    <div>
         <table>
             <thead>
                 <tr>
@@ -32,9 +32,9 @@
                         <td><input @bind="footerConnects[idx].Platform" placeholder="e.g. Twitter" /></td>
                         <td><input @bind="footerConnects[idx].Url" placeholder="https://twitter.com/..." /></td>
                         <td>
-                            <div class="icon-input-group">
+                            <div role="group">
                                 <input @bind="footerConnects[idx].Icon" placeholder="icon-name" />
-                                <button type="button" class="outline btn-icon" title="Choose icon" aria-label="Choose icon" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
+                                <button type="button" class="outline" title="Choose icon" aria-label="Choose icon" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
                                 @if (!string.IsNullOrWhiteSpace(footerConnects[idx].Icon))
                                 {
                                     <i class="site-icon" data-lucide="@footerConnects[idx].Icon"></i>
@@ -42,7 +42,7 @@
                             </div>
                         </td>
                         <td>
-                            <button class="outline secondary btn-icon" title="Remove" aria-label="Remove connect link" @onclick="() => RemoveConnect(idx)">
+                            <button class="outline secondary" title="Remove" aria-label="Remove connect link" @onclick="() => RemoveConnect(idx)">
                                 <i class="site-icon" data-lucide="trash-2"></i>
                             </button>
                         </td>
@@ -50,12 +50,12 @@
                 }
             </tbody>
         </table>
-        <div class="table-toolbar-footer">
+        <div>
             <button class="outline" @onclick="AddConnect"><i class="site-icon" data-lucide="plus"></i>Add Connect Link</button>
         </div>
     </div>
 
-    <div class="btn-group btn-group-top">
+    <div role="group">
         <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
     </div>
 

@@ -1,47 +1,44 @@
 @inject IJSRuntime Js
 
-@if (Open)
-{
-    <div class="icon-picker-backdrop" @onclick="Close">
-        <div class="icon-picker-modal" @onclick:stopPropagation>
-            <div class="table-toolbar">
-                <h4 class="picker-heading">Select Icon</h4>
-                <button class="outline secondary picker-close" @onclick="Close"><i class="site-icon" data-lucide="x"></i></button>
-            </div>
+<dialog @ref="dialogRef" class="picker-dialog picker-dialog-icon" aria-labelledby="icon-picker-title" @oncancel="Close" @oncancel:preventDefault="true">
+    <article>
+        <header>
+            <h4 id="icon-picker-title">Select Icon</h4>
+            <button type="button" class="outline secondary" aria-label="Close" @onclick="Close"><i class="site-icon" data-lucide="x"></i></button>
+        </header>
 
-            <input type="text" @bind="search" @bind:event="oninput" placeholder="Search icons..." class="picker-search-gap" autocomplete="off" />
+        <SearchFilter SearchQuery="@search" SearchQueryChanged="HandleSearch" Placeholder="Search icons..." />
 
-            @if (icons.Count == 0)
+        @if (icons.Count == 0)
+        {
+            <p><small>Loading icons...</small></p>
+        }
+        else
+        {
+            var filtered = string.IsNullOrWhiteSpace(search)
+                ? icons
+                : icons.Where(i => i.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            @if (filtered.Count == 0)
             {
-                <p class="pagination-info picker-info">Loading icons...</p>
+                <p><small>No icons matching "@search".</small></p>
             }
             else
             {
-                var filtered = string.IsNullOrWhiteSpace(search)
-                    ? icons
-                    : icons.Where(i => i.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-
-                @if (filtered.Count == 0)
-                {
-                    <p class="pagination-info picker-info">No icons matching "@search".</p>
-                }
-                else
-                {
-                    <div class="icon-picker-grid">
-                        @foreach (var icon in filtered)
-                        {
-                            var iName = icon;
-                            <button type="button" class="icon-picker-tile @(iName == Value ? "selected" : "")" title="@iName" @onclick="() => Select(iName)">
-                                <i class="site-icon icon-lg" data-lucide="@iName"></i>
-                                <span>@iName</span>
-                            </button>
-                        }
-                    </div>
-                }
+                <div class="grid picker-tiles">
+                    @foreach (var icon in filtered)
+                    {
+                        var iName = icon;
+                        <button type="button" class="outline" aria-pressed="@(iName == Value)" title="@iName" @onclick="() => Select(iName)">
+                            <i class="site-icon" data-lucide="@iName"></i>
+                            <small>@iName</small>
+                        </button>
+                    }
+                </div>
             }
-        </div>
-    </div>
-}
+        }
+    </article>
+</dialog>
 
 @code {
     [Parameter]
@@ -56,6 +53,8 @@
     [Parameter]
     public EventCallback OnClose { get; set; }
 
+    private ElementReference dialogRef;
+    private bool lastOpen;
     private string search = "";
     private List<string> icons = [];
 
@@ -66,13 +65,24 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (Open != lastOpen)
+        {
+            lastOpen = Open;
+            if (Open)
+                await DialogInterop.OpenAsync(Js, dialogRef);
+            else
+                await DialogInterop.CloseAsync(Js, dialogRef);
+        }
+
         if (Open)
             await LucideInterop.RefreshIconsAsync(Js);
     }
 
-    private void Close()
+    private void HandleSearch(string val) => search = val;
+
+    private async Task Close()
     {
-        OnClose.InvokeAsync();
+        await OnClose.InvokeAsync();
     }
 
     private async Task Select(string icon)

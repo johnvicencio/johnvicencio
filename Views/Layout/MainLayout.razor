@@ -9,64 +9,68 @@
 <div class="site-shell">
     <header class="site-header">
         <div class="container">
-            <nav class="site-nav">
-                <ul class="site-nav-brand">
-                    <li><strong><a class="site-nav-link site-brand-link" href="/"><img class="site-brand-img" src="/images/johnvicencio-brand.png" alt="johnvicencio" /></a></strong></li>
+            <nav aria-label="Main navigation">
+                <ul>
+                    <li><strong><a href="/" aria-current="@NavAriaCurrent("/")"><img src="/images/johnvicencio-brand.png" alt="johnvicencio" /></a></strong></li>
                 </ul>
-                <button type="button" class="site-menu-toggle outline secondary" aria-label="Toggle navigation menu" aria-expanded="@mobileMenuOpen" @onclick="ToggleMobileMenu">
+                <button type="button" class="outline secondary" aria-label="Toggle navigation menu" aria-expanded="@mobileMenuOpen" @onclick="ToggleMobileMenu">
                     <i class="site-icon" data-lucide="@(mobileMenuOpen ? "x" : "menu")"></i>
                 </button>
-                <ul class="site-nav-links">
+                <ul>
                     @foreach (var link in allNavLinks)
                     {
-                        <li><a class="site-nav-link" href="@link.Url"><i class="site-icon" data-lucide="@link.Icon"></i>@link.Label</a></li>
+                        <li><a href="@link.Url" aria-current="@NavAriaCurrent(link.Url)"><i class="site-icon" data-lucide="@link.Icon"></i>@link.Label</a></li>
                     }
                     @if (Session.IsLoggedIn)
                     {
-                        <li><a class="site-nav-link" href="/admin"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
-                        <li><a class="site-nav-link" href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
+                        <li><a href="/admin" aria-current="@NavAriaCurrent("/admin")"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
+                        <li><a href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
                     }
                 </ul>
             </nav>
             @if (mobileMenuOpen)
             {
-                <nav class="site-mobile-nav" aria-label="Mobile navigation">
-                    @foreach (var link in allNavLinks)
-                    {
-                        <a class="site-nav-link" href="@link.Url" @onclick="CloseMobileMenu"><i class="site-icon" data-lucide="@link.Icon"></i>@link.Label</a>
-                    }
-                    @if (Session.IsLoggedIn)
-                    {
-                        <a class="site-nav-link" href="/admin" @onclick="CloseMobileMenu"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a>
-                        <a class="site-nav-link" href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a>
-                    }
+                <nav aria-label="Mobile navigation">
+                    <ul>
+                        @foreach (var link in allNavLinks)
+                        {
+                            <li><a href="@link.Url" aria-current="@NavAriaCurrent(link.Url)" @onclick="CloseMobileMenu"><i class="site-icon" data-lucide="@link.Icon"></i>@link.Label</a></li>
+                        }
+                        @if (Session.IsLoggedIn)
+                        {
+                            <li><a href="/admin" aria-current="@NavAriaCurrent("/admin")" @onclick="CloseMobileMenu"><i class="site-icon" data-lucide="layout-dashboard"></i>Dashboard</a></li>
+                            <li><a href="" @onclick="LogOut" @onclick:preventDefault="true"><i class="site-icon" data-lucide="log-out"></i>Logout</a></li>
+                        }
+                    </ul>
                 </nav>
             }
         </div>
     </header>
 
-    <main class="container site-main">
-        @if (maintenanceMode && !Session.IsLoggedIn)
-        {
-            <section class="maintenance-block">
-                <h1>Under Maintenance</h1>
-                <p>This site is currently undergoing scheduled maintenance. Please check back soon.</p>
-            </section>
-        }
-        else
-        {
-            @Body
-        }
+    <main class="site-main">
+        <div class="container">
+            @if (maintenanceMode && !Session.IsLoggedIn)
+            {
+                <section class="maintenance-block">
+                    <h1>Under Maintenance</h1>
+                    <p>This site is currently undergoing scheduled maintenance. Please check back soon.</p>
+                </section>
+            }
+            else
+            {
+                @Body
+            }
+        </div>
     </main>
 
     <footer class="site-footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col footer-about">
+            <div class="grid">
+                <div>
                     <h4>@footerAboutHeader</h4>
-                    <div class="footer-about-body">@((MarkupString)footerAbout)</div>
+                    <div>@((MarkupString)footerAbout)</div>
                 </div>
-                <div class="footer-col footer-sections">
+                <div>
                     <h4>Sections</h4>
                     <div class="footer-section-columns">
                         <ul>
@@ -83,9 +87,9 @@
                         </ul>
                     </div>
                 </div>
-                <div class="footer-col footer-connect">
+                <div>
                     <h4>Connect</h4>
-                    <ul class="footer-connect-list">
+                    <ul>
                         @foreach (var connect in footerConnects)
                         {
                             <li><a href="@connect.Url" target="_blank" rel="noopener noreferrer"><i class="site-icon" data-lucide="@connect.Icon"></i>@connect.Platform</a></li>
@@ -96,7 +100,7 @@
         </div>
         <div class="footer-bottom">
             <div class="container">
-                <p>&copy; @DateTime.Now.Year John Vicencio. Made with <span class="footer-heart">&hearts;</span> in the USA.</p>
+                <small>&copy; @DateTime.Now.Year John Vicencio. Made with <span class="footer-heart">&hearts;</span> in the USA.</small>
             </div>
         </div>
     </footer>
@@ -246,6 +250,25 @@
         var path = url.Split('#', '?')[0].TrimEnd('/');
         return path.Equals("/terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
             path.Equals("/privacy-policy", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string? NavAriaCurrent(string url)
+    {
+        var currentPath = new Uri(Nav.Uri).AbsolutePath.TrimEnd('/');
+        if (string.IsNullOrEmpty(currentPath))
+            currentPath = "/";
+
+        var linkPath = url.Split('#', '?')[0].TrimEnd('/');
+        if (string.IsNullOrEmpty(linkPath))
+            linkPath = "/";
+
+        if (linkPath.Equals("/admin", StringComparison.OrdinalIgnoreCase))
+            return currentPath.StartsWith("/admin", StringComparison.OrdinalIgnoreCase) ? "page" : null;
+
+        if (linkPath.Equals("/", StringComparison.OrdinalIgnoreCase))
+            return currentPath == "/" ? "page" : null;
+
+        return currentPath.Equals(linkPath, StringComparison.OrdinalIgnoreCase) ? "page" : null;
     }
 
     private void OnPagesChanged()

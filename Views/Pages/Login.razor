@@ -6,29 +6,37 @@
 
 <PageTitle>Login — John Vicencio</PageTitle>
 
-<div class="login-page">
+<section>
+<article>
+<header>
 <h1>Login</h1>
+</header>
 <p>Type your username and password:</p>
 
 @if (!string.IsNullOrWhiteSpace(message))
 {
-    <p role="alert" class="form-alert form-alert-danger">@message</p>
+    <p role="alert">@message</p>
 }
 
-<EditForm Model="loginForm" OnValidSubmit="UnlockVaultAsync" class="login-form">
+<EditForm Model="loginForm" OnValidSubmit="UnlockVaultAsync">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <InputText @bind-Value="loginForm.Username" placeholder="Username" autocomplete="username" />
-    <InputText type="password" @bind-Value="loginForm.Passphrase" placeholder="Password" autocomplete="current-password" maxlength="200" />
+    <label>Username
+        <InputText @bind-Value="loginForm.Username" placeholder="Username" autocomplete="username" />
+    </label>
+    <label>Password
+        <InputText type="password" @bind-Value="loginForm.Passphrase" placeholder="Password" autocomplete="current-password" maxlength="200" />
+    </label>
 
     <button type="submit" aria-busy="@isBusy">Submit</button>
 
-    <p class="muted-sm mt-1">
+    <small>
         <a href="/admin/reset-password">Forgot your password?</a>
-    </p>
+    </small>
 </EditForm>
-</div>
+</article>
+</section>
 
 @code {
     private readonly LoginForm loginForm = new();

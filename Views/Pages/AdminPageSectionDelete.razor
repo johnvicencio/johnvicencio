@@ -7,15 +7,15 @@
 <AdminPageLayout Title="@title">
     @if (loading)
     {
-        <p class="loading-state">Loading...</p>
+        <p aria-busy="true">Loading...</p>
     }
     else if (page is null)
     {
-        <p class="empty-state">Page not found.</p>
+        <p>Page not found.</p>
     }
     else if (sec is null)
     {
-        <p class="empty-state">Section not found.</p>
+        <p>Section not found.</p>
     }
     else
     {
@@ -23,10 +23,12 @@
             Are you sure you want to delete the <strong>@SlugHelper.SectionTypeDisplayName(sec.Type)</strong> section
             "@(string.IsNullOrWhiteSpace(sec.Heading) ? "(no heading)" : sec.Heading)"?
         </p>
-        <p class="muted-sm">This will permanently remove this section from the page.</p>
+        <small>This will permanently remove this section from the page.</small>
         <hr />
-        <button class="outline danger" @onclick="ConfirmDelete" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Yes, Delete</button>
-        <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+        <div role="group">
+            <button class="outline danger" @onclick="ConfirmDelete" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Yes, Delete</button>
+            <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+        </div>
     }
 </AdminPageLayout>
 

@@ -8,15 +8,15 @@
 
     @if (loading)
     {
-        <p class="loading-state">Loading logs...</p>
+        <p aria-busy="true">Loading logs...</p>
     }
     else if (logs.Count == 0)
     {
-        <p class="empty-state">No application logs recorded yet.</p>
+        <p>No application logs recorded yet.</p>
     }
     else
     {
-        <div class="table-wrap"><table>
+        <div><table>
             <thead>
                 <tr>
                     <th>Time</th>
@@ -30,11 +30,11 @@
                 @foreach (var entry in filteredLogs)
                 {
                     <tr>
-                        <td class="log-time">@FormatTime(entry.Timestamp)</td>
-                        <td><span class="log-level log-@entry.Level.ToLowerInvariant()">@entry.Level</span></td>
+                        <td>@FormatTime(entry.Timestamp)</td>
+                        <td><span>@entry.Level</span></td>
                         <td><code>@entry.Source</code></td>
-                        <td class="log-message">@entry.Message</td>
-                        <td class="log-context">@entry.Context</td>
+                        <td>@entry.Message</td>
+                        <td>@entry.Context</td>
                     </tr>
                 }
             </tbody>
@@ -74,10 +74,12 @@
             <option value="warn">Warn</option>
             <option value="error">Error</option>
         </select>
-        <input type="text" @bind="searchFilter" @bind:event="oninput" placeholder="Search messages..." style="width:14rem" />
-        <button class="outline btn-action" @onclick="RefreshLogs"><i class="site-icon" data-lucide="refresh-cw"></i></button>
-        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        <SearchFilter SearchQuery="@searchFilter" SearchQueryChanged="HandleSearchFilter" Placeholder="Search messages..." />
+        <button class="outline" @onclick="RefreshLogs"><i class="site-icon" data-lucide="refresh-cw"></i></button>
+        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
+
+    private void HandleSearchFilter(string val) => searchFilter = val;
 
     protected override async Task OnInitializedAsync()
     {

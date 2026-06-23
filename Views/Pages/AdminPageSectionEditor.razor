@@ -9,22 +9,22 @@
 <AdminPageLayout Title="@title">
         @if (loading)
         {
-            <p class="loading-state">Loading...</p>
+            <p aria-busy="true">Loading...</p>
         }
         else if (page is null)
         {
-            <p class="empty-state">Page not found.</p>
+            <p>Page not found.</p>
         }
         else
         {
-            <div class="page-editor">
+            <div>
                 @if (!string.IsNullOrWhiteSpace(message))
                 {
-                    <p role="alert" class="form-alert form-alert-danger">@message</p>
+                    <p role="alert">@message</p>
                 }
 
                 <label>Section ID
-                    <input readonly class="muted-text" value="@sec.SectionId" />
+                    <input readonly value="@sec.SectionId" />
                 </label>
 
                 <label>Anchor ID <small>Optional, for links like <code>#experience</code>.</small>
@@ -50,7 +50,7 @@
                         <button type="button" class="outline" @onclick="OpenSectionImagePicker"><i class="site-icon" data-lucide="image"></i>Select Image</button>
                         @if (!string.IsNullOrWhiteSpace(sec.ImageUrl))
                         {
-                            <p class="pagination-info">Selected: <code>@sec.ImageUrl</code></p>
+                            <small>Selected: <code>@sec.ImageUrl</code></small>
                         }
                         <label>Image Alt Text
                             <input @bind="sec.ImageAlt" />
@@ -62,23 +62,23 @@
                             </select>
                         </label>
                         <hr />
-                        <div class="table-toolbar">
+                        <div>
                             <h5>Buttons</h5>
                             @if (sec.Buttons.Count < 3)
                             {
-                                <button class="outline btn-action" @onclick="() => AddButton()"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
+                                <button class="outline" @onclick="() => AddButton()"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
                             }
                         </div>
                         @for (var bi = 0; bi < sec.Buttons.Count; bi++)
                         {
                             var btn = sec.Buttons[bi];
                             var localBi = bi;
-                            <div class="editor-card">
-                                <div class="grid grid-2col">
+                            <article>
+                                <div class="grid">
                                     <label>Button Icon
-                                        <div class="flex-group">
+                                        <div role="group">
                                             <input @bind="btn.Icon" placeholder="icon-name" />
-                                            <button type="button" class="outline btn-icon" @onclick="() => OpenIconPicker(localBi)"><i class="site-icon" data-lucide="search"></i></button>
+                                            <button type="button" class="outline" @onclick="() => OpenIconPicker(localBi)"><i class="site-icon" data-lucide="search"></i></button>
                                             @if (!string.IsNullOrWhiteSpace(btn.Icon)) { <i class="site-icon" data-lucide="@btn.Icon"></i> }
                                         </div>
                                     </label>
@@ -86,13 +86,13 @@
                                         <input @bind="btn.Text" />
                                     </label>
                                 </div>
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Button URL
                                         <input @bind="btn.Url" />
                                     </label>
                                 </div>
-                                <button class="outline secondary btn-tiny" @onclick="() => RemoveButton(localBi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
-                            </div>
+                                <button class="outline secondary" @onclick="() => RemoveButton(localBi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
+                            </article>
                         }
                         break;
 
@@ -101,7 +101,7 @@
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div class="editor-card">
+                            <article>
                                 <h5>Column @(localCi + 1)</h5>
                                 <label>Title
                                     <input @bind="col.Title" />
@@ -109,20 +109,20 @@
                                 <label>Body</label>
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="220" />
                                 <hr />
-                                <div class="table-toolbar">
+                                <div>
                                     <h6>Button</h6>
                                     @if (string.IsNullOrWhiteSpace(col.ActionText) && string.IsNullOrWhiteSpace(col.ActionUrl))
                                     {
-                                        <button class="outline btn-action" @onclick="() => AddColumnButton(localCi)"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
+                                        <button class="outline" @onclick="() => AddColumnButton(localCi)"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
                                     }
                                 </div>
                                 @if (!string.IsNullOrWhiteSpace(col.ActionText) || !string.IsNullOrWhiteSpace(col.ActionUrl))
                                 {
-                                    <div class="grid grid-2col">
+                                    <div class="grid">
                                         <label>Button Icon
-                                            <div class="flex-group">
+                                            <div role="group">
                                                 <input @bind="col.ActionIcon" placeholder="icon-name" />
-                                                <button type="button" class="outline btn-icon" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                                <button type="button" class="outline" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                                 @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
                                             </div>
                                         </label>
@@ -130,14 +130,14 @@
                                             <input @bind="col.ActionText" />
                                         </label>
                                     </div>
-                                    <div class="grid grid-2col">
+                                    <div class="grid">
                                         <label>Button URL
                                             <input @bind="col.ActionUrl" />
                                         </label>
                                     </div>
-                                    <button class="outline secondary btn-tiny" @onclick="() => RemoveColumnButton(localCi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
+                                    <button class="outline secondary" @onclick="() => RemoveColumnButton(localCi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
                                 }
-                            </div>
+                            </article>
                         }
                         break;
 
@@ -146,12 +146,12 @@
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div class="editor-card">
+                            <article>
                                 <h5>Column @(localCi + 1)</h5>
                                 <label>Icon
-                                    <div class="flex-group">
+                                    <div role="group">
                                         <input @bind="col.ActionIcon" placeholder="icon-name" />
-                                        <button type="button" class="outline btn-icon" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                        <button type="button" class="outline" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                         @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
                                     </div>
                                 </label>
@@ -160,7 +160,7 @@
                                 </label>
                                 <label>Body</label>
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="220" />
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Action Text
                                         <input @bind="col.ActionText" />
                                     </label>
@@ -168,36 +168,36 @@
                                         <input @bind="col.ActionUrl" />
                                     </label>
                                 </div>
-                            </div>
+                            </article>
                         }
                         break;
 
                     case "grid-card":
                     case "portfolio":
                         <label>Section Icon
-                            <div class="flex-group">
+                            <div role="group">
                                 <input @bind="sec.Icon" placeholder="icon-name" />
-                                <button type="button" class="outline btn-icon" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
+                                <button type="button" class="outline" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
                                 @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
                             </div>
                         </label>
                         <label>Header
                             <input @bind="sec.Heading" />
                         </label>
-                        <div class="table-toolbar">
+                        <div>
                             <h5>Grid Cards</h5>
-                            <button type="button" class="outline btn-action" @onclick="AddGridCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
+                            <button type="button" class="outline" @onclick="AddGridCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
                         </div>
                         @for (var ci = 0; ci < sec.Columns.Count; ci++)
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div class="editor-card">
-                                <div class="table-toolbar">
+                            <article>
+                                <div>
                                     <h5>Card @(localCi + 1)</h5>
-                                    <button type="button" class="outline danger btn-tiny" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
+                                    <button type="button" class="outline danger" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Image URL
                                         <input @bind="col.ImageUrl" />
                                     </label>
@@ -208,9 +208,9 @@
                                 <button type="button" class="outline" @onclick="() => OpenColumnImagePicker(localCi)"><i class="site-icon" data-lucide="image"></i>Select Image</button>
                                 @if (!string.IsNullOrWhiteSpace(col.ImageUrl))
                                 {
-                                    <p class="pagination-info">Selected: <code>@col.ImageUrl</code></p>
+                                    <small>Selected: <code>@col.ImageUrl</code></small>
                                 }
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Image Link
                                         <input @bind="col.ImageLink" />
                                     </label>
@@ -226,7 +226,7 @@
                                 </label>
                                 <label>Description</label>
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="180" />
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Bottom Link Text
                                         <input @bind="col.ActionText" />
                                     </label>
@@ -240,7 +240,7 @@
                                         <option value="true">New tab</option>
                                     </select>
                                 </label>
-                            </div>
+                            </article>
                         }
                         break;
 
@@ -248,29 +248,29 @@
                     case "cardcollection":
                     case "row-card":
                         <label>Section Icon
-                            <div class="flex-group">
+                            <div role="group">
                                 <input @bind="sec.Icon" placeholder="icon-name" />
-                                <button type="button" class="outline btn-icon" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
+                                <button type="button" class="outline" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
                                 @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
                             </div>
                         </label>
                         <label>Header
                             <input @bind="sec.Heading" />
                         </label>
-                        <div class="table-toolbar">
+                        <div>
                             <h5>Cards</h5>
-                            <button type="button" class="outline btn-action" @onclick="AddRowCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
+                            <button type="button" class="outline" @onclick="AddRowCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
                         </div>
                         @for (var ci = 0; ci < sec.Columns.Count; ci++)
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div class="editor-card">
-                                <div class="table-toolbar">
+                            <article>
+                                <div>
                                     <h5>Card @(localCi + 1)</h5>
-                                    <button type="button" class="outline danger btn-tiny" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
+                                    <button type="button" class="outline danger" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Avatar Image URL
                                         <input @bind="col.ImageUrl" />
                                     </label>
@@ -281,9 +281,9 @@
                                 <button type="button" class="outline" @onclick="() => OpenColumnImagePicker(localCi)"><i class="site-icon" data-lucide="image"></i>Select Avatar</button>
                                 @if (!string.IsNullOrWhiteSpace(col.ImageUrl))
                                 {
-                                    <p class="pagination-info">Selected: <code>@col.ImageUrl</code></p>
+                                    <small>Selected: <code>@col.ImageUrl</code></small>
                                 }
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Image Link
                                         <input @bind="col.ImageLink" />
                                     </label>
@@ -294,7 +294,7 @@
                                         </select>
                                     </label>
                                 </div>
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Title
                                         <input @bind="col.Title" />
                                     </label>
@@ -304,11 +304,11 @@
                                 </div>
                                 <label>Description</label>
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="180" />
-                                <div class="grid grid-2col">
+                                <div class="grid">
                                     <label>Right Icon
-                                        <div class="flex-group">
+                                        <div>
                                             <input @bind="col.ActionIcon" placeholder="icon-name" />
-                                            <button type="button" class="outline btn-icon" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                            <button type="button" class="outline" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                             @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
                                         </div>
                                     </label>
@@ -322,7 +322,7 @@
                                         <option value="true">New tab</option>
                                     </select>
                                 </label>
-                            </div>
+                            </article>
                         }
                         break;
 
@@ -340,8 +340,10 @@
                 }
 
                 <hr />
-                <button @onclick="SaveSection" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Section</button>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+                <div role="group">
+                    <button @onclick="SaveSection" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Section</button>
+                    <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+                </div>
 
             </div>
         }

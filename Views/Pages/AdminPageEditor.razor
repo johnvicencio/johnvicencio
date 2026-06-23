@@ -8,14 +8,14 @@
 <AdminPageLayout Title="@title">
         @if (loading)
         {
-            <p class="loading-state">Loading...</p>
+            <p aria-busy="true">Loading...</p>
         }
         else
         {
-            <div class="page-editor">
+            <div>
                 @if (!string.IsNullOrWhiteSpace(message))
                 {
-                    <p role="alert" class="form-alert form-alert-danger">@message</p>
+                    <p role="alert">@message</p>
                 }
 
                 @if (isAddMode)
@@ -31,7 +31,7 @@
                     </label>
                 }
 
-                <div class="grid grid-2col">
+                <div class="grid">
                     <label>Page Title
                         <input @bind="editTitle" @oninput="OnTitleChanged" maxlength="200" />
                     </label>
@@ -54,21 +54,23 @@
                 {
                     @if (IsBlogPage)
                     {
-                        <p class="pagination-info">Blog pages use the blog post editor and do not support extra page sections.</p>
+                        <small>Blog pages use the blog post editor and do not support extra page sections.</small>
                         <button class="outline" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="book-open"></i>Manage Blog</button>
                     }
                     else
                     {
-                        <div class="btn-group">
+                        <div role="group">
                             <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="layers"></i>Manage Sections</button>
                         </div>
-                        <p class="muted-text">@sectionCount section(s) on this page.</p>
+                        <small>@sectionCount section(s) on this page.</small>
                     }
                 }
 
                 <hr />
-                <button @onclick="SavePage" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Page</button>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+                <div role="group">
+                    <button @onclick="SavePage" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Page</button>
+                    <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+                </div>
 
             </div>
         }

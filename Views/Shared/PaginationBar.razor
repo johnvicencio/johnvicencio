@@ -4,26 +4,26 @@
 
 @if (TotalPages > 1)
 {
-    <nav class="table-pagination" aria-label="Pagination">
-        <button class="outline secondary pagination-btn" title="First Page" aria-label="First Page" disabled="@(CurrentPage <= 1)" @onclick="() => GoToPage(1)"><span class="pagination-icon">&laquo;</span></button>
-        <button class="outline secondary pagination-btn" title="Previous Page" aria-label="Previous Page" disabled="@(CurrentPage <= 1)" @onclick="() => GoToPage(CurrentPage - 1)"><i class="site-icon" data-lucide="chevron-left"></i></button>
+    <nav aria-label="Pagination">
+        <button class="outline secondary" title="First Page" aria-label="First Page" disabled="@(CurrentPage <= 1)" @onclick="() => GoToPage(1)"><span>&laquo;</span></button>
+        <button class="outline secondary" title="Previous Page" aria-label="Previous Page" disabled="@(CurrentPage <= 1)" @onclick="() => GoToPage(CurrentPage - 1)"><i class="site-icon" data-lucide="chevron-left"></i></button>
         @foreach (var p in PaginationWindow)
         {
             if (p == CurrentPage)
             {
-                <span class="pagination-btn current">@p</span>
+                <span aria-current="page">@p</span>
             }
             else if (p == -1)
             {
-                <span class="pagination-ellipsis">...</span>
+                <span>...</span>
             }
             else
             {
-                <a href="@(PageUrl?.Invoke(p) ?? "#")" class="pagination-btn outline secondary pagination-link">@p</a>
+                <a href="@(PageUrl?.Invoke(p) ?? "#")" role="button" class="outline secondary">@p</a>
             }
         }
-        <button class="outline secondary pagination-btn" title="Next Page" aria-label="Next Page" disabled="@(CurrentPage >= TotalPages)" @onclick="() => GoToPage(CurrentPage + 1)"><i class="site-icon" data-lucide="chevron-right"></i></button>
-        <button class="outline secondary pagination-btn" title="Last Page" aria-label="Last Page" disabled="@(CurrentPage >= TotalPages)" @onclick="() => GoToPage(TotalPages)"><span class="pagination-icon">&raquo;</span></button>
+        <button class="outline secondary" title="Next Page" aria-label="Next Page" disabled="@(CurrentPage >= TotalPages)" @onclick="() => GoToPage(CurrentPage + 1)"><i class="site-icon" data-lucide="chevron-right"></i></button>
+        <button class="outline secondary" title="Last Page" aria-label="Last Page" disabled="@(CurrentPage >= TotalPages)" @onclick="() => GoToPage(TotalPages)"><span>&raquo;</span></button>
     </nav>
 }
 

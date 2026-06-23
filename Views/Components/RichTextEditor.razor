@@ -1,33 +1,33 @@
 @inject IJSRuntime Js
 
 <div class="rich-editor">
-    <div class="rich-toolbar">
-        <button type="button" class="outline secondary rich-btn" @onclick='() => Format("bold")' title="Bold" aria-label="Bold"><strong>B</strong></button>
-        <button type="button" class="outline secondary rich-btn" @onclick='() => Format("italic")' title="Italic" aria-label="Italic"><em>I</em></button>
-        <button type="button" class="outline secondary rich-btn" @onclick='() => Format("underline")' title="Underline" aria-label="Underline"><u>U</u></button>
+    <div class="rich-toolbar" role="group" aria-label="Formatting">
+        <button type="button" class="outline secondary" @onclick='() => Format("bold")' title="Bold" aria-label="Bold"><strong>B</strong></button>
+        <button type="button" class="outline secondary" @onclick='() => Format("italic")' title="Italic" aria-label="Italic"><em>I</em></button>
+        <button type="button" class="outline secondary" @onclick='() => Format("underline")' title="Underline" aria-label="Underline"><u>U</u></button>
 
         <span class="sep"></span>
 
-        <button type="button" class="outline secondary rich-btn-sm" @onclick='() => Format("formatBlock", "h2")' title="Heading 2" aria-label="Heading 2">H2</button>
-        <button type="button" class="outline secondary rich-btn-sm" @onclick='() => Format("formatBlock", "h3")' title="Heading 3" aria-label="Heading 3">H3</button>
-        <button type="button" class="outline secondary rich-btn-sm" @onclick='() => Format("formatBlock", "p")' title="Paragraph" aria-label="Paragraph">P</button>
+        <button type="button" class="outline secondary" @onclick='() => Format("formatBlock", "h2")' title="Heading 2" aria-label="Heading 2">H2</button>
+        <button type="button" class="outline secondary" @onclick='() => Format("formatBlock", "h3")' title="Heading 3" aria-label="Heading 3">H3</button>
+        <button type="button" class="outline secondary" @onclick='() => Format("formatBlock", "p")' title="Paragraph" aria-label="Paragraph">P</button>
 
         <span class="sep"></span>
 
-        <button type="button" class="outline secondary rich-btn" @onclick='() => Format("insertUnorderedList")' title="Bullet list" aria-label="Bullet list">
+        <button type="button" class="outline secondary" @onclick='() => Format("insertUnorderedList")' title="Bullet list" aria-label="Bullet list">
             <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="3" cy="3" r="1.2" fill="currentColor"/><line x1="6" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1"/><circle cx="3" cy="9" r="1.2" fill="currentColor"/><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1"/></svg>
         </button>
-        <button type="button" class="outline secondary rich-btn" @onclick='() => Format("insertOrderedList")' title="Ordered list" aria-label="Ordered list">
+        <button type="button" class="outline secondary" @onclick='() => Format("insertOrderedList")' title="Ordered list" aria-label="Ordered list">
             <svg width="12" height="12" viewBox="0 0 12 12"><text x="0" y="4" font-size="4" fill="currentColor" font-weight="bold">1.</text><line x1="6" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1"/><text x="0" y="9" font-size="4" fill="currentColor" font-weight="bold">2.</text><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1"/></svg>
         </button>
 
         <span class="sep"></span>
 
-        <button type="button" class="outline secondary rich-btn" @onclick='() => Format("createLink")' title="Insert link" aria-label="Insert link">Link</button>
+        <button type="button" class="outline secondary" @onclick='() => Format("createLink")' title="Insert link" aria-label="Insert link">Link</button>
 
         <span class="sep-grow"></span>
 
-        <button type="button" class="outline secondary rich-btn-sm" @onclick="ToggleSource" aria-label="Toggle source view">@(showingSource ? "WYSIWYG" : "Source")</button>
+        <button type="button" class="outline secondary" @onclick="ToggleSource" aria-label="Toggle source view">@(showingSource ? "WYSIWYG" : "Source")</button>
     </div>
 
     <div id="@editorId" contenteditable="@(!showingSource)" class="rich-editor-body"
