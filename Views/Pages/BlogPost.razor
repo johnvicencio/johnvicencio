@@ -86,7 +86,7 @@ else
                 image = string.IsNullOrWhiteSpace(post.ImageUrl) ? null : $"https://johnvicencio.com{post.ImageUrl}"
             });
         }
-        if (!firstRender)
+        if (!firstRender && post is not null)
         {
             await Js.InvokeVoidAsync("scrollToNav");
         }
