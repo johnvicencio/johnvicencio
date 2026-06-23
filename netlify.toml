@@ -1,5 +1,5 @@
 [build]
-  command = "node .agent-code/scripts/generate-image-index.mjs && dotnet publish -c Release"
+  command = "dotnet publish -c Release"
   publish = "bin/Release/net8.0/publish/wwwroot"
   functions = "netlify/functions"
 

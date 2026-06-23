@@ -20,4 +20,19 @@
     <Folder Include="wwwroot\data\" />
   </ItemGroup>
 
+  <Target Name="GenerateImageIndex" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <AgentCodeScript>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\.agent-code\scripts\generate-image-index.mjs'))</AgentCodeScript>
+    </PropertyGroup>
+    <Exec
+      Condition="Exists('$(AgentCodeScript)')"
+      Command="node &quot;$(AgentCodeScript)&quot;"
+      WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Copy
+      Condition="!Exists('$(AgentCodeScript)')"
+      SourceFiles="$(MSBuildProjectDirectory)/wwwroot/images/index.json"
+      DestinationFiles="$(MSBuildProjectDirectory)/netlify/functions/image-index.json"
+      SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
