@@ -5,9 +5,9 @@
 
 @if (!isReady)
 {
-    <section class="login-page">
-        <article class="admin-wrap">
-            <p class="loading-state">Loading...</p>
+    <section>
+        <article>
+            <p aria-busy="true">Loading...</p>
         </article>
     </section>
 }
@@ -17,22 +17,22 @@ else if (!Session.IsLoggedIn)
 }
 else
 {
-    <section class="login-page">
-        <article class="admin-wrap">
+    <section>
+        <article>
             @if (!string.IsNullOrWhiteSpace(Title) || ToolbarItems is not null)
             {
-                <div class="table-toolbar">
+                <header>
                     @if (!string.IsNullOrWhiteSpace(Title))
                     {
-                        <h2>@Title</h2>
+                        <h1>@Title</h1>
                     }
                     @if (ToolbarItems is not null)
                     {
-                        <div class="flex-group-lg">
+                        <div role="group">
                             @ToolbarItems
                         </div>
                     }
-                </div>
+                </header>
             }
             @ChildContent
         </article>

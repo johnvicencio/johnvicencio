@@ -10,7 +10,7 @@
 <AdminPageLayout Title="Settings">
         @if (loading)
         {
-            <p class="loading-state">Loading...</p>
+            <p aria-busy="true">Loading...</p>
         }
         else
         {
@@ -18,10 +18,10 @@
 
             @if (!string.IsNullOrWhiteSpace(message))
             {
-                <p role="alert" class="form-alert form-alert-success">@message</p>
+                <p role="alert">@message</p>
             }
 
-            <div class="grid grid-2col">
+            <div class="grid">
                 <label>Site Name
                     <input @bind="settings.SiteName" />
                 </label>
@@ -30,7 +30,7 @@
                 </label>
             </div>
 
-            <div class="grid grid-2col">
+            <div class="grid">
                 <label>Author Name
                     <input @bind="settings.AuthorName" />
                 </label>
@@ -39,12 +39,12 @@
                 </label>
             </div>
 
-            <div class="field-top-spacing">
-                <label class="switch-label">
+            <div>
+                <label>
                     <input type="checkbox" role="switch" @bind="settings.MaintenanceMode" />
                     Maintenance Mode
                 </label>
-                <p class="switch-caption">
+                <p>
                     When enabled, the homepage shows "Under Maintenance" instead of normal content.
                 </p>
             </div>
@@ -52,9 +52,9 @@
             <hr />
 
             <h3>Email / SMTP</h3>
-            <p class="muted-text">Google app passwords are encrypted by the Netlify Function before saving to Blobs. Set <code>SETTINGS_ENCRYPTION_KEY</code> in Netlify first.</p>
+            <small>Google app passwords are encrypted by the Netlify Function before saving to Blobs. Set <code>SETTINGS_ENCRYPTION_KEY</code> in Netlify first.</small>
 
-            <div class="grid grid-2col">
+            <div class="grid">
                 <label>SMTP Host
                     <input @bind="settings.SmtpHost" placeholder="smtp.example.com" maxlength="200" />
                 </label>
@@ -63,7 +63,7 @@
                 </label>
             </div>
 
-            <div class="grid grid-2col">
+            <div class="grid">
                 <label>SMTP Username
                     <input @bind="settings.SmtpUsername" />
                 </label>
@@ -73,14 +73,14 @@
             </div>
             @if (settings.SmtpPasswordConfigured)
             {
-                <p class="text-success"><i class="site-icon" data-lucide="lock-keyhole"></i>Encrypted app password is saved in Netlify Blobs.</p>
+                <p><i class="site-icon" data-lucide="lock-keyhole"></i>Encrypted app password is saved in Netlify Blobs.</p>
             }
             else
             {
-                <p class="muted-text"><i class="site-icon" data-lucide="circle-alert"></i>No Google app password is saved yet.</p>
+                <small><i class="site-icon" data-lucide="circle-alert"></i>No Google app password is saved yet.</small>
             }
 
-            <div class="grid grid-2col">
+            <div class="grid">
                 <label>From Email
                     <input type="email" @bind="settings.FromEmail" placeholder="noreply@example.com" />
                 </label>
@@ -94,18 +94,20 @@
             </label>
 
             <hr />
-            <button @onclick="SaveSettings" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Settings</button>
+            <button type="button" @onclick="SaveSettings" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save Settings</button>
 
             <hr />
 
             <h3>Netlify Content Writes</h3>
             <p>Paste the same token configured in Netlify as <code>CONTENT_WRITE_TOKEN</code>. This browser will send it when saving to Netlify Blobs.</p>
-            <p class="muted-text">On localhost, use <code>netlify dev</code> if you want this token to write through the local Netlify Function. Plain <code>dotnet run</code> falls back to browser storage.</p>
-            <input type="password" @bind="contentToken" placeholder="CONTENT_WRITE_TOKEN" />
-            <button @onclick="SaveContentTokenAsync"><i class="site-icon" data-lucide="key-round"></i>Save Token</button>
+            <small>On localhost, use <code>netlify dev</code> if you want this token to write through the local Netlify Function. Plain <code>dotnet run</code> falls back to browser storage.</small>
+            <div role="group">
+                <input type="password" @bind="contentToken" placeholder="CONTENT_WRITE_TOKEN" />
+                <button type="button" class="outline" @onclick="SaveContentTokenAsync"><i class="site-icon" data-lucide="key-round"></i>Save Token</button>
+            </div>
             @if (tokenSaved)
             {
-                <p role="alert" class="form-alert form-alert-success"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
+                <p role="alert"><i class="site-icon" data-lucide="check-circle"></i>Token saved in this browser.</p>
             }
 
             <hr />
@@ -113,20 +115,20 @@
             <h3>Admin Vault</h3>
             @if (!string.IsNullOrWhiteSpace(vaultMessage))
             {
-                <p role="alert" class="form-alert form-alert-success">@vaultMessage</p>
+                <p role="alert">@vaultMessage</p>
             }
             <p>Seed the encrypted admin vault into Netlify Blobs as <code>users/admin.json</code>. This stores the encrypted login vault, not the plain password.</p>
             @if (checkingVault)
             {
-                <p class="pagination-info"><i class="site-icon" data-lucide="loader"></i>Checking admin vault status...</p>
+                <small><i class="site-icon" data-lucide="loader"></i>Checking admin vault status...</small>
             }
             else if (adminVaultSeeded)
             {
-                <p class="text-success"><i class="site-icon" data-lucide="check-circle"></i>Seeded: Admin Vault exists in Netlify Blobs.</p>
+                <p><i class="site-icon" data-lucide="check-circle"></i>Seeded: Admin Vault exists in Netlify Blobs.</p>
             }
             else
             {
-                <p class="muted-text"><i class="site-icon" data-lucide="circle-alert"></i>Not seeded yet: Admin Vault was not found in Netlify Blobs.</p>
+                <small><i class="site-icon" data-lucide="circle-alert"></i>Not seeded yet: Admin Vault was not found in Netlify Blobs.</small>
             }
             <button class="outline" @onclick="SeedAdminVaultAsync" aria-busy="@seedingVault"><i class="site-icon" data-lucide="database"></i>Seed Admin Vault</button>
 

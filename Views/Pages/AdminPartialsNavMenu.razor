@@ -7,18 +7,18 @@
 
 <AdminPageLayout Title="Nav Bar">
 
-        <p class="muted-text">
+        <small>
             Manage all nav bar links. Reorder with arrows, edit inline, delete, or add new links.
             Page links are pre-loaded from <a href="/admin/pages">Pages</a>.
             Use <code>#block</code> URLs for same-page anchor links.
-        </p>
+        </small>
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
-            <p role="alert" class="form-alert form-alert-success">@message</p>
+            <p role="alert">@message</p>
         }
 
-        <div class="table-wrap">
+        <div>
             <table>
                 <thead>
                     <tr>
@@ -35,15 +35,15 @@
                         var idx = i;
                         var isEditing = editingNav.Contains(idx);
                         <tr>
-                            <td class="nav-index">@(idx + 1)</td>
+                            <td>@(idx + 1)</td>
                             @if (isEditing)
                             {
                                 <td><input @bind="navLinks[idx].Label" placeholder="e.g. About" /></td>
                                 <td><input @bind="navLinks[idx].Url" placeholder="e.g. /about or #block" /></td>
                                 <td>
-                                    <div class="icon-input-group">
+                                    <div role="group">
                                         <input @bind="navLinks[idx].Icon" placeholder="icon-name" />
-                                        <button type="button" class="outline btn-icon" title="Choose icon" aria-label="Choose icon" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
+                                        <button type="button" class="outline" title="Choose icon" aria-label="Choose icon" @onclick="() => OpenIconPicker(idx)"><i class="site-icon" data-lucide="search"></i></button>
                                         @if (!string.IsNullOrWhiteSpace(navLinks[idx].Icon))
                                         {
                                             <i class="site-icon" data-lucide="@navLinks[idx].Icon"></i>
@@ -54,60 +54,62 @@
                             else
                             {
                                 <td><strong>@navLinks[idx].Label</strong></td>
-                                <td><code class="muted-sm">@navLinks[idx].Url</code></td>
+                                <td><code>@navLinks[idx].Url</code></td>
                                 <td>
                                     @if (!string.IsNullOrWhiteSpace(navLinks[idx].Icon))
                                     {
-                                        <span class="inline-icon-group">
+                                        <span>
                                             <i class="site-icon" data-lucide="@navLinks[idx].Icon"></i>
-                                            <code class="muted-sm">@navLinks[idx].Icon</code>
+                                            <code>@navLinks[idx].Icon</code>
                                         </span>
                                     }
                                 </td>
                             }
-                            <td class="action-cell">
-                                <button class="outline secondary btn-tiny" title="Move up" aria-label="Move up" @onclick="() => MoveNavLink(idx, -1)" disabled="@(idx == 0)">
+                            <td>
+                                <div role="group">
+                                <button class="outline secondary" title="Move up" aria-label="Move up" @onclick="() => MoveNavLink(idx, -1)" disabled="@(idx == 0)">
                                     <i class="site-icon" data-lucide="chevron-up"></i>
                                 </button>
-                                <button class="outline secondary btn-tiny" title="Move down" aria-label="Move down" @onclick="() => MoveNavLink(idx, 1)" disabled="@(idx == navLinks.Count - 1)">
+                                <button class="outline secondary" title="Move down" aria-label="Move down" @onclick="() => MoveNavLink(idx, 1)" disabled="@(idx == navLinks.Count - 1)">
                                     <i class="site-icon" data-lucide="chevron-down"></i>
                                 </button>
                                 @if (isEditing)
                                 {
-                                    <button class="outline btn-tiny" title="Save" aria-label="Save nav link" @onclick="() => SaveNavLink(idx)">
+                                    <button class="outline" title="Save" aria-label="Save nav link" @onclick="() => SaveNavLink(idx)">
                                         <i class="site-icon" data-lucide="check"></i>
                                     </button>
                                 }
                                 else
                                 {
-                                    <button class="outline secondary btn-tiny" title="Edit" aria-label="Edit nav link" @onclick="() => EditNavLink(idx)">
+                                    <button class="outline secondary" title="Edit" aria-label="Edit nav link" @onclick="() => EditNavLink(idx)">
                                         <i class="site-icon" data-lucide="pencil"></i>
                                     </button>
                                 }
                                 @if (isEditing)
                                 {
-                                    <button class="outline secondary btn-tiny" title="Cancel" aria-label="Cancel editing" @onclick="() => CancelNavLink(idx)">
+                                    <button class="outline secondary" title="Cancel" aria-label="Cancel editing" @onclick="() => CancelNavLink(idx)">
                                         <i class="site-icon" data-lucide="x"></i>
                                     </button>
                                 }
                                 else
                                 {
-                                    <button class="outline secondary btn-tiny" title="Remove" aria-label="Remove nav link" @onclick="() => RemoveNavLink(idx)">
+                                    <button class="outline secondary" title="Remove" aria-label="Remove nav link" @onclick="() => RemoveNavLink(idx)">
                                         <i class="site-icon" data-lucide="trash-2"></i>
                                     </button>
                                 }
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-            <div class="table-toolbar-footer">
+            <div role="group">
                 <button class="outline" @onclick="AddNavLink"><i class="site-icon" data-lucide="plus"></i>Add Nav Link</button>
                 <button class="outline secondary" @onclick="SyncNavFromPages"><i class="site-icon" data-lucide="refresh-cw"></i>Sync from Pages</button>
             </div>
         </div>
 
-        <div class="btn-group btn-group-top">
+        <div role="group">
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
 </AdminPageLayout>

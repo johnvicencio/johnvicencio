@@ -2,7 +2,7 @@
     <SectionHeading Heading="@Section.Heading" HeadingLevel="@HeadingLevel" />
     @if (!string.IsNullOrWhiteSpace(Section.Body))
     {
-        <div class="content-body">@((MarkupString)Section.Body)</div>
+        <div>@((MarkupString)Section.Body)</div>
     }
 </section>
 

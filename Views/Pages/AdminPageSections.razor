@@ -7,23 +7,23 @@
 <AdminPageLayout Title="@pageTitle" ToolbarItems="@SectionsToolbar">
     @if (loading)
     {
-        <p class="loading-state">Loading...</p>
+        <p aria-busy="true">Loading...</p>
     }
     else if (page is null)
     {
-        <p class="empty-state">Page not found.</p>
+        <p>Page not found.</p>
     }
     else if (page.Sections.Count == 0)
     {
-        <p class="empty-state">No sections yet.</p>
+        <p>No sections yet.</p>
     }
     else
     {
         @if (!string.IsNullOrWhiteSpace(errorMessage))
         {
-            <p role="alert" class="form-alert form-alert-danger">@errorMessage</p>
+            <p role="alert">@errorMessage</p>
         }
-        <div class="table-wrap"><table>
+        <div><table>
             <thead>
                 <tr>
                     <th>Type</th>
@@ -39,8 +39,10 @@
                         <td>@SlugHelper.SectionTypeDisplayName(sec.Type)</td>
                         <td>@sec.Heading</td>
                         <td>
-                            <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/edit/{sec.SectionId}")'><i class="site-icon" data-lucide="pencil"></i></button>
-                            <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/delete/{sec.SectionId}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                            <div role="group">
+                                <button class="outline" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/edit/{sec.SectionId}")'><i class="site-icon" data-lucide="pencil"></i></button>
+                                <button class="outline danger" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/delete/{sec.SectionId}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -60,7 +62,7 @@
         {
             <button class="outline" title="Add Section" aria-label="Add Section" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i></button>
         }
-        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
 
     private bool loading = true;

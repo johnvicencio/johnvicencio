@@ -5,16 +5,16 @@
 <PageTitle>Footer Sections</PageTitle>
 <AdminPageLayout Title="Footer Sections">
 
-    <p class="muted-text">
+    <small>
         Footer sections follow the Nav Bar menu order. Edit links in
         <a href="/admin/partials/navmenu">Nav Bar</a> to update footer sections.
-    </p>
+    </small>
 
-    <div class="table-wrap">
+    <div>
         <table>
             <thead>
                 <tr>
-                    <th class="nav-index">#</th>
+                    <th>#</th>
                     <th>Label</th>
                     <th>URL</th>
                     <th>Icon</th>
@@ -25,10 +25,10 @@
                 {
                     var idx = i;
                     <tr>
-                        <td class="nav-index">@(idx + 1)</td>
+                        <td>@(idx + 1)</td>
                         <td><strong>@footerSections[idx].Label</strong></td>
-                        <td><code class="muted-sm">@footerSections[idx].Url</code></td>
-                        <td><code class="muted-sm">@footerSections[idx].Icon</code></td>
+                        <td><code>@footerSections[idx].Url</code></td>
+                        <td><code>@footerSections[idx].Icon</code></td>
                     </tr>
                 }
             </tbody>

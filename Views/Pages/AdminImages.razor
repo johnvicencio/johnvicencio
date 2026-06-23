@@ -4,7 +4,7 @@
 <PageTitle>Images</PageTitle>
 
 <AdminPageLayout Title="Images">
-    <p class="muted-sm">Browse static images from <code>wwwroot/images</code>. This page reads <code>/images/index.json</code>, so add new files to <code>wwwroot/images</code> and regenerate the index when the folder changes.</p>
+    <small>Browse static images from <code>wwwroot/images</code>. This page reads <code>/images/index.json</code>, so add new files to <code>wwwroot/images</code> and regenerate the index when the folder changes.</small>
     @if (folders.Count > 0)
     {
         <label>Folder
@@ -19,35 +19,35 @@
     }
     @if (!string.IsNullOrWhiteSpace(message))
     {
-        <p role="alert" class="form-alert">@message</p>
+        <p role="alert">@message</p>
     }
 
     <hr />
 
     @if (loading)
     {
-        <p class="loading-state">Loading...</p>
+        <p aria-busy="true">Loading...</p>
     }
     else if (VisibleImages.Count == 0)
     {
-        <p class="empty-state">No images found.</p>
+        <p>No images found.</p>
     }
     else
     {
-        <div class="image-picker-grid">
+        <div class="grid">
             @foreach (var image in VisibleImages)
             {
                 <article>
-                    <img src="@image.Url" alt="@image.FileName" class="thumbnail" />
-                    <p class="mono-text">@image.FileName</p>
+                    <img src="@image.Url" alt="@image.FileName" />
+                    <p>@image.FileName</p>
                     @if (!string.IsNullOrWhiteSpace(image.Folder))
                     {
-                        <p class="muted-sm">@image.Folder</p>
+                        <small>@image.Folder</small>
                     }
                     <label>Relative Path
                         <input readonly value="@image.Url" />
                     </label>
-                    <button class="outline btn-action" @onclick="() => SelectImage(image.Url)"><i class="site-icon" data-lucide="check"></i>Select</button>
+                    <button class="outline" @onclick="() => SelectImage(image.Url)"><i class="site-icon" data-lucide="check"></i>Select</button>
                 </article>
             }
         </div>

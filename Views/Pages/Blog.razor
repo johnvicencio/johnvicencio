@@ -6,10 +6,10 @@
 
 <PageTitle>Blog — John Vicencio</PageTitle>
 
-<div class="page-header">
+<header>
     <h1>Blog</h1>
     <SearchFilter SearchQuery="@searchQuery" SearchQueryChanged="HandleSearch" Placeholder="Search posts..." />
-</div>
+</header>
 
 @if (FilteredPosts.Count == 0)
 {
@@ -17,17 +17,24 @@
 }
 else
 {
-    <section class="post-list">
+    <section>
         @foreach (var post in PagedPosts)
         {
             <article>
                 @if (!string.IsNullOrWhiteSpace(post.ImageUrl))
                 {
-                    <img src="@post.ImageUrl" alt="@post.Title" class="thumbnail thumbnail-sm" />
+                    <figure>
+                        <img src="@post.ImageUrl" alt="@post.Title" />
+                    </figure>
                 }
-                <h2><a href="@Router.BlogPostPath(post.Slug)">@post.Title</a></h2>
-                <p class="post-list-date"><time datetime="@post.PublishedOn.ToString("yyyy-MM-dd")">@post.PublishedOn.ToString("MMMM d, yyyy")</time></p>
+                <header>
+                    <h2><a href="@Router.BlogPostPath(post.Slug)">@post.Title</a></h2>
+                    <small><time datetime="@post.PublishedOn.ToString("yyyy-MM-dd")">@post.PublishedOn.ToString("MMMM d, yyyy")</time></small>
+                </header>
                 <p>@TruncateContent(post.Content, 200)</p>
+                <footer>
+                    <a href="@Router.BlogPostPath(post.Slug)" role="button" class="outline">Read more</a>
+                </footer>
             </article>
         }
     </section>

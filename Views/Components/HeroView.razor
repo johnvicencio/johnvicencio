@@ -1,7 +1,9 @@
-<section id="@Section.AnchorId" class="hero @(Section.ImageFullWidth ? "hero-full-width" : "hero-contained")">
+<section id="@Section.AnchorId" class="hero@(Section.ImageFullWidth ? " hero-full-width" : "")">
     @if (!string.IsNullOrWhiteSpace(Section.ImageUrl))
     {
-        <img src="@Section.ImageUrl" alt="@Section.ImageAlt" class="hero-image" />
+        <figure>
+            <img src="@Section.ImageUrl" alt="@Section.ImageAlt" />
+        </figure>
     }
     <SectionHeading Heading="@Section.Heading" HeadingLevel="@HeadingLevel" />
     @if (!string.IsNullOrWhiteSpace(Section.Body))
@@ -10,7 +12,7 @@
     }
     @if (Section.Buttons.Count > 0)
     {
-        <div class="hero-buttons">
+        <div role="group">
             @foreach (var btn in Section.Buttons)
             {
                 if (!string.IsNullOrWhiteSpace(btn.Text) && !string.IsNullOrWhiteSpace(btn.Url))

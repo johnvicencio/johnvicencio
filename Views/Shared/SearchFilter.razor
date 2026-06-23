@@ -1,16 +1,13 @@
 @namespace johnvicencio.Views.Shared
 @inject IJSRuntime Js
 
-<div class="table-search">
-    <div class="table-search-field">
-        <i class="site-icon" data-lucide="search"></i>
-        <input type="text" placeholder="@Placeholder" value="@SearchQuery" @oninput="OnInput" aria-label="@Placeholder" autocomplete="off" />
-    </div>
+<search role="search">
+    <input type="search" name="search" placeholder="@Placeholder" value="@SearchQuery" @oninput="OnInput" aria-label="@Placeholder" autocomplete="off" />
     @if (!string.IsNullOrWhiteSpace(SearchQuery))
     {
-        <button type="button" class="outline secondary btn-action search-clear" title="Clear search" aria-label="Clear search" @onclick="Clear"><i class="site-icon" data-lucide="x"></i></button>
+        <button type="button" class="outline secondary" title="Clear search" aria-label="Clear search" @onclick="Clear"><i class="site-icon" data-lucide="x"></i></button>
     }
-</div>
+</search>
 
 @code {
     [Parameter] public string SearchQuery { get; set; } = "";

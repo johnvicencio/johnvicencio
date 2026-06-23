@@ -16,23 +16,23 @@
         {
             <button class="outline" title="Add Post" aria-label="Add Post" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i></button>
         }
-        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
     }
 
     @if (!hasBlogPage)
     {
-        <p class="empty-state">Create a page with slug "blog" to enable blog management.</p>
+        <p>Create a page with slug "blog" to enable blog management.</p>
     }
 
     @if (hasBlogPage && filteredList.Count == 0)
     {
-        <p class="empty-state">@(postList.Count == 0 ? "No posts yet." : "No posts match your search.")</p>
+        <p>@(postList.Count == 0 ? "No posts yet." : "No posts match your search.")</p>
     }
 
     @if (hasBlogPage && filteredList.Count > 0)
     {
-        <div class="table-wrap"><table>
+        <div><table>
             <colgroup>
                 <col />
                 <col style="width:7rem" />
@@ -40,8 +40,8 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th>Title <span tabindex="0" class="sort-icon" @onclick="SortByTitle" @onkeydown="KeySortByTitle">@SortIcon("title")</span></th>
-                    <th>Date <span tabindex="0" class="sort-icon" @onclick="SortByPublished" @onkeydown="KeySortByPublished">@SortIcon("published")</span></th>
+                    <th>Title <span tabindex="0" @onclick="SortByTitle" @onkeydown="KeySortByTitle">@SortIcon("title")</span></th>
+                    <th>Date <span tabindex="0" @onclick="SortByPublished" @onkeydown="KeySortByPublished">@SortIcon("published")</span></th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -52,9 +52,11 @@
                         <td><strong>@pt.Title</strong></td>
                         <td>@pt.PublishedOn.ToString("M/d/yyyy")</td>
                         <td>
-                            <a href="@Router.BlogPostPath(pt.Slug)" target="_blank" class="outline btn-action" title="Preview" aria-label="Preview"><i class="site-icon" data-lucide="eye"></i></a>
-                            <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
-                            <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                            <div role="group">
+                                <a href="@Router.BlogPostPath(pt.Slug)" target="_blank" role="button" class="outline" title="Preview" aria-label="Preview"><i class="site-icon" data-lucide="eye"></i></a>
+                                <button class="outline" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
+                                <button class="outline danger" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                            </div>
                         </td>
                     </tr>
                 }

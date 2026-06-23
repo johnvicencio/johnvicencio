@@ -7,25 +7,26 @@
 <AdminPageLayout Title="Message" ToolbarItems="@DetailToolbar">
     @if (loading)
     {
-        <p class="loading-state">Loading...</p>
+        <p aria-busy="true">Loading...</p>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
     {
-        <p class="empty-state text-danger">@errorMessage</p>
+        <p>@errorMessage</p>
     }
     else if (message is null)
     {
-        <p class="empty-state">Message not found.</p>
+        <p>Message not found.</p>
     }
     else
     {
-        <p class="muted-sm info-row">From</p>
-        <h3 class="info-row">@message.Name</h3>
+        <header>
+            <h3>@message.Name</h3>
+        </header>
+        <small>From</small>
         <p><a href="mailto:@message.Email">@message.Email</a></p>
-        <p class="muted-sm">@FormatDate(message.SubmittedUtc)</p>
-        <p class="muted-sm">Ticket #@ticketNumber</p>
+        <small>@FormatDate(message.SubmittedUtc) · Ticket #@ticketNumber</small>
         <hr />
-        <div class="pre-wrap">@message.Message</div>
+        <div>@message.Message</div>
         <hr />
         <button class="outline danger" @onclick="DeleteMessageAsync" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Delete</button>
     }
@@ -87,7 +88,7 @@
 
     private RenderFragment DetailToolbar => __builder =>
     {
-        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
 
     private static string FormatDate(DateTimeOffset dto)

@@ -5,7 +5,7 @@
 
 @if (!isReady)
 {
-    <AdminPageLayout><p class="loading-state">Loading...</p></AdminPageLayout>
+    <AdminPageLayout><p aria-busy="true">Loading...</p></AdminPageLayout>
 }
 else if (!Session.IsLoggedIn)
 {
@@ -14,7 +14,7 @@ else if (!Session.IsLoggedIn)
 else if (itemTitle is null)
 {
     <AdminPageLayout Title="@(resourceName ?? "Confirm Delete")">
-        <p class="empty-state">Item not found.</p>
+        <p>Item not found.</p>
     </AdminPageLayout>
 }
 else
@@ -25,10 +25,10 @@ else
             <strong>@itemTitle</strong>
             @if (!string.IsNullOrWhiteSpace(itemDetail))
             {
-                <br /><span class="muted-text">@itemDetail</span>
+                <br /><span>@itemDetail</span>
             }
         </blockquote>
-        <div class="btn-group btn-group-top">
+        <div role="group">
             <button class="outline danger" @onclick="HandleConfirm" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i> Yes, Delete</button>
             <button class="outline secondary" @onclick="HandleCancel"><i class="site-icon" data-lucide="x"></i> Cancel</button>
         </div>

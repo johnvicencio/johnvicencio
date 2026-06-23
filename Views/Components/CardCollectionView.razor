@@ -1,38 +1,45 @@
 @inject IJSRuntime Js
 
 <section id="@Section.AnchorId" class="card-collection @(IsGridCard ? "grid-card-section" : "row-card-section")">
-    <SectionHeading Class="row-card-heading" Heading="@Section.Heading" HeadingLevel="@HeadingLevel" Icon="@Section.Icon" />
+    <SectionHeading Heading="@Section.Heading" HeadingLevel="@HeadingLevel" Icon="@Section.Icon" />
     @if (Section.Columns.Count > 0)
     {
         @if (IsGridCard)
         {
-            <div class="grid grid-card-grid">
+            <div class="grid">
                 @foreach (var item in Section.Columns)
                 {
-                    <article class="portfolio-card">
-                        <div class="portfolio-card-media">
-                            @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
-                            {
-                                <a class="portfolio-card-image" href="@(string.IsNullOrWhiteSpace(item.ImageLink) ? item.ActionUrl : item.ImageLink)" target="@LinkTarget(item.ImageLinkNewTab)" rel="@LinkRel(item.ImageLinkNewTab)">
+                    <article>
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            <figure>
+                                <a href="@(string.IsNullOrWhiteSpace(item.ImageLink) ? item.ActionUrl : item.ImageLink)" target="@LinkTarget(item.ImageLinkNewTab)" rel="@LinkRel(item.ImageLinkNewTab)">
                                     <img src="@item.ImageUrl" alt="@item.ImageAlt" />
                                 </a>
-                            }
-                            @if (expandedCards.Contains(item) && !string.IsNullOrWhiteSpace(item.Body))
-                            {
-                                <div class="portfolio-card-reveal">@((MarkupString)item.Body)</div>
-                            }
-                        </div>
-                        <div class="portfolio-card-titlebar">
+                                @if (IsExpanded(item))
+                                {
+                                    <div class="card-description-overlay">@((MarkupString)item.Body)</div>
+                                }
+                            </figure>
+                        }
+                        <header>
                             <h3>@item.Title</h3>
-                            <button type="button" class="outline secondary" @onclick="() => ToggleCard(item)" aria-label="Toggle @item.Title description">
-                                <i class="site-icon" data-lucide="@(expandedCards.Contains(item) ? "x" : "ellipsis")"></i>
-                            </button>
-                        </div>
+                            @if (!string.IsNullOrWhiteSpace(item.Body))
+                            {
+                                <button type="button"
+                                        class="outline secondary"
+                                        @onclick="() => ToggleCard(item)"
+                                        aria-label="@(IsExpanded(item) ? "Close" : "Open") @item.Title description"
+                                        aria-expanded="@IsExpanded(item)">
+                                    <i class="site-icon" data-lucide="@(IsExpanded(item) ? "x" : "ellipsis")"></i>
+                                </button>
+                            }
+                        </header>
                         @if (!string.IsNullOrWhiteSpace(item.ActionText) && !string.IsNullOrWhiteSpace(item.ActionUrl))
                         {
-                            <div class="portfolio-card-action">
-                                <a href="@item.ActionUrl" target="@LinkTarget(item.ActionNewTab)" rel="@LinkRel(item.ActionNewTab)">@item.ActionText</a>
-                            </div>
+                            <footer>
+                                <a href="@item.ActionUrl" role="button" class="outline" target="@LinkTarget(item.ActionNewTab)" rel="@LinkRel(item.ActionNewTab)">@item.ActionText</a>
+                            </footer>
                         }
                     </article>
                 }
@@ -43,10 +50,10 @@
             <div class="row-card-list">
             @foreach (var item in Section.Columns)
             {
-                <article class="row-card">
-                    <div class="row-card-avatar">
-                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
-                        {
+                <article>
+                    @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                    {
+                        <figure>
                             @if (!string.IsNullOrWhiteSpace(item.ImageLink))
                             {
                                 <a href="@item.ImageLink" target="@LinkTarget(item.ImageLinkNewTab)" rel="@LinkRel(item.ImageLinkNewTab)">
@@ -57,27 +64,29 @@
                             {
                                 <img src="@item.ImageUrl" alt="@item.ImageAlt" />
                             }
-                        }
-                    </div>
-                    <div class="row-card-body">
+                        </figure>
+                    }
+                    <div>
                         @if (!string.IsNullOrWhiteSpace(item.Title))
                         {
                             <h3>@item.Title</h3>
                         }
                         @if (!string.IsNullOrWhiteSpace(item.Subtitle))
                         {
-                            <p class="row-card-subtitle">@((MarkupString)item.Subtitle)</p>
+                            <small>@((MarkupString)item.Subtitle)</small>
                         }
                         @if (!string.IsNullOrWhiteSpace(item.Body))
                         {
-                            <div class="row-card-description">@((MarkupString)item.Body)</div>
+                            <div>@((MarkupString)item.Body)</div>
                         }
                     </div>
                     @if (!string.IsNullOrWhiteSpace(item.ActionUrl))
                     {
-                        <a class="row-card-action" href="@item.ActionUrl" target="@LinkTarget(item.ActionNewTab)" rel="@LinkRel(item.ActionNewTab)" aria-label="@($"Open {item.Title}")">
-                            <i class="site-icon" data-lucide="@(string.IsNullOrWhiteSpace(item.ActionIcon) ? "external-link" : item.ActionIcon)"></i>
-                        </a>
+                        <footer>
+                            <a href="@item.ActionUrl" target="@LinkTarget(item.ActionNewTab)" rel="@LinkRel(item.ActionNewTab)" aria-label="@($"Open {item.Title}")">
+                                <i class="site-icon" data-lucide="@(string.IsNullOrWhiteSpace(item.ActionIcon) ? "external-link" : item.ActionIcon)"></i>
+                            </a>
+                        </footer>
                     }
                 </article>
             }
@@ -99,12 +108,14 @@
 
     private bool IsGridCard => Section.Type is "grid-card" or "portfolio";
 
-    private readonly HashSet<SectionColumn> expandedCards = [];
+    private readonly HashSet<SectionColumn> expandedCards = new();
+
+    private bool IsExpanded(SectionColumn item) => expandedCards.Contains(item);
 
     private void ToggleCard(SectionColumn item)
     {
-        if (!expandedCards.Add(item))
-            expandedCards.Remove(item);
+        if (!expandedCards.Remove(item))
+            expandedCards.Add(item);
     }
 
     private static string? LinkTarget(bool newTab) => newTab ? "_blank" : null;
