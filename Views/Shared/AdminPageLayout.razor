@@ -1,0 +1,38 @@
+@namespace johnvicencio.Views.Shared
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject IJSRuntime Js
+
+@if (!isReady)
+{
+    <div class="login-page" style="width:100%">
+        <article style="width:100%;max-width:1200px;margin:0 auto">
+            <p class="loading-state">Loading...</p>
+        </article>
+    </div>
+}
+else if (!Session.IsLoggedIn)
+{
+    Nav.NavigateTo("/login", replace: true);
+}
+else
+{
+    <div class="login-page" style="width:100%">
+        <article style="width:100%;max-width:1200px;margin:0 auto">
+            @ChildContent
+        </article>
+    </div>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+
+    private bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.TryRestoreAsync(Js);
+        isReady = true;
+    }
+}

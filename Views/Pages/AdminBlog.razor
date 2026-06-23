@@ -1,83 +1,77 @@
 @page "/admin/blog"
-@inject VaultSessionService Session
 @inject NavigationManager Nav
+@inject IJSRuntime Js
 @inject BlogController Blog
 @inject PageController Pages
-@inject IJSRuntime Js
 @inject RouterController Router
 
 <PageTitle>Blog Posts</PageTitle>
 
-<div class="login-page" style="width:100%">
+<AdminPageLayout>
 
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">Blog Posts</h2>
-            <div style="display:flex;align-items:center;gap:0.75rem">
-                <div class="table-search" style="display:flex;align-items:center;gap:0.5rem">
-                    <span class="site-icon" data-lucide="search" style="flex-shrink:0;opacity:0.5"></span>
-                    <input type="text" placeholder="Search title, slug, summary, content, or date..." value="@search" @oninput="OnSearchInput" style="margin:0;min-width:18rem" />
-                    @if (!string.IsNullOrWhiteSpace(search))
-                    {
-                        <button class="outline secondary" style="padding:0.2rem 0.5rem;min-height:auto;font-size:0.8rem" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
-                    }
-                </div>
-                @if (hasBlogPage)
+    <div class="table-toolbar">
+        <h2 style="margin:0">Blog Posts</h2>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+            <div class="table-search" style="display:flex;align-items:center;gap:0.5rem">
+                <span class="site-icon" data-lucide="search" style="flex-shrink:0;opacity:0.5"></span>
+                <input type="text" placeholder="Search title, slug, summary, content, or date..." value="@search" @oninput="OnSearchInput" style="margin:0;min-width:18rem" />
+                @if (!string.IsNullOrWhiteSpace(search))
                 {
-                    <button class="outline" title="Add Post" aria-label="Add Post" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i></button>
+                    <button class="outline secondary btn-action" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
                 }
-                <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
             </div>
+            @if (hasBlogPage)
+            {
+                <button class="outline" title="Add Post" aria-label="Add Post" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i></button>
+            }
+            <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
         </div>
+    </div>
 
-        @if (!hasBlogPage)
-        {
-            <p class="pagination-info" style="padding:1rem">Create a page with slug "blog" to enable blog management.</p>
-        }
+    @if (!hasBlogPage)
+    {
+        <p class="pagination-info" style="padding:1rem">Create a page with slug "blog" to enable blog management.</p>
+    }
 
-        @if (hasBlogPage && filteredList.Count == 0)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">@(postList.Count == 0 ? "No posts yet." : "No posts match your search.")</p>
-        }
+    @if (hasBlogPage && filteredList.Count == 0)
+    {
+        <p class="empty-state">@(postList.Count == 0 ? "No posts yet." : "No posts match your search.")</p>
+    }
 
-        @if (hasBlogPage && filteredList.Count > 0)
-        {
-            <table style="table-layout:fixed">
-                <colgroup>
-                    <col />
-                    <col style="width:7rem" />
-                    <col style="width:10rem" />
-                </colgroup>
-                <thead>
+    @if (hasBlogPage && filteredList.Count > 0)
+    {
+        <table style="table-layout:fixed">
+            <colgroup>
+                <col />
+                <col style="width:7rem" />
+                <col style="width:10rem" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Title <span tabindex="0" class="sort-icon" @onclick="SortByTitle" @onkeydown="KeySortByTitle">@SortIcon("title")</span></th>
+                    <th>Date <span tabindex="0" class="sort-icon" @onclick="SortByPublished" @onkeydown="KeySortByPublished">@SortIcon("published")</span></th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pt in PagedPosts)
+                {
                     <tr>
-                        <th>Title <span tabindex="0" class="sort-icon" @onclick="SortByTitle" @onkeydown="KeySortByTitle">@SortIcon("title")</span></th>
-                        <th>Date <span tabindex="0" class="sort-icon" @onclick="SortByPublished" @onkeydown="KeySortByPublished">@SortIcon("published")</span></th>
-                        <th>Actions</th>
+                        <td><strong>@pt.Title</strong></td>
+                        <td>@pt.PublishedOn.ToString("M/d/yyyy")</td>
+                        <td>
+                            <a href="@Router.BlogPostPath(pt.Slug)" target="_blank" class="outline btn-action" title="Preview" aria-label="Preview" style="display:inline-flex;align-items:center;text-decoration:none"><i class="site-icon" data-lucide="eye"></i></a>
+                            <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
+                            <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var pt in PagedPosts)
-                    {
-                        <tr>
-                            <td><strong>@pt.Title</strong></td>
-                            <td>@pt.PublishedOn.ToString("M/d/yyyy")</td>
-                            <td>
-                                <a href="@Router.BlogPostPath(pt.Slug)" target="_blank" class="outline" title="Preview" aria-label="Preview" style="padding:0.25rem 0.5rem;font-size:0.75rem;display:inline-flex;align-items:center;text-decoration:none"><i class="site-icon" data-lucide="eye"></i></a>
-                                <button class="outline" title="Edit" aria-label="Edit" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
-                                <button class="outline danger" title="Delete" aria-label="Delete" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
 
-            <PaginationBar CurrentPage="currentPage" TotalPages="TotalPages" PageUrl="GetAdminPageUrl" />
-        }
-
-
-    </article>
-
-</div>
+        <PaginationBar CurrentPage="currentPage" TotalPages="TotalPages" PageUrl="GetAdminPageUrl" />
+    }
+</AdminPageLayout>
 
 @code {
     [Parameter]
@@ -102,13 +96,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         postList = await Blog.GetPostsAsync();
         ApplyFilter();
         var pageList = await Pages.GetPagesAsync();

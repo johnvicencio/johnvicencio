@@ -1302,6 +1302,41 @@ hr {
     text-align: left;
 }
 
+/* ---- Utility classes ---- */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.empty-state {
+    padding: 1rem;
+    text-align: center;
+}
+
+.loading-state {
+    text-align: center;
+}
+
+.grid-2col {
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid-3col {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.muted-text {
+    font-size: 0.9rem;
+    color: var(--app-muted);
+}
+
+@supports (display: grid) {
+    .grid-2col, .grid-3col {
+        display: grid;
+        gap: var(--grid-spacing, 0.75rem);
+    }
+}
+
 @media (max-width: 767.98px) {
     .footer-grid {
         grid-template-columns: 1fr;
