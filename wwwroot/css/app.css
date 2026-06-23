@@ -408,12 +408,12 @@ table th
     border-bottom: 1px solid var(--app-border-soft);
 }
 
-/* MDB-style rounded search input-group */
+/* Rounded search input-group */
 .table-search {
     position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.35rem;
 }
 
 .table-search .site-icon:first-child {
@@ -427,8 +427,13 @@ table th
 
 .table-search input {
     padding-left: 2.25rem;
+    padding-right: 0.25rem;
     max-width: 18rem;
     margin: 0;
+}
+
+.table-search .btn-action {
+    flex-shrink: 0;
 }
 
 .table-pagination {

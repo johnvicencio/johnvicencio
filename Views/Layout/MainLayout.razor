@@ -142,7 +142,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Js.InvokeVoidAsync("lucide.createIcons");
+        try { await Js.InvokeVoidAsync("lucide.createIcons"); } catch { }
     }
 
     private async Task LoadNavAsync()
@@ -227,7 +227,7 @@
         {
             await LoadNavAsync();
             StateHasChanged();
-            await Js.InvokeVoidAsync("lucide.createIcons");
+            try { await Js.InvokeVoidAsync("lucide.createIcons"); } catch { }
         });
     }
 
@@ -235,7 +235,7 @@
     {
         await LoadNavAsync();
         StateHasChanged();
-        await Js.InvokeVoidAsync("lucide.createIcons");
+        try { await Js.InvokeVoidAsync("lucide.createIcons"); } catch { }
     }
 
     public void Dispose()

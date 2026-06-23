@@ -54,6 +54,6 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Js.InvokeVoidAsync("lucide.createIcons");
+        try { await Js.InvokeVoidAsync("lucide.createIcons"); } catch { }
     }
 }
