@@ -26,9 +26,9 @@
         <label class="sr-only-field" aria-hidden="true">Website
             <input tabindex="-1" autocomplete="off" @bind="website" />
         </label>
-        <input @bind="contactName" aria-label="Your name" placeholder="Your name" />
-        <input type="email" @bind="contactEmail" aria-label="Your email" placeholder="your@email.com" />
-        <textarea @bind="contactMessage" rows="4" aria-label="Your message" placeholder="Your message..."></textarea>
+        <input @bind="contactName" aria-label="Your name" placeholder="Your name" maxlength="120" />
+        <input type="email" @bind="contactEmail" aria-label="Your email" placeholder="your@email.com" maxlength="180" />
+        <textarea @bind="contactMessage" rows="4" aria-label="Your message" placeholder="Your message..." maxlength="4000"></textarea>
         <label class="contact-consent">
             <input type="checkbox" @bind="consentAccepted" />
             <span>I agree to the <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>

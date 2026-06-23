@@ -25,19 +25,19 @@
 
                 <div class="grid grid-2col">
                     <label>Title
-                        <input @bind="editPostTitle" @oninput="OnPostTitleChanged" />
+                        <input @bind="editPostTitle" @oninput="OnPostTitleChanged" maxlength="200" />
                     </label>
                     <label>Slug
-                        <input @bind="editPostSlug" />
+                        <input @bind="editPostSlug" maxlength="200" />
                     </label>
                 </div>
 
                 <div class="grid grid-2col">
                     <label>Description (SEO)
-                        <input @bind="editPostDescription" />
+                        <input @bind="editPostDescription" maxlength="300" />
                     </label>
                     <label>Keywords (SEO)
-                        <textarea @bind="editPostKeywords" rows="2" placeholder="comma, separated"></textarea>
+                        <textarea @bind="editPostKeywords" rows="2" placeholder="comma, separated" maxlength="500"></textarea>
                     </label>
                 </div>
 
@@ -45,7 +45,7 @@
                 <RichTextEditor @bind-Value="editPostContent" MinHeight="400" />
 
                 <label>Post Image URL
-                    <input @bind="editPostImageUrl" />
+                    <input @bind="editPostImageUrl" maxlength="500" />
                 </label>
                 <button type="button" class="outline" @onclick="() => showImagePicker = true"><i class="site-icon" data-lucide="image"></i>Select Image</button>
                 @if (!string.IsNullOrWhiteSpace(editPostImageUrl))
@@ -58,7 +58,7 @@
                 }
 
                 <label>Summary
-                    <textarea @bind="editPostSummary" rows="2"></textarea>
+                    <textarea @bind="editPostSummary" rows="2" maxlength="500"></textarea>
                 </label>
 
                 <label>Published Date

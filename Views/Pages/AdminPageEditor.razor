@@ -33,19 +33,19 @@
 
                 <div class="grid grid-2col">
                     <label>Page Title
-                        <input @bind="editTitle" @oninput="OnTitleChanged" />
+                        <input @bind="editTitle" @oninput="OnTitleChanged" maxlength="200" />
                     </label>
                     <label>Slug
-                        <input @bind="editSlug" />
+                        <input @bind="editSlug" maxlength="200" />
                     </label>
                 </div>
 
                 <label>Description (SEO)
-                    <input @bind="editDescription" />
+                    <input @bind="editDescription" maxlength="300" />
                 </label>
 
                 <label>Keywords (SEO)
-                    <textarea @bind="editKeywords" rows="2" placeholder="comma, separated"></textarea>
+                    <textarea @bind="editKeywords" rows="2" placeholder="comma, separated" maxlength="500"></textarea>
                 </label>
 
                 <hr />

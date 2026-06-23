@@ -56,7 +56,7 @@
 
             <div class="grid grid-2col">
                 <label>SMTP Host
-                    <input @bind="settings.SmtpHost" placeholder="smtp.example.com" />
+                    <input @bind="settings.SmtpHost" placeholder="smtp.example.com" maxlength="200" />
                 </label>
                 <label>SMTP Port
                     <input type="number" @bind="settings.SmtpPort" />
@@ -68,7 +68,7 @@
                     <input @bind="settings.SmtpUsername" />
                 </label>
                 <label>Google App Password
-                    <input type="password" @bind="settings.SmtpPassword" placeholder="Leave blank to keep existing password" />
+                    <input type="password" @bind="settings.SmtpPassword" placeholder="Leave blank to keep existing password" maxlength="200" />
                 </label>
             </div>
             @if (settings.SmtpPasswordConfigured)

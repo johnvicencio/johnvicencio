@@ -20,7 +20,7 @@
     <ValidationSummary />
 
     <InputText @bind-Value="loginForm.Username" placeholder="Username" autocomplete="username" />
-    <InputText type="password" @bind-Value="loginForm.Passphrase" placeholder="Password" autocomplete="current-password" />
+    <InputText type="password" @bind-Value="loginForm.Passphrase" placeholder="Password" autocomplete="current-password" maxlength="200" />
 
     <button type="submit" aria-busy="@isBusy">Submit</button>
 
