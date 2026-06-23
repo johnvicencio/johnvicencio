@@ -1,0 +1,106 @@
+@page "/admin/logs"
+@inject LogService Log
+@inject NavigationManager Nav
+
+<PageTitle>Application Logs</PageTitle>
+
+<AdminPageLayout Title="Application Logs" ToolbarItems="@LogsToolbar">
+
+    @if (loading)
+    {
+        <p class="loading-state">Loading logs...</p>
+    }
+    else if (logs.Count == 0)
+    {
+        <p class="empty-state">No application logs recorded yet.</p>
+    }
+    else
+    {
+        <div class="table-wrap"><table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Level</th>
+                    <th>Source</th>
+                    <th>Message</th>
+                    <th>Context</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in filteredLogs)
+                {
+                    <tr>
+                        <td class="log-time">@FormatTime(entry.Timestamp)</td>
+                        <td><span class="log-level log-@entry.Level.ToLowerInvariant()">@entry.Level</span></td>
+                        <td><code>@entry.Source</code></td>
+                        <td class="log-message">@entry.Message</td>
+                        <td class="log-context">@entry.Context</td>
+                    </tr>
+                }
+            </tbody>
+        </table></div>
+    }
+</AdminPageLayout>
+
+@code {
+    private bool loading = true;
+    private List<LogEntry> logs = [];
+    private string levelFilter = "";
+    private string searchFilter = "";
+
+    private List<LogEntry> filteredLogs
+    {
+        get
+        {
+            var q = logs.AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(levelFilter))
+                q = q.Where(e => e.Level.Equals(levelFilter, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(searchFilter))
+            {
+                var s = searchFilter.Trim().ToLowerInvariant();
+                q = q.Where(e =>
+                    (e.Source?.ToLowerInvariant().Contains(s) ?? false) ||
+                    (e.Message?.ToLowerInvariant().Contains(s) ?? false));
+            }
+            return q.ToList();
+        }
+    }
+
+    private RenderFragment LogsToolbar => __builder =>
+    {
+        <select @bind="levelFilter" @bind:after="StateHasChanged" style="width:auto">
+            <option value="">All levels</option>
+            <option value="info">Info</option>
+            <option value="warn">Warn</option>
+            <option value="error">Error</option>
+        </select>
+        <input type="text" @bind="searchFilter" @bind:event="oninput" placeholder="Search messages..." style="width:14rem" />
+        <button class="outline btn-action" @onclick="RefreshLogs"><i class="site-icon" data-lucide="refresh-cw"></i></button>
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshLogs();
+    }
+
+    private async Task RefreshLogs()
+    {
+        loading = true;
+        try
+        {
+            logs = await Log.GetLogsAsync();
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private static string FormatTime(string timestamp)
+    {
+        if (DateTimeOffset.TryParse(timestamp, out var dto))
+            return dto.ToLocalTime().ToString("M/d/yyyy h:mm:ss tt").ToLowerInvariant();
+        return timestamp;
+    }
+}

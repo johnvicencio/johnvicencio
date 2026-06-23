@@ -1545,6 +1545,56 @@ hr {
     border-radius: 0.75rem;
 }
 
+/* Log viewer */
+.log-time {
+    white-space: nowrap;
+    font-size: 0.72rem;
+    font-family: monospace;
+}
+
+.log-level {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.2rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.log-info {
+    background: color-mix(in srgb, var(--pico-primary) 10%, transparent);
+    color: var(--pico-primary);
+}
+
+.log-warn {
+    background: color-mix(in srgb, #ffc107 20%, transparent);
+    color: #8a6d00;
+}
+
+.log-error {
+    background: color-mix(in srgb, var(--app-danger) 15%, transparent);
+    color: var(--app-danger);
+}
+
+.log-message {
+    font-size: 0.82rem;
+    max-width: 24rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.log-context {
+    font-size: 0.72rem;
+    font-family: monospace;
+    color: var(--app-muted);
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* ---- Utility classes ---- */
 .btn-action {
     padding: 0.25rem 0.5rem;

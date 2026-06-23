@@ -70,6 +70,16 @@ else
 
         <article class="admin-card">
             <header>
+                <h3>Logs</h3>
+                <p class="muted-text">Application events and errors</p>
+            </header>
+            <footer>
+                <button class="outline btn-block" title="View Logs" aria-label="View Logs" @onclick='() => Nav.NavigateTo("/admin/logs")'><i class="site-icon" data-lucide="scroll-text"></i></button>
+            </footer>
+        </article>
+
+        <article class="admin-card">
+            <header>
                 <h3>Partials</h3>
                 <p class="muted-text">Nav links, footer, connect</p>
             </header>

@@ -7,11 +7,13 @@ public sealed class PageController
     private const string ContentName = "pages";
 
     private readonly DataStore store;
+    private readonly LogService log;
     private List<Page>? pages;
 
-    public PageController(DataStore store)
+    public PageController(DataStore store, LogService log)
     {
         this.store = store;
+        this.log = log;
     }
 
     public event Action? PagesChanged;
@@ -19,6 +21,11 @@ public sealed class PageController
     public async Task<List<Page>> GetPagesAsync()
     {
         pages ??= await store.LoadAsync<Page>(ContentName);
+        if (pages is null)
+        {
+            await log.WarnAsync("PageController", "GetPagesAsync returned null");
+            return [];
+        }
         NormalizeSortOrder(pages);
         return pages;
     }
@@ -26,20 +33,29 @@ public sealed class PageController
     public async Task<Page?> GetPageAsync(string slug)
     {
         var all = await GetPagesAsync();
-        return all.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+        var page = all.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+        if (page is null)
+            await log.WarnAsync("PageController", $"Page not found: {slug}");
+        return page;
     }
 
     public async Task<Page?> GetPageByIdAsync(string id)
     {
         var all = await GetPagesAsync();
-        return all.FirstOrDefault(p => p.Id == id);
+        var page = all.FirstOrDefault(p => p.Id == id);
+        if (page is null)
+            await log.WarnAsync("PageController", $"Page not found by id: {id}");
+        return page;
     }
 
     public async Task AddPageAsync(Page page)
     {
         var all = await GetPagesAsync();
         if (all.Any(p => p.Slug.Equals(page.Slug, StringComparison.OrdinalIgnoreCase)))
+        {
+            await log.WarnAsync("PageController", $"Duplicate slug attempt: {page.Slug}");
             throw new InvalidOperationException($"A page with slug '{page.Slug}' already exists.");
+        }
 
         page.SortOrder = page.Slug.Equals("home", StringComparison.OrdinalIgnoreCase)
             ? 0
@@ -48,6 +64,7 @@ public sealed class PageController
         var updated = new List<Page>(all) { page };
         await store.SaveAsync(updated, ContentName);
         pages = updated;
+        await log.InfoAsync("PageController", $"Added page: {page.Slug}");
         PagesChanged?.Invoke();
     }
 
@@ -55,7 +72,10 @@ public sealed class PageController
     {
         var all = await GetPagesAsync();
         if (all.Any(p => p.Id != page.Id && p.Slug.Equals(page.Slug, StringComparison.OrdinalIgnoreCase)))
+        {
+            await log.WarnAsync("PageController", $"Duplicate slug on update: {page.Slug}");
             throw new InvalidOperationException($"A page with slug '{page.Slug}' already exists.");
+        }
 
         var updated = new List<Page>(all);
         var index = updated.FindIndex(p => p.Id == page.Id);
@@ -63,6 +83,7 @@ public sealed class PageController
             updated[index] = page;
         await store.SaveAsync(updated, ContentName);
         pages = updated;
+        await log.InfoAsync("PageController", $"Updated page: {page.Slug}");
         PagesChanged?.Invoke();
     }
 
@@ -73,6 +94,7 @@ public sealed class PageController
         updated.RemoveAll(p => p.Id == pageId);
         await store.SaveAsync(updated, ContentName);
         pages = updated;
+        await log.InfoAsync("PageController", $"Deleted page: {pageId}");
         PagesChanged?.Invoke();
     }
 
@@ -100,6 +122,7 @@ public sealed class PageController
         var updated = all.Select(page => movable.FirstOrDefault(p => p.Id == page.Id) ?? page).ToList();
         await store.SaveAsync(updated, ContentName);
         pages = updated;
+        await log.InfoAsync("PageController", $"Moved page: {pageId} direction {direction}");
         PagesChanged?.Invoke();
     }
 

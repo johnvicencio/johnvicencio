@@ -8,10 +8,12 @@ public sealed class DataStore
 {
     private readonly HttpClient http;
     private readonly IJSRuntime? js;
+    private readonly LogService log;
 
-    public DataStore(HttpClient http, IJSRuntime? js = null)
+    public DataStore(HttpClient http, LogService log, IJSRuntime? js = null)
     {
         this.http = http;
+        this.log = log;
         this.js = js;
     }
 
@@ -22,8 +24,9 @@ public sealed class DataStore
             var fromBlob = await http.GetFromJsonAsync<List<T>>(NetlifyContentUrl(contentName));
             if (fromBlob is not null) return fromBlob;
         }
-        catch
+        catch (Exception ex)
         {
+            await log.WarnAsync("DataStore", $"LoadAsync failed for {contentName}", new { error = ex.Message });
             return [];
         }
 
@@ -37,8 +40,9 @@ public sealed class DataStore
             var fromBlob = await http.GetFromJsonAsync<T>(NetlifyContentUrl(contentName));
             if (fromBlob is not null) return fromBlob;
         }
-        catch
+        catch (Exception ex)
         {
+            await log.WarnAsync("DataStore", $"LoadSingleAsync failed for {contentName}", new { error = ex.Message });
             return null;
         }
 
@@ -55,11 +59,24 @@ public sealed class DataStore
         if (!string.IsNullOrWhiteSpace(token))
             request.Headers.Add("x-content-token", token);
 
-        var response = await http.SendAsync(request);
-        if (response.IsSuccessStatusCode) return;
+        try
+        {
+            var response = await http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                await log.InfoAsync("DataStore", $"Saved {contentName}");
+                return;
+            }
 
-        var error = await response.Content.ReadAsStringAsync();
-        throw new InvalidOperationException($"Could not save {contentName}: {(int)response.StatusCode} {response.ReasonPhrase}. {error}");
+            var error = await response.Content.ReadAsStringAsync();
+            await log.ErrorAsync("DataStore", $"Save failed for {contentName}", new { status = (int)response.StatusCode, error });
+            throw new InvalidOperationException($"Could not save {contentName}: {(int)response.StatusCode} {response.ReasonPhrase}. {error}");
+        }
+        catch (Exception ex) when (ex is not InvalidOperationException)
+        {
+            await log.ErrorAsync("DataStore", $"Save exception for {contentName}", new { error = ex.Message });
+            throw;
+        }
     }
 
     private static string NetlifyContentUrl(string contentName) =>
