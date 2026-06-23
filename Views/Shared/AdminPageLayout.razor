@@ -51,4 +51,9 @@ else
         await Session.TryRestoreAsync(Js);
         isReady = true;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+    }
 }
