@@ -19,4 +19,16 @@ public static class SlugHelper
         while (result.Contains("--")) result = result.Replace("--", "-");
         return result;
     }
+
+    public static string SectionTypeDisplayName(string? type) => type switch
+    {
+        "hero" => "Hero",
+        "2-col" => "2-Column",
+        "3-col" => "3-Column",
+        "cards" or "cardcollection" or "row-card" => "Row Card",
+        "grid-card" or "portfolio" => "Grid Card",
+        "content" => "Content",
+        "contact" => "Contact",
+        _ => "",
+    };
 }
