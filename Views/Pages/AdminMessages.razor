@@ -77,6 +77,7 @@
     private RenderFragment MessagesToolbar => __builder =>
     {
         <SearchFilter SearchQuery="@search" SearchQueryChanged="HandleSearch" Placeholder="Search name, email, or message..." />
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
 
     private void HandleSearch(string val)
