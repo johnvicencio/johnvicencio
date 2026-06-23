@@ -1,0 +1,83 @@
+@namespace johnvicencio.Views.Shared
+@inject VaultSessionService Session
+@inject NavigationManager Nav
+@inject IJSRuntime Js
+
+@if (!isReady)
+{
+    <AdminPageLayout><p class="loading-state">Loading...</p></AdminPageLayout>
+}
+else if (!Session.IsLoggedIn)
+{
+    Nav.NavigateTo("/login", replace: true);
+}
+else if (itemTitle is null)
+{
+    <AdminPageLayout Title="@(resourceName ?? "Confirm Delete")">
+        <p class="empty-state">Item not found.</p>
+    </AdminPageLayout>
+}
+else
+{
+    <AdminPageLayout Title="@($"Delete {resourceName}")">
+            <p>Are you sure you want to delete the following @(resourceName?.ToLowerInvariant() ?? "item")?</p>
+        <blockquote>
+            <strong>@itemTitle</strong>
+            @if (!string.IsNullOrWhiteSpace(itemDetail))
+            {
+                <br /><span class="muted-text">@itemDetail</span>
+            }
+        </blockquote>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+            <button class="outline danger" @onclick="HandleConfirm" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i> Yes, Delete</button>
+            <button class="outline secondary" @onclick="HandleCancel"><i class="site-icon" data-lucide="x"></i> Cancel</button>
+        </div>
+    </AdminPageLayout>
+}
+
+@code {
+    [Parameter] public string? ItemTitle { get; set; }
+    [Parameter] public string? ItemDetail { get; set; }
+
+    private string? itemDetail;
+    [Parameter] public string? ResourceName { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public string? CancelUrl { get; set; }
+
+    private string? itemTitle;
+    private string? resourceName;
+    private bool deleting;
+    private bool isReady;
+
+    protected override void OnParametersSet()
+    {
+        itemTitle = ItemTitle;
+        itemDetail = ItemDetail;
+        resourceName = ResourceName ?? "Item";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.TryRestoreAsync(Js);
+        isReady = true;
+    }
+
+    private async Task HandleConfirm()
+    {
+        deleting = true;
+        try
+        {
+            await OnConfirm.InvokeAsync();
+        }
+        finally
+        {
+            deleting = false;
+        }
+    }
+
+    private void HandleCancel()
+    {
+        if (!string.IsNullOrWhiteSpace(CancelUrl))
+            Nav.NavigateTo(CancelUrl);
+    }
+}

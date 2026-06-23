@@ -11,14 +11,7 @@
     @code {
     private RenderFragment BlogToolbar => __builder =>
     {
-        <div class="table-search" style="display:flex;align-items:center;gap:0.5rem">
-            <span class="site-icon" data-lucide="search" style="flex-shrink:0;opacity:0.5"></span>
-            <input type="text" placeholder="Search title, slug, summary, content, or date..." value="@search" @oninput="OnSearchInput" style="margin:0;min-width:18rem" />
-            @if (!string.IsNullOrWhiteSpace(search))
-            {
-                <button class="outline secondary btn-action" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
-            }
-        </div>
+        <SearchFilter SearchQuery="@search" SearchQueryChanged="HandleSearch" Placeholder="Search title, slug, summary, content, or date..." />
         @if (hasBlogPage)
         {
             <button class="outline" title="Add Post" aria-label="Add Post" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i></button>
@@ -101,9 +94,9 @@
         hasBlogPage = pageList.Any(p => p.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase));
     }
 
-    private void OnSearchInput(ChangeEventArgs e)
+    private void HandleSearch(string val)
     {
-        search = e.Value?.ToString() ?? "";
+        search = val;
         Nav.NavigateTo(GetAdminPageUrl(1));
         ApplyFilter();
     }

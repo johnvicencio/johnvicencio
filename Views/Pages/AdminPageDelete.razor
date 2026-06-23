@@ -1,86 +1,24 @@
 @page "/admin/pages/delete/{PageId}"
-@inject VaultSessionService Session
-@inject IJSRuntime Js
-@inject NavigationManager Nav
 @inject PageController Pages
 
-<PageTitle>@deleteTitle</PageTitle>
+<PageTitle>Delete Page</PageTitle>
 
-<div class="login-page" style="width:100%">
-
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">@deleteTitle</h2>
-            <div>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
-            </div>
-        </div>
-
-        @if (loading)
-        {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
-        }
-        else if (currentPage is null)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
-        }
-        else if (deleted)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Page deleted.</p>
-        }
-        else
-        {
-            <p style="padding:1rem 0">Are you sure you want to delete the page <strong>@currentPage.Title</strong> (slug: @currentPage.Slug)?</p>
-
-            <p class="pagination-info">This will permanently remove the page and all its @currentPage.Sections.Count section(s).</p>
-
-            <hr />
-
-            <button class="outline danger" @onclick="ConfirmDelete" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Yes, Delete</button>
-            <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
-        }
-    </article>
-
-</div>
+<DeleteConfirm ItemTitle="@currentPage?.Title" ItemDetail="@($"slug: {currentPage?.Slug}, {currentPage?.Sections.Count} section(s)")" ResourceName="Page" CancelUrl="/admin/pages" OnConfirm="ConfirmDelete" />
 
 @code {
-    [Parameter]
-    public string PageId { get; set; } = "";
+    [Parameter] public string PageId { get; set; } = "";
 
-    private bool loading = true;
-    private bool deleting;
-    private bool deleted;
     private Page? currentPage;
 
-    private string deleteTitle => $"Delete {currentPage?.Title ?? "Page"} Page";
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         var pages = await Pages.GetPagesAsync();
         currentPage = pages.FirstOrDefault(p => p.Id == PageId);
-        loading = false;
     }
 
     private async Task ConfirmDelete()
     {
-        deleting = true;
-        try
-        {
+        if (currentPage is not null)
             await Pages.DeletePageAsync(PageId);
-            deleted = true;
-        }
-        finally
-        {
-            deleting = false;
-            Nav.NavigateTo("/admin/pages");
-        }
     }
 }
-
