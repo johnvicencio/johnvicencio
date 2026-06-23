@@ -18,71 +18,79 @@ else
 {
     <h1>Admin Dashboard</h1>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:1200px;margin:0 auto;width:100%">
+    <div class="card-grid">
 
         <article class="admin-card">
-            <h3>Pages</h3>
-            <p class="pagination-info" style="margin:0.25rem 0">
-                @totalPages page(s)
-            </p>
-            <p class="pagination-info" style="margin:0.25rem 0">
-                @totalSections section(s)
-            </p>
-            <hr />
-            <button class="outline" title="Manage Pages" aria-label="Manage Pages" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="sliders-horizontal"></i></button>
+            <header>
+                <h3>Pages</h3>
+                <p class="muted-text">@totalPages page(s)</p>
+                <p class="muted-text">@totalSections section(s)</p>
+            </header>
+            <footer>
+                <button class="outline btn-block" title="Manage Pages" aria-label="Manage Pages" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="sliders-horizontal"></i></button>
+            </footer>
         </article>
 
         <article class="admin-card">
-            <h3>Blog</h3>
-            <p class="pagination-info" style="margin:0.25rem 0">
-                @totalPosts post(s)
-            </p>
-            <hr />
-            <button class="outline" title="Manage Blog" aria-label="Manage Blog" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="book-open"></i></button>
+            <header>
+                <h3>Blog</h3>
+                <p class="muted-text">@totalPosts post(s)</p>
+            </header>
+            <footer>
+                <button class="outline btn-block" title="Manage Blog" aria-label="Manage Blog" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="book-open"></i></button>
+            </footer>
         </article>
 
         <article class="admin-card">
-            <h3>Messages</h3>
-            @if (!string.IsNullOrWhiteSpace(messageError))
-            {
-                <p class="pagination-info" style="margin:0.25rem 0;color:var(--pico-del-color)">Counts unavailable</p>
-            }
-            else
-            {
-                <p class="pagination-info" style="margin:0.25rem 0">
-                    @totalMessages total
+            <header>
+                <h3>Messages</h3>
+                @if (!string.IsNullOrWhiteSpace(messageError))
+                {
+                    <p class="text-danger">Counts unavailable</p>
+                }
+                else
+                {
+                    <p class="muted-text">@totalMessages total</p>
+                    <p class="muted-text">@newMessages new</p>
+                }
+            </header>
+            <footer>
+                <button class="outline btn-block" title="Manage Messages" aria-label="Manage Messages" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="inbox"></i></button>
+            </footer>
+        </article>
+
+        <article class="admin-card">
+            <header>
+                <h3>Images</h3>
+                <p class="muted-text">Upload and reuse media</p>
+            </header>
+            <footer>
+                <button class="outline btn-block" title="Manage Images" aria-label="Manage Images" @onclick='() => Nav.NavigateTo("/admin/images")'><i class="site-icon" data-lucide="image"></i></button>
+            </footer>
+        </article>
+
+        <article class="admin-card">
+            <header>
+                <h3>Partials</h3>
+                <p class="muted-text">Nav links, footer, connect</p>
+            </header>
+            <footer>
+                <button class="outline btn-block" title="Manage Partials" aria-label="Manage Partials" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="puzzle"></i></button>
+            </footer>
+        </article>
+
+        <article class="admin-card">
+            <header>
+                <h3>Settings</h3>
+                <p>
+                    <a href="https://app.netlify.com/projects/johnvicencio/deploys" target="_blank" rel="noopener noreferrer">
+                        <img src="https://api.netlify.com/api/v1/badges/a990b9f4-0b90-4325-9054-5ab13fe29c75/deploy-status" alt="Netlify Deploy Status" />
+                    </a>
                 </p>
-                <p class="pagination-info" style="margin:0.25rem 0">
-                    @newMessages new
-                </p>
-            }
-            <hr />
-            <button class="outline" title="Manage Messages" aria-label="Manage Messages" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="inbox"></i></button>
-        </article>
-
-        <article class="admin-card">
-            <h3>Images</h3>
-            <p class="pagination-info" style="margin:0.25rem 0">Upload and reuse media</p>
-            <hr />
-            <button class="outline" title="Manage Images" aria-label="Manage Images" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/images")'><i class="site-icon" data-lucide="image"></i></button>
-        </article>
-
-        <article class="admin-card">
-            <h3>Partials</h3>
-            <p class="pagination-info" style="margin:0.25rem 0">Nav links, footer, connect</p>
-            <hr />
-            <button class="outline" title="Manage Partials" aria-label="Manage Partials" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="puzzle"></i></button>
-        </article>
-
-        <article class="admin-card">
-            <h3>Settings</h3>
-            <p class="pagination-info" style="margin:0.25rem 0">
-                <a href="https://app.netlify.com/projects/johnvicencio/deploys" target="_blank" rel="noopener noreferrer">
-                    <img src="https://api.netlify.com/api/v1/badges/a990b9f4-0b90-4325-9054-5ab13fe29c75/deploy-status" alt="Netlify Deploy Status" style="display:block" />
-                </a>
-            </p>
-            <hr />
-            <button class="outline" title="Manage Settings" aria-label="Manage Settings" style="width:100%" @onclick='() => Nav.NavigateTo("/admin/settings")'><i class="site-icon" data-lucide="settings"></i></button>
+            </header>
+            <footer>
+                <button class="outline btn-block" title="Manage Settings" aria-label="Manage Settings" @onclick='() => Nav.NavigateTo("/admin/settings")'><i class="site-icon" data-lucide="settings"></i></button>
+            </footer>
         </article>
 
     </div>

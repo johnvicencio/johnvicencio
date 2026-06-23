@@ -28,7 +28,7 @@ else
                 <br /><span class="muted-text">@itemDetail</span>
             }
         </blockquote>
-        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+        <div class="btn-group btn-group-top">
             <button class="outline danger" @onclick="HandleConfirm" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i> Yes, Delete</button>
             <button class="outline secondary" @onclick="HandleCancel"><i class="site-icon" data-lucide="x"></i> Cancel</button>
         </div>

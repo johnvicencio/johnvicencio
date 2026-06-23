@@ -5,13 +5,13 @@
 @if (TotalPages > 1)
 {
     <nav class="table-pagination" aria-label="Pagination">
-        <button class="outline secondary pagination-btn" title="First Page" aria-label="First Page" disabled="@(CurrentPage <= 1)" @onclick="() => GoToPage(1)"><span style="font-size:0.75rem">&laquo;</span></button>
+        <button class="outline secondary pagination-btn" title="First Page" aria-label="First Page" disabled="@(CurrentPage <= 1)" @onclick="() => GoToPage(1)"><span class="pagination-icon">&laquo;</span></button>
         <button class="outline secondary pagination-btn" title="Previous Page" aria-label="Previous Page" disabled="@(CurrentPage <= 1)" @onclick="() => GoToPage(CurrentPage - 1)"><i class="site-icon" data-lucide="chevron-left"></i></button>
         @foreach (var p in PaginationWindow)
         {
             if (p == CurrentPage)
             {
-                <span class="pagination-btn current" style="font-weight:700;display:inline-flex;align-items:center;justify-content:center">@p</span>
+                <span class="pagination-btn current">@p</span>
             }
             else if (p == -1)
             {
@@ -19,11 +19,11 @@
             }
             else
             {
-                <a href="@(PageUrl?.Invoke(p) ?? "#")" class="pagination-btn outline secondary" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">@p</a>
+                <a href="@(PageUrl?.Invoke(p) ?? "#")" class="pagination-btn outline secondary pagination-link">@p</a>
             }
         }
         <button class="outline secondary pagination-btn" title="Next Page" aria-label="Next Page" disabled="@(CurrentPage >= TotalPages)" @onclick="() => GoToPage(CurrentPage + 1)"><i class="site-icon" data-lucide="chevron-right"></i></button>
-        <button class="outline secondary pagination-btn" title="Last Page" aria-label="Last Page" disabled="@(CurrentPage >= TotalPages)" @onclick="() => GoToPage(TotalPages)"><span style="font-size:0.75rem">&raquo;</span></button>
+        <button class="outline secondary pagination-btn" title="Last Page" aria-label="Last Page" disabled="@(CurrentPage >= TotalPages)" @onclick="() => GoToPage(TotalPages)"><span class="pagination-icon">&raquo;</span></button>
     </nav>
 }
 

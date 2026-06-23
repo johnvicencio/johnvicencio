@@ -16,13 +16,13 @@
         {
             <button class="outline" title="Add Post" aria-label="Add Post" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i></button>
         }
-        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
     }
 
     @if (!hasBlogPage)
     {
-        <p class="pagination-info" style="padding:1rem">Create a page with slug "blog" to enable blog management.</p>
+        <p class="muted-text" style="padding:1rem">Create a page with slug "blog" to enable blog management.</p>
     }
 
     @if (hasBlogPage && filteredList.Count == 0)
@@ -32,7 +32,7 @@
 
     @if (hasBlogPage && filteredList.Count > 0)
     {
-        <table style="table-layout:fixed">
+        <table>
             <colgroup>
                 <col />
                 <col style="width:7rem" />
@@ -52,7 +52,7 @@
                         <td><strong>@pt.Title</strong></td>
                         <td>@pt.PublishedOn.ToString("M/d/yyyy")</td>
                         <td>
-                            <a href="@Router.BlogPostPath(pt.Slug)" target="_blank" class="outline btn-action" title="Preview" aria-label="Preview" style="display:inline-flex;align-items:center;text-decoration:none"><i class="site-icon" data-lucide="eye"></i></a>
+                            <a href="@Router.BlogPostPath(pt.Slug)" target="_blank" class="outline btn-action" title="Preview" aria-label="Preview"><i class="site-icon" data-lucide="eye"></i></a>
                             <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/blog/edit/{pt.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
                             <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/blog/delete/{pt.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
                         </td>
@@ -197,4 +197,3 @@
         if (next <= TotalPages) Nav.NavigateTo(GetAdminPageUrl(next));
     }
 }
-

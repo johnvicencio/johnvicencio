@@ -24,7 +24,7 @@
                 }
 
                 <label>Section ID
-                    <input readonly class="pagination-info" value="@sec.SectionId" style="cursor:not-allowed" />
+                    <input readonly class="muted-text" value="@sec.SectionId" />
                 </label>
 
                 <label>Anchor ID <small>Optional, for links like <code>#experience</code>.</small>
@@ -63,7 +63,7 @@
                         </label>
                         <hr />
                         <div class="table-toolbar">
-                            <h5 style="margin:0">Buttons</h5>
+                            <h5>Buttons</h5>
                             @if (sec.Buttons.Count < 3)
                             {
                                 <button class="outline btn-action" @onclick="() => AddButton()"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
@@ -73,7 +73,7 @@
                         {
                             var btn = sec.Buttons[bi];
                             var localBi = bi;
-                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div class="editor-card">
                                 <div class="grid grid-2col">
                                     <label>Button Icon
                                         <div class="flex-group">
@@ -91,7 +91,7 @@
                                         <input @bind="btn.Url" />
                                     </label>
                                 </div>
-                                <button class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveButton(localBi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
+                                <button class="outline secondary btn-tiny" @onclick="() => RemoveButton(localBi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
                             </div>
                         }
                         break;
@@ -101,7 +101,7 @@
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div class="editor-card">
                                 <h5>Column @(localCi + 1)</h5>
                                 <label>Title
                                     <input @bind="col.Title" />
@@ -110,7 +110,7 @@
                                 <RichTextEditor @key="col" @bind-Value="col.Body" MinHeight="220" />
                                 <hr />
                                 <div class="table-toolbar">
-                                    <h6 style="margin:0">Button</h6>
+                                    <h6>Button</h6>
                                     @if (string.IsNullOrWhiteSpace(col.ActionText) && string.IsNullOrWhiteSpace(col.ActionUrl))
                                     {
                                         <button class="outline btn-action" @onclick="() => AddColumnButton(localCi)"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
@@ -135,7 +135,7 @@
                                             <input @bind="col.ActionUrl" />
                                         </label>
                                     </div>
-                                    <button class="outline secondary" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveColumnButton(localCi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
+                                    <button class="outline secondary btn-tiny" @onclick="() => RemoveColumnButton(localCi)"><i class="site-icon" data-lucide="x"></i>Remove</button>
                                 }
                             </div>
                         }
@@ -146,7 +146,7 @@
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div class="editor-card">
                                 <h5>Column @(localCi + 1)</h5>
                                 <label>Icon
                                     <div class="flex-group">
@@ -185,16 +185,16 @@
                             <input @bind="sec.Heading" />
                         </label>
                         <div class="table-toolbar">
-                            <h5 style="margin:0">Grid Cards</h5>
+                            <h5>Grid Cards</h5>
                             <button type="button" class="outline btn-action" @onclick="AddGridCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
                         </div>
                         @for (var ci = 0; ci < sec.Columns.Count; ci++)
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div class="editor-card">
                                 <div class="table-toolbar">
-                                    <h5 style="margin:0">Card @(localCi + 1)</h5>
+                                    <h5>Card @(localCi + 1)</h5>
                                     <button type="button" class="outline danger btn-tiny" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
                                 <div class="grid grid-2col">
@@ -258,16 +258,16 @@
                             <input @bind="sec.Heading" />
                         </label>
                         <div class="table-toolbar">
-                            <h5 style="margin:0">Cards</h5>
+                            <h5>Cards</h5>
                             <button type="button" class="outline btn-action" @onclick="AddRowCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
                         </div>
                         @for (var ci = 0; ci < sec.Columns.Count; ci++)
                         {
                             var col = sec.Columns[ci];
                             var localCi = ci;
-                            <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
+                            <div class="editor-card">
                                 <div class="table-toolbar">
-                                    <h5 style="margin:0">Card @(localCi + 1)</h5>
+                                    <h5>Card @(localCi + 1)</h5>
                                     <button type="button" class="outline danger btn-tiny" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
                                 <div class="grid grid-2col">

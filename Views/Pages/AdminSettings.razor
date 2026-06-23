@@ -39,12 +39,12 @@
                 </label>
             </div>
 
-            <div style="margin-top:0.5rem">
-                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+            <div class="field-top-spacing">
+                <label class="switch-label">
                     <input type="checkbox" role="switch" @bind="settings.MaintenanceMode" />
                     Maintenance Mode
                 </label>
-                <p style="font-size:0.9rem;color:var(--app-muted);margin:0.25rem 0 0 1.8rem">
+                <p class="switch-caption">
                     When enabled, the homepage shows "Under Maintenance" instead of normal content.
                 </p>
             </div>
@@ -52,7 +52,7 @@
             <hr />
 
             <h3>Email / SMTP</h3>
-            <p style="font-size:0.9rem">Google app passwords are encrypted by the Netlify Function before saving to Blobs. Set <code>SETTINGS_ENCRYPTION_KEY</code> in Netlify first.</p>
+            <p class="muted-text">Google app passwords are encrypted by the Netlify Function before saving to Blobs. Set <code>SETTINGS_ENCRYPTION_KEY</code> in Netlify first.</p>
 
             <div class="grid grid-2col">
                 <label>SMTP Host
@@ -73,11 +73,11 @@
             </div>
             @if (settings.SmtpPasswordConfigured)
             {
-                <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="lock-keyhole"></i>Encrypted app password is saved in Netlify Blobs.</p>
+                <p class="text-success"><i class="site-icon" data-lucide="lock-keyhole"></i>Encrypted app password is saved in Netlify Blobs.</p>
             }
             else
             {
-                <p class="pagination-info"><i class="site-icon" data-lucide="circle-alert"></i>No Google app password is saved yet.</p>
+                <p class="muted-text"><i class="site-icon" data-lucide="circle-alert"></i>No Google app password is saved yet.</p>
             }
 
             <div class="grid grid-2col">
@@ -100,7 +100,7 @@
 
             <h3>Netlify Content Writes</h3>
             <p>Paste the same token configured in Netlify as <code>CONTENT_WRITE_TOKEN</code>. This browser will send it when saving to Netlify Blobs.</p>
-            <p style="font-size:0.9rem">On localhost, use <code>netlify dev</code> if you want this token to write through the local Netlify Function. Plain <code>dotnet run</code> falls back to browser storage.</p>
+            <p class="muted-text">On localhost, use <code>netlify dev</code> if you want this token to write through the local Netlify Function. Plain <code>dotnet run</code> falls back to browser storage.</p>
             <input type="password" @bind="contentToken" placeholder="CONTENT_WRITE_TOKEN" />
             <button @onclick="SaveContentTokenAsync"><i class="site-icon" data-lucide="key-round"></i>Save Token</button>
             @if (tokenSaved)
@@ -122,11 +122,11 @@
             }
             else if (adminVaultSeeded)
             {
-                <p style="color:var(--pico-ins-color)"><i class="site-icon" data-lucide="check-circle"></i>Seeded: Admin Vault exists in Netlify Blobs.</p>
+                <p class="text-success"><i class="site-icon" data-lucide="check-circle"></i>Seeded: Admin Vault exists in Netlify Blobs.</p>
             }
             else
             {
-                <p class="pagination-info"><i class="site-icon" data-lucide="circle-alert"></i>Not seeded yet: Admin Vault was not found in Netlify Blobs.</p>
+                <p class="muted-text"><i class="site-icon" data-lucide="circle-alert"></i>Not seeded yet: Admin Vault was not found in Netlify Blobs.</p>
             }
             <button class="outline" @onclick="SeedAdminVaultAsync" aria-busy="@seedingVault"><i class="site-icon" data-lucide="database"></i>Seed Admin Vault</button>
 

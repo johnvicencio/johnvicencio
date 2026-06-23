@@ -16,7 +16,7 @@ else
         <p><time>@post.PublishedOn.ToString("MMMM d, yyyy")</time></p>
         @if (!string.IsNullOrWhiteSpace(post.ImageUrl))
         {
-            <img src="@post.ImageUrl" alt="@post.Title" style="width:100%;max-height:420px;object-fit:cover;border-radius:0.75rem" />
+            <img src="@post.ImageUrl" alt="@post.Title" class="thumbnail thumbnail-lg" style="border-radius:0.75rem" />
         }
         <div class="content-body">@((MarkupString)post.Content)</div>
     </article>

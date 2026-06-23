@@ -228,6 +228,22 @@ code {
     color: #c02d76;
 }
 
+.msg-snippet {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    color: var(--app-muted);
+}
+
+.msg-date {
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+
+
 :root {
     --app-surface: #ffffff;
     --app-surface-muted: #f8fafc;
@@ -1261,6 +1277,214 @@ hr {
 .three-col-icon-block .content-body,
 .three-col-icon-block p {
     text-align: left;
+}
+
+/* Page header with title + search */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0 0 0.75rem 0;
+}
+
+.page-header h1,
+.page-header h2 {
+    margin: 0;
+}
+
+/* Card grid for admin dashboards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+/* Button group for form action */
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-group-right {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.btn-group-top {
+    margin-top: 1rem;
+}
+
+/* Image thumbnail */
+.thumbnail {
+    width: 100%;
+    border-radius: 0.5rem;
+    object-fit: cover;
+}
+
+.thumbnail-sm {
+    max-height: 260px;
+}
+
+.thumbnail-lg {
+    max-height: 420px;
+}
+
+/* Preview image */
+.preview-img {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+/* Pre-wrap text block */
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
+/* Icons at 1.5rem */
+.icon-lg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Admin section type icon */
+.type-icon {
+    font-size: 1.5rem;
+}
+
+/* Info row with label/value */
+.info-row {
+    margin: 0.25rem 0;
+}
+
+.info-row h3:first-child {
+    margin-top: 0;
+}
+
+/* Danger text */
+.text-danger {
+    color: var(--pico-del-color);
+}
+
+/* Success text */
+.text-success {
+    color: var(--pico-ins-color);
+}
+
+/* Block-level button */
+.btn-block {
+    width: 100%;
+}
+
+/* Admin card in dashboard grid */
+.admin-card footer {
+    margin-top: auto;
+}
+
+/* Fieldset search group in Pico style */
+
+/* Section editor card blocks */
+.editor-card {
+    border: 1px solid var(--pico-form-element-border-color);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.editor-card h5,
+.editor-card h6 {
+    margin: 0;
+}
+
+/* Field spacing */
+.field-top-spacing {
+    margin-top: 1rem;
+}
+
+/* Pagination icons */
+.pagination-icon {
+    font-size: 0.75rem;
+}
+
+/* Pagination link */
+.pagination-link {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Switch label for settings */
+.switch-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.switch-caption {
+    font-size: 0.9rem;
+    color: var(--app-muted);
+    margin: 0.25rem 0 0 1.8rem;
+}
+
+/* Pagination current page */
+.pagination-btn.current {
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fieldset[role=search] */
+[role="search"] .site-icon {
+[role="search"] .site-icon {
+    flex-shrink: 0;
+    opacity: 0.5;
+}
+
+[role="search"] input {
+    margin: 0;
+}
+
+/* Nav index column */
+.nav-index {
+    text-align: center;
+    color: var(--app-muted);
+}
+
+/* Icon input group */
+.icon-input-group {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+/* Inline icon + label */
+.inline-icon-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* Action cell buttons */
+.action-cell {
+    white-space: nowrap;
+}
+
+/* Table toolbar footer */
+.table-toolbar-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--app-border-soft);
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 /* ---- Utility classes ---- */

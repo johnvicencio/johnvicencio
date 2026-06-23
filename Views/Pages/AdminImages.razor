@@ -34,12 +34,12 @@
     }
     else
     {
-        <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem">
+        <div class="image-picker-grid">
             @foreach (var image in VisibleImages)
             {
-                <article style="margin:0">
-                    <img src="@image.Url" alt="@image.FileName" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:0.5rem" />
-                    <p class="mono-text" style="word-break:break-all">@image.FileName</p>
+                <article>
+                    <img src="@image.Url" alt="@image.FileName" class="thumbnail" style="aspect-ratio:4/3" />
+                    <p class="mono-text">@image.FileName</p>
                     @if (!string.IsNullOrWhiteSpace(image.Folder))
                     {
                         <p class="muted-sm">@image.Folder</p>

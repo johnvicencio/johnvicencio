@@ -17,10 +17,10 @@
         <label for="footer-about-header">Header</label>
         <input id="footer-about-header" @bind="footerAboutHeader" placeholder="e.g. About John Vicencio" />
 
-        <label for="footer-about-text" style="margin-top:1rem">About Text</label>
+        <label for="footer-about-text" class="field-top-spacing">About Text</label>
         <RichTextEditor @bind-Value="footerAbout" MinHeight="220" Placeholder="Write about yourself..." />
 
-        <div style="display:flex;gap:0.5rem;margin-top:1rem">
+        <div class="btn-group btn-group-top">
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
 
@@ -63,4 +63,3 @@
     }
 }
 </AdminPageLayout>
-

@@ -16,38 +16,38 @@
     else
     {
         <label>Section ID
-            <input readonly class="pagination-info" value="@sectionId" style="cursor:not-allowed" />
+            <input readonly class="muted-text" value="@sectionId" />
         </label>
 
-        <p class="pagination-info" style="margin-bottom:1rem">Choose a section type:</p>
+        <p class="muted-text" style="margin-bottom:1rem">Choose a section type:</p>
 
         <div class="section-type-grid">
             <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/hero/add")'>
-                <i class="site-icon" data-lucide="image" style="font-size:1.5rem"></i>
+                <i class="site-icon type-icon" data-lucide="image"></i>
                 <span>Hero</span>
             </button>
             <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/2-col/add")'>
-                <i class="site-icon" data-lucide="columns-2" style="font-size:1.5rem"></i>
+                <i class="site-icon type-icon" data-lucide="columns-2"></i>
                 <span>2 Columns</span>
             </button>
             <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/3-col/add")'>
-                <i class="site-icon" data-lucide="columns-3" style="font-size:1.5rem"></i>
+                <i class="site-icon type-icon" data-lucide="columns-3"></i>
                 <span>3 Columns</span>
             </button>
             <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/cards/add")'>
-                <i class="site-icon" data-lucide="list" style="font-size:1.5rem"></i>
+                <i class="site-icon type-icon" data-lucide="list"></i>
                 <span>Row Card</span>
             </button>
             <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/grid-card/add")'>
-                <i class="site-icon" data-lucide="layout-grid" style="font-size:1.5rem"></i>
+                <i class="site-icon type-icon" data-lucide="layout-grid"></i>
                 <span>Grid Card</span>
             </button>
             <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/content/add")'>
-                <i class="site-icon" data-lucide="file-text" style="font-size:1.5rem"></i>
+                <i class="site-icon type-icon" data-lucide="file-text"></i>
                 <span>Content</span>
             </button>
             <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/contact/add")'>
-                <i class="site-icon" data-lucide="mail" style="font-size:1.5rem"></i>
+                <i class="site-icon type-icon" data-lucide="mail"></i>
                 <span>Contact</span>
             </button>
         </div>
@@ -82,4 +82,3 @@
         loading = false;
     }
 }
-

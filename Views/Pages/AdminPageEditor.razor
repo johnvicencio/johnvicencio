@@ -59,10 +59,10 @@
                     }
                     else
                     {
-                        <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
+                        <div class="btn-group">
                             <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="layers"></i>Manage Sections</button>
                         </div>
-                        <p class="pagination-info">@sectionCount section(s) on this page.</p>
+                        <p class="muted-text">@sectionCount section(s) on this page.</p>
                     }
                 }
 

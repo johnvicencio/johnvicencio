@@ -12,7 +12,7 @@
         }
         else if (!string.IsNullOrWhiteSpace(errorMessage))
         {
-            <p class="pagination-info" style="padding:1rem;color:var(--pico-del-color)">@errorMessage</p>
+            <p class="empty-state text-danger">@errorMessage</p>
         }
         else if (filteredList.Count == 0)
         {
@@ -35,10 +35,10 @@
                     {
                         var snippet = GetSnippet(message);
                         <tr>
-                            <td style="white-space:nowrap"><strong>@message.Name</strong></td>
-                            <td style="font-size:0.85rem">@message.Email</td>
-                            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.85rem;color:var(--app-muted)">@snippet</td>
-                            <td style="white-space:nowrap;font-size:0.8rem">@FormatDate(message.SubmittedUtc)</td>
+                            <td><strong>@message.Name</strong></td>
+                            <td class="mono-text">@message.Email</td>
+                            <td class="msg-snippet">@snippet</td>
+                            <td class="msg-date">@FormatDate(message.SubmittedUtc)</td>
                             <td>
                                 <button class="outline btn-action" title="Open Message" aria-label="Open Message" @onclick='() => Nav.NavigateTo($"/admin/messages/{message.Id}")'><i class="site-icon" data-lucide="@(message.IsRead ? "mail-open" : "mail")"></i></button>
                             </td>
@@ -130,4 +130,3 @@
         return local.ToString("M/d/yyyy h:mm tt").ToLowerInvariant();
     }
 }
-

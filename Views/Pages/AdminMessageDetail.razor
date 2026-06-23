@@ -11,7 +11,7 @@
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
     {
-        <p class="empty-state" style="color:var(--pico-del-color)">@errorMessage</p>
+        <p class="empty-state text-danger">@errorMessage</p>
     }
     else if (message is null)
     {
@@ -19,13 +19,13 @@
     }
     else
     {
-        <p class="muted-sm" style="margin:0.25rem 0">From</p>
-        <h3 style="margin-top:0">@message.Name</h3>
+        <p class="muted-sm info-row">From</p>
+        <h3 class="info-row">@message.Name</h3>
         <p><a href="mailto:@message.Email">@message.Email</a></p>
         <p class="muted-sm">@FormatDate(message.SubmittedUtc)</p>
         <p class="muted-sm">Ticket #@ticketNumber</p>
         <hr />
-        <div style="white-space:pre-wrap">@message.Message</div>
+        <div class="pre-wrap">@message.Message</div>
         <hr />
         <button class="outline danger" @onclick="DeleteMessageAsync" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Delete</button>
     }
