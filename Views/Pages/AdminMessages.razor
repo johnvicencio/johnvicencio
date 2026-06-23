@@ -4,11 +4,7 @@
 
 <PageTitle>Messages</PageTitle>
 
-<AdminPageLayout Title="Messages">
-
-        <div style="margin-bottom:0.75rem">
-            <input value="@search" @oninput="OnSearchInput" placeholder="Search name, email, or message..." />
-        </div>
+<AdminPageLayout Title="Messages" ToolbarItems="@MessagesToolbar">
 
         @if (loading)
         {
@@ -76,9 +72,16 @@
         {
             loading = false;
         }
-    }private void OnSearchInput(ChangeEventArgs e)
+    }
+
+    private RenderFragment MessagesToolbar => __builder =>
     {
-        search = e.Value?.ToString() ?? "";
+        <SearchFilter SearchQuery="@search" SearchQueryChanged="HandleSearch" Placeholder="Search name, email, or message..." />
+    };
+
+    private void HandleSearch(string val)
+    {
+        search = val;
         ApplyFilter();
     }
 
