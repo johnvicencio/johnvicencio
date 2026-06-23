@@ -93,6 +93,6 @@
     private static string FormatDate(DateTimeOffset dto)
     {
         var local = dto.ToLocalTime();
-        return local.ToString("MMM d, yyyy") + " at " + local.ToString("h:mm tt").ToLowerInvariant();
+        return local.ToString("M/d/yyyy h:mm tt").ToLowerInvariant();
     }
 }
