@@ -228,21 +228,7 @@
         }
     }
 
-    static string ToSlug(string title)
-    {
-        if (string.IsNullOrWhiteSpace(title)) return string.Empty;
-        var slug = new System.Text.StringBuilder();
-        foreach (var c in title.ToLowerInvariant().Trim())
-        {
-            if (char.IsLetterOrDigit(c))
-                slug.Append(c);
-            else if (c is ' ' or '-')
-                slug.Append('-');
-        }
-        var result = slug.ToString().Trim('-');
-        while (result.Contains("--")) result = result.Replace("--", "-");
-        return result;
-    }
+    static string ToSlug(string title) => SlugHelper.ToSlug(title);
 
     private List<PageSection> CreateInitialSections() => pageKind switch
     {

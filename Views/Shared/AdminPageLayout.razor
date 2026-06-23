@@ -6,7 +6,7 @@
 @if (!isReady)
 {
     <div class="login-page" style="width:100%">
-        <article style="width:100%;max-width:1200px;margin:0 auto">
+        <article class="admin-wrap">
             <p class="loading-state">Loading...</p>
         </article>
     </div>
@@ -18,15 +18,31 @@ else if (!Session.IsLoggedIn)
 else
 {
     <div class="login-page" style="width:100%">
-        <article style="width:100%;max-width:1200px;margin:0 auto">
+        <article class="admin-wrap">
+            @if (!string.IsNullOrWhiteSpace(Title) || ToolbarItems is not null)
+            {
+                <div class="table-toolbar">
+                    @if (!string.IsNullOrWhiteSpace(Title))
+                    {
+                        <h2 style="margin:0">@Title</h2>
+                    }
+                    @if (ToolbarItems is not null)
+                    {
+                        <div style="display:flex;align-items:center;gap:0.75rem">
+                            @ToolbarItems
+                        </div>
+                    }
+                </div>
+            }
             @ChildContent
         </article>
     </div>
 }
 
 @code {
+    [Parameter] public string? Title { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-
+    [Parameter] public RenderFragment? ToolbarItems { get; set; }
 
     private bool isReady;
 

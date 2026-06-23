@@ -7,26 +7,25 @@
 
 <PageTitle>Blog Posts</PageTitle>
 
-<AdminPageLayout>
-
-    <div class="table-toolbar">
-        <h2 style="margin:0">Blog Posts</h2>
-        <div style="display:flex;align-items:center;gap:0.75rem">
-            <div class="table-search" style="display:flex;align-items:center;gap:0.5rem">
-                <span class="site-icon" data-lucide="search" style="flex-shrink:0;opacity:0.5"></span>
-                <input type="text" placeholder="Search title, slug, summary, content, or date..." value="@search" @oninput="OnSearchInput" style="margin:0;min-width:18rem" />
-                @if (!string.IsNullOrWhiteSpace(search))
-                {
-                    <button class="outline secondary btn-action" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
-                }
-            </div>
-            @if (hasBlogPage)
+<AdminPageLayout Title="Blog Posts" ToolbarItems="@BlogToolbar">
+    @code {
+    private RenderFragment BlogToolbar => __builder =>
+    {
+        <div class="table-search" style="display:flex;align-items:center;gap:0.5rem">
+            <span class="site-icon" data-lucide="search" style="flex-shrink:0;opacity:0.5"></span>
+            <input type="text" placeholder="Search title, slug, summary, content, or date..." value="@search" @oninput="OnSearchInput" style="margin:0;min-width:18rem" />
+            @if (!string.IsNullOrWhiteSpace(search))
             {
-                <button class="outline" title="Add Post" aria-label="Add Post" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i></button>
+                <button class="outline secondary btn-action" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
             }
-            <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
         </div>
-    </div>
+        @if (hasBlogPage)
+        {
+            <button class="outline" title="Add Post" aria-label="Add Post" @onclick='() => Nav.NavigateTo("/admin/blog/add")'><i class="site-icon" data-lucide="plus"></i></button>
+        }
+        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+    };
+    }
 
     @if (!hasBlogPage)
     {
