@@ -99,11 +99,20 @@ main section > article .grid > article {
 }
 
 main section > article .grid > article footer {
+    display: flex;
+    justify-content: flex-end;
     margin-top: auto;
 }
 
 main section > article .grid > article footer button {
-    width: 100%;
+    width: auto;
+}
+
+/* Admin action buttons — same outline border on cards, tables, and toolbars */
+main section > article :is(button, [role="button"], a[role="button"]).outline {
+    --pico-border-radius: var(--app-radius-md);
+    border: var(--pico-border-width) solid var(--pico-border-color);
+    border-radius: var(--app-radius-md);
 }
 
 main section > article header {
@@ -169,7 +178,6 @@ h1:focus {
     border-radius: var(--pico-border-radius);
     background: var(--app-surface-muted);
     color: var(--app-text);
-    box-shadow: var(--app-shadow-1);
 }
 
 [role="alert"] p:last-child {
@@ -192,7 +200,6 @@ h1:focus {
     color-scheme: light only;
     background: lightyellow;
     bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     display: none;
     left: 0;
@@ -205,7 +212,6 @@ h1:focus {
 :root {
     --pico-font-family: 'Adamina', Georgia, serif;
     --app-navbar-height: 64px;
-    --pico-border-radius: 2rem;
     --pico-typography-spacing-vertical: 1.5rem;
     --pico-form-element-spacing-vertical: 1rem;
     --pico-form-element-spacing-horizontal: 1.25rem;
@@ -223,9 +229,7 @@ h1:focus {
     --app-success: #14a44d;
     --app-radius-sm: 0.375rem;
     --app-radius-md: 0.5rem;
-    --app-shadow-1: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-    --app-shadow-2: 0 4px 8px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
-    --app-shadow-3: 0 8px 24px rgba(0,0,0,0.06), 0 4px 8px rgba(0,0,0,0.04);
+    --pico-border-radius: var(--app-radius-md);
 
     --pico-line-height: 1.6;
     --pico-outline-width: 0.125rem;
@@ -235,8 +239,6 @@ h1:focus {
     --pico-block-spacing-horizontal: 1.25rem;
     --pico-nav-link-spacing-vertical: 0.5rem;
     --pico-nav-link-spacing-horizontal: 0.75rem;
-    --pico-group-box-shadow: var(--app-shadow-1);
-    --pico-card-box-shadow: var(--app-shadow-1);
     --pico-card-sectioning-background-color: var(--app-surface-muted);
 
     --pico-primary: var(--app-primary);
@@ -276,25 +278,18 @@ body {
     color: var(--app-text);
 }
 
+/* Cards: square corners (controls use --app-radius-md via button/input rules) */
 article {
-    border: 1px solid var(--app-border-soft);
-    border-radius: var(--pico-border-radius);
-    box-shadow: var(--app-shadow-1);
-    transition: border-color var(--pico-transition), box-shadow var(--pico-transition), transform var(--pico-transition);
+    border-radius: 0;
 }
 
-article:hover {
-    border-color: var(--app-border);
-    box-shadow: var(--app-shadow-2);
-    transform: translateY(-1px);
-}
-
-/* Pico buttons + Material hints */
+/* Pico buttons — squareish radius scoped to controls, not cards */
 button,
 [role=button],
 input[type=submit],
 input[type=reset],
 input[type=button] {
+    --pico-border-radius: var(--app-radius-md);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -303,43 +298,36 @@ input[type=button] {
     padding: 0.375rem 1rem;
     line-height: 1.4;
     text-decoration: none;
-    box-shadow: none;
     width: auto;
     transition:
         background-color var(--pico-transition),
         border-color var(--pico-transition),
-        color var(--pico-transition),
-        box-shadow var(--pico-transition),
-        transform var(--pico-transition);
-}
-
-button:not(.outline):not(.secondary):not(.contrast):not(:disabled):not([aria-pressed]),
-[role=button]:not(.outline):not(.secondary):not(.contrast):not(:disabled):not([aria-pressed]),
-input[type=submit]:not(:disabled),
-input[type=button]:not(.outline):not(:disabled) {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-button:not(.outline):not(:disabled):not([aria-pressed]):hover,
-[role=button]:not(.outline):not(:disabled):not([aria-pressed]):hover,
-input[type=submit]:not(:disabled):hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
-}
-
-button:not(.outline):not(:disabled):not([aria-pressed]):active,
-[role=button]:not(.outline):not(:disabled):not([aria-pressed]):active,
-input[type=submit]:not(:disabled):active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+        color var(--pico-transition);
 }
 
 button:focus-visible,
 [role=button]:focus-visible,
 input[type=submit]:focus-visible,
-input[type=button]:focus-visible {
+input[type=button]:focus-visible,
+input[type=reset]:focus-visible {
     outline: none;
     box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
+}
+
+/* Mouse click focus — suppress Pico/app rings; keyboard keeps :focus-visible above */
+button:focus:not(:focus-visible),
+[role=button]:focus:not(:focus-visible),
+input[type=submit]:focus:not(:focus-visible),
+input[type=button]:focus:not(:focus-visible),
+input[type=reset]:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+[role=link]:focus:not(:focus-visible),
+input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]):focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+    --pico-box-shadow: none;
 }
 
 button.secondary,
@@ -349,31 +337,28 @@ button.secondary,
 
 button.outline,
 [role=button].outline {
-    border-color: var(--app-border);
-    color: var(--app-primary);
-    background-color: transparent;
-    box-shadow: none;
+    --pico-background-color: transparent;
+    --pico-color: var(--pico-primary);
+    --pico-border-color: var(--app-border);
 }
 
 button.outline:hover,
 [role=button].outline:hover {
-    border-color: var(--app-primary);
-    background-color: rgba(30, 109, 242, 0.06);
-    box-shadow: none;
-    transform: none;
+    --pico-border-color: var(--pico-primary);
+    --pico-background-color: rgba(30, 109, 242, 0.06);
 }
 
 button.outline.secondary,
 [role=button].outline.secondary {
-    border-color: var(--app-border);
-    color: var(--app-text);
+    --pico-border-color: var(--app-border);
+    --pico-color: var(--app-text);
 }
 
 button.outline.secondary:hover,
 [role=button].outline.secondary:hover {
-    border-color: var(--app-muted);
-    background-color: rgba(0, 0, 0, 0.04);
-    color: var(--app-text);
+    --pico-border-color: var(--app-muted);
+    --pico-background-color: rgba(0, 0, 0, 0.04);
+    --pico-color: var(--app-text);
 }
 
 button.danger,
@@ -387,17 +372,14 @@ button.danger,
 
 button.danger.outline,
 [role=button].danger.outline {
-    border-color: rgba(220, 53, 69, 0.5);
-    color: var(--app-danger);
-    box-shadow: none;
+    --pico-border-color: rgba(220, 53, 69, 0.5);
+    --pico-color: var(--app-danger);
 }
 
 button.danger.outline:hover,
 [role=button].danger.outline:hover {
-    border-color: var(--app-danger);
-    background-color: rgba(220, 53, 69, 0.06);
-    box-shadow: none;
-    transform: none;
+    --pico-border-color: var(--app-danger);
+    --pico-background-color: rgba(220, 53, 69, 0.06);
 }
 
 button:has(> .site-icon:only-child),
@@ -413,27 +395,55 @@ button:has(> span:only-child),
     align-items: center;
     flex-wrap: wrap;
     gap: 0.5rem;
+    width: auto;
+    margin-bottom: 0;
+    border-radius: 0;
+    box-shadow: none;
+    --pico-group-box-shadow: none;
 }
 
-table td button,
-table td [role=button] {
+/* Separate controls in a group — not Pico segmented pills */
+[role="group"] > :is(button, [role="button"], a[role="button"]) {
+    flex: 0 0 auto;
+    margin-left: 0;
+    --pico-border-radius: var(--app-radius-md);
+    border-top-left-radius: var(--app-radius-md);
+    border-top-right-radius: var(--app-radius-md);
+    border-bottom-left-radius: var(--app-radius-md);
+    border-bottom-right-radius: var(--app-radius-md);
+}
+
+[role="group"] :is(button, [role="button"], a[role="button"]):not(:first-child) {
+    margin-left: 0;
+}
+
+table td > :is(button, [role="button"], a[role="button"]) {
     margin-right: 0.25rem;
 }
 
-table td button:last-child,
-table td [role=button]:last-child {
+table td > :is(button, [role="button"], a[role="button"]):last-child {
     margin-right: 0;
 }
 
-input:not([type="search"]), textarea, select {
+table td [role="group"] :is(button, [role="button"], a[role="button"]) {
+    margin-right: 0;
+}
+
+input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="search"]),
+textarea,
+select {
     width: 100%;
     max-width: 100%;
+    border-radius: var(--pico-border-radius);
     transition: border-color var(--pico-transition), box-shadow var(--pico-transition), background-color var(--pico-transition);
 }
 
-input:focus, textarea:focus, select:focus {
-    border-color: var(--pico-primary);
-    box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
+input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="search"]):focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: none;
+    --pico-box-shadow: none;
 }
 
 label {
@@ -513,17 +523,30 @@ main section > article > header [role="group"] [role="search"] {
     margin-bottom: 0;
 }
 
-/* Pico search: square corners, native icon, hide WebKit clear (custom clear in SearchFilter) */
+/* Pico search: square corners — override Pico pill radius on group + children */
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-decoration {
     display: none;
 }
 
-input[type="search"],
-[role="search"],
-[role="search"] input {
+[role="search"] {
     --pico-border-radius: 0;
     border-radius: 0;
+    overflow: hidden;
+}
+
+[role="search"] > :is(input, select),
+input[type="search"] {
+    --pico-border-radius: 0;
+    border-radius: 0;
+}
+
+/* Search clear button: uniform radius (override Pico group pill corners) */
+[role="search"] > :is(button, [role="button"]),
+[role="search"] > :is(button, [role="button"]):not(:first-child),
+[role="search"] > :is(button, [role="button"]):not(:last-child) {
+    --pico-border-radius: var(--app-radius-md);
+    border-radius: var(--app-radius-md);
 }
 
 nav[aria-label="Post navigation"] {
@@ -587,10 +610,15 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
 .site-header nav ul li a,
 .site-header nav ul li button[type="button"]:not([class]) {
     --pico-nav-link-spacing-vertical: 0.15rem;
-    border-radius: 999px;
-    color: var(--app-text);
+    --pico-color: var(--app-text);
+    --pico-text-decoration: none;
+    border-radius: var(--app-radius-md);
+    color: var(--pico-color);
     font-weight: 600;
-    transition: background-color var(--pico-transition), color var(--pico-transition);
+    transition:
+        color var(--pico-transition),
+        text-decoration var(--pico-transition),
+        -webkit-text-decoration var(--pico-transition);
 }
 
 .site-header nav ul li button[type="button"]:not([class]) {
@@ -598,17 +626,27 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     padding: var(--pico-nav-link-spacing-vertical) var(--pico-nav-link-spacing-horizontal);
     border: none;
     background: transparent;
-    box-shadow: none;
     font: inherit;
     cursor: pointer;
 }
 
 .site-header nav ul li a:hover,
-.site-header nav ul li a[aria-current="page"],
 .site-header nav ul li button[type="button"]:not([class]):hover {
-    background: rgba(31, 111, 235, 0.08);
-    color: var(--app-primary);
-    text-decoration: none;
+    --pico-color: var(--pico-primary-hover);
+    --pico-underline: var(--pico-primary-hover-underline);
+    --pico-text-decoration: underline;
+}
+
+.site-header nav ul li a[aria-current="page"] {
+    --pico-color: var(--pico-primary);
+    --pico-underline: var(--pico-primary-underline);
+    --pico-text-decoration: none;
+}
+
+.site-header nav ul li button[type="button"]:not([class]):hover {
+    -webkit-text-decoration: var(--pico-text-decoration);
+    text-decoration: var(--pico-text-decoration);
+    text-decoration-color: var(--pico-underline);
 }
 
 .site-header nav strong a {
@@ -784,6 +822,25 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     padding-block: clamp(3rem, 7vw, 5rem);
 }
 
+.grid-card-section > header {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.grid-card-section > header .site-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    color: var(--pico-primary);
+}
+
+.grid-card-section > header h1,
+.grid-card-section > header h2 {
+    margin: 0;
+}
+
 .grid-card-section .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
@@ -792,9 +849,16 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
 .card-collection .grid > article {
     display: flex;
     flex-direction: column;
+    height: 100%;
     margin: 0;
     overflow: hidden;
     padding: 0;
+}
+
+.card-collection .grid > article > figure,
+.card-collection .grid > article > header,
+.card-collection .grid > article > p {
+    flex: 0 0 auto;
 }
 
 .card-collection .grid > article > figure {
@@ -823,7 +887,10 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     grid-template-columns: 1fr auto;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.85rem 1rem;
+    margin: 0;
+    padding: 1em;
+    border: 0;
+    background: transparent;
 }
 
 .card-collection .grid > article > header h3 {
@@ -836,24 +903,25 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     min-height: auto;
 }
 
-.card-collection .grid > article > figure > div {
+.card-collection .grid > article > figure .card-description-overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
-    overflow: auto;
-    padding: 1rem;
-    background: color-mix(in srgb, var(--app-surface) 94%, transparent);
-    transform: translateY(0);
-    box-shadow: inset 0 -1px 0 var(--app-border-soft);
+    overflow-y: auto;
+    margin: 0;
+    padding: 1em;
+    border: 0;
+    background: color-mix(in srgb, var(--app-surface) 92%, transparent);
+    font-size: 0.9rem;
 }
 
-.card-collection .grid > article > figure > div :last-child {
+.card-collection .grid > article > figure .card-description-overlay :last-child {
     margin-bottom: 0;
 }
 
 .card-collection .grid > article > footer {
     margin-top: auto;
-    padding: 0.85rem 1rem;
+    padding: 1.5em;
     border-top: 1px solid var(--app-border-soft);
 }
 
@@ -922,24 +990,46 @@ nav[aria-label="Post navigation"] > a:nth-child(2):not(:first-child):not(:last-c
     }
 
     .site-header nav[aria-label="Mobile navigation"] ul {
-        min-height: auto;
+        display: block !important;
         margin: 0;
+    }
+
+    .site-header nav[aria-label="Mobile navigation"] ul li {
+        display: block !important;
+        width: 100% !important;
     }
 
     .site-header nav[aria-label="Mobile navigation"] a,
     .site-header nav[aria-label="Mobile navigation"] ul li button[type="button"]:not([class]) {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        width: 100%;
         min-height: auto;
         padding: 0.65rem 0.25rem;
-        color: var(--app-text);
+        --pico-color: var(--app-text);
+        --pico-text-decoration: none;
+        color: var(--pico-color);
         font-weight: 600;
-        text-decoration: none;
     }
 
     .site-header nav[aria-label="Mobile navigation"] a:hover,
-    .site-header nav[aria-label="Mobile navigation"] a[aria-current="page"],
     .site-header nav[aria-label="Mobile navigation"] ul li button[type="button"]:not([class]):hover {
-        color: var(--app-primary);
-        text-decoration: none;
+        --pico-color: var(--pico-primary-hover);
+        --pico-underline: var(--pico-primary-hover-underline);
+        --pico-text-decoration: underline;
+    }
+
+    .site-header nav[aria-label="Mobile navigation"] a[aria-current="page"] {
+        --pico-color: var(--pico-primary);
+        --pico-underline: var(--pico-primary-underline);
+        --pico-text-decoration: none;
+    }
+
+    .site-header nav[aria-label="Mobile navigation"] ul li button[type="button"]:not([class]):hover {
+        -webkit-text-decoration: var(--pico-text-decoration);
+        text-decoration: var(--pico-text-decoration);
+        text-decoration-color: var(--pico-underline);
     }
 
     .row-card-list > article {
@@ -993,8 +1083,6 @@ dialog.picker-dialog > article {
     max-height: 90vh;
     overflow: auto;
     background: var(--pico-card-background-color);
-    border-radius: 0.75rem;
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.35);
 }
 
 dialog.picker-dialog-icon {
@@ -1042,14 +1130,15 @@ dialog.picker-dialog .picker-tiles > button {
 dialog.picker-dialog .picker-tiles > button[aria-pressed="true"] {
     border-color: var(--pico-primary);
     background-color: rgba(30, 109, 242, 0.06);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pico-primary) 30%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--pico-primary) 30%, transparent);
+    outline-offset: -2px;
 }
 
 dialog.picker-dialog .picker-tiles > button img {
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
-    border-radius: 0.35rem;
+    border-radius: var(--app-radius-sm);
 }
 
 dialog.picker-dialog .picker-tiles > button small {
@@ -1118,17 +1207,16 @@ main section > article > .grid > button.outline span {
 }
 
 /* Contact form */
-.contact-section form label:has(input[type="checkbox"]) {
+.contact-section form label:has(input[role="switch"]) {
     display: flex;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    font-weight: 400;
 }
 
-.contact-section form label:has(input[type="checkbox"]) input {
-    width: 1.1rem;
-    min-width: 1.1rem;
-    height: 1.1rem;
-    margin-top: 0.25rem;
+.contact-section form label:has(input[role="switch"]) input[role="switch"] {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
 }
 
 .contact-section form footer {
@@ -1147,6 +1235,7 @@ main section > article > .grid > button.outline span {
     background: var(--app-footer-bg);
     color: var(--app-footer-text);
     padding: 2.5rem 0 0;
+    font-size: .75em;
 }
 
 .site-footer h4 {
@@ -1257,7 +1346,6 @@ main section > article > .grid > button.outline span {
     align-items: center;
     flex-wrap: wrap;
     gap: 0.75rem;
-    width: 100%;
     padding-block: 1rem 0.5rem;
 }
 
@@ -1271,6 +1359,12 @@ main section > article > .grid > button.outline span {
     margin-bottom: 0;
     flex: 0 1 min(18rem, 100%);
     width: min(18rem, 100%);
+}
+
+.site-main > .container > header [role="search"] input[type="search"]:focus {
+    outline: none;
+    box-shadow: none;
+    --pico-box-shadow: none;
 }
 
 dialog.picker-dialog [role="search"] {
@@ -1346,6 +1440,12 @@ main section > article > nav[aria-label="Pagination"] {
     margin-bottom: 0.35rem;
 }
 
+.site-main > .container > section > article > header h2 a,
+.site-main > .container > section > article > header h2 a:hover {
+    --pico-text-decoration: none;
+    text-decoration: none;
+}
+
 .site-main > .container > section > article > footer {
     margin-top: 0.75rem;
     padding-top: 0;
@@ -1367,6 +1467,7 @@ main section > article > nav[aria-label="Pagination"] {
     background: #f5f5f5;
     border-bottom: 1px solid var(--pico-form-element-border-color);
     align-items: center;
+    width: 100%;
 }
 
 .rich-toolbar .sep {

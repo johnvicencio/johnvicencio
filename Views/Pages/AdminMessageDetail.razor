@@ -20,11 +20,11 @@
     else
     {
         <header>
-            <small>From</small>
             <h3>@message.Name</h3>
-            <p><a href="mailto:@message.Email">@message.Email</a></p>
-            <small>@FormatDate(message.SubmittedUtc) · Ticket #@ticketNumber</small>
         </header>
+        <small>From</small>
+        <p><a href="mailto:@message.Email">@message.Email</a></p>
+        <small>@FormatDate(message.SubmittedUtc) · Ticket #@ticketNumber</small>
         <hr />
         <div>@message.Message</div>
         <hr />

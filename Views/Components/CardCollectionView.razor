@@ -10,26 +10,30 @@
                 @foreach (var item in Section.Columns)
                 {
                     <article>
-                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl) || (expandedCards.Contains(item) && !string.IsNullOrWhiteSpace(item.Body)))
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
                         {
                             <figure>
-                                @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                <a href="@(string.IsNullOrWhiteSpace(item.ImageLink) ? item.ActionUrl : item.ImageLink)" target="@LinkTarget(item.ImageLinkNewTab)" rel="@LinkRel(item.ImageLinkNewTab)">
+                                    <img src="@item.ImageUrl" alt="@item.ImageAlt" />
+                                </a>
+                                @if (IsExpanded(item))
                                 {
-                                    <a href="@(string.IsNullOrWhiteSpace(item.ImageLink) ? item.ActionUrl : item.ImageLink)" target="@LinkTarget(item.ImageLinkNewTab)" rel="@LinkRel(item.ImageLinkNewTab)">
-                                        <img src="@item.ImageUrl" alt="@item.ImageAlt" />
-                                    </a>
-                                }
-                                @if (expandedCards.Contains(item) && !string.IsNullOrWhiteSpace(item.Body))
-                                {
-                                    <div>@((MarkupString)item.Body)</div>
+                                    <div class="card-description-overlay">@((MarkupString)item.Body)</div>
                                 }
                             </figure>
                         }
                         <header>
                             <h3>@item.Title</h3>
-                            <button type="button" class="outline secondary" @onclick="() => ToggleCard(item)" aria-label="Toggle @item.Title description">
-                                <i class="site-icon" data-lucide="@(expandedCards.Contains(item) ? "x" : "ellipsis")"></i>
-                            </button>
+                            @if (!string.IsNullOrWhiteSpace(item.Body))
+                            {
+                                <button type="button"
+                                        class="outline secondary"
+                                        @onclick="() => ToggleCard(item)"
+                                        aria-label="@(IsExpanded(item) ? "Close" : "Open") @item.Title description"
+                                        aria-expanded="@IsExpanded(item)">
+                                    <i class="site-icon" data-lucide="@(IsExpanded(item) ? "x" : "ellipsis")"></i>
+                                </button>
+                            }
                         </header>
                         @if (!string.IsNullOrWhiteSpace(item.ActionText) && !string.IsNullOrWhiteSpace(item.ActionUrl))
                         {
@@ -104,12 +108,14 @@
 
     private bool IsGridCard => Section.Type is "grid-card" or "portfolio";
 
-    private readonly HashSet<SectionColumn> expandedCards = [];
+    private readonly HashSet<SectionColumn> expandedCards = new();
+
+    private bool IsExpanded(SectionColumn item) => expandedCards.Contains(item);
 
     private void ToggleCard(SectionColumn item)
     {
-        if (!expandedCards.Add(item))
-            expandedCards.Remove(item);
+        if (!expandedCards.Remove(item))
+            expandedCards.Add(item);
     }
 
     private static string? LinkTarget(bool newTab) => newTab ? "_blank" : null;

@@ -116,6 +116,8 @@
     private List<FooterConnect> footerConnects = [];
     private bool mobileMenuOpen;
     private bool maintenanceMode;
+    private string? currentFragment;
+    private DotNetObjectReference<MainLayout>? dotNetRef;
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,9 +134,24 @@
             Session.ReturnUrl = null;
         }
 
+        currentFragment = NormalizeFragment(new Uri(Nav.Uri).Fragment);
+        Nav.LocationChanged += OnLocationChanged;
         Pages.PagesChanged += OnPagesChanged;
         Site.SettingsChanged += OnSettingsChanged;
         await LoadNavAsync();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentFragment = NormalizeFragment(new Uri(e.Location).Fragment);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public void OnBrowserLocationChanged(string hash)
+    {
+        currentFragment = NormalizeFragment(hash);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task LogOut()
@@ -156,6 +173,12 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            dotNetRef = DotNetObjectReference.Create(this);
+            try { await Js.InvokeVoidAsync("registerNavLocationListener", dotNetRef); } catch { }
+        }
+
         try { await LucideInterop.RefreshIconsAsync(Js); } catch { }
     }
 
@@ -254,21 +277,46 @@
 
     private string? NavAriaCurrent(string url)
     {
-        var currentPath = new Uri(Nav.Uri).AbsolutePath.TrimEnd('/');
+        var currentUri = new Uri(Nav.Uri);
+        var currentPath = currentUri.AbsolutePath.TrimEnd('/');
         if (string.IsNullOrEmpty(currentPath))
             currentPath = "/";
 
-        var linkPath = url.Split('#', '?')[0].TrimEnd('/');
-        if (string.IsNullOrEmpty(linkPath))
-            linkPath = "/";
+        var activeFragment = currentFragment ?? NormalizeFragment(currentUri.Fragment);
+        var (linkPath, linkFragment) = ParseNavUrl(url);
 
         if (linkPath.Equals("/admin", StringComparison.OrdinalIgnoreCase))
             return currentPath.StartsWith("/admin", StringComparison.OrdinalIgnoreCase) ? "page" : null;
 
+        if (linkFragment is not null)
+            return currentPath == "/" && activeFragment == linkFragment ? "page" : null;
+
         if (linkPath.Equals("/", StringComparison.OrdinalIgnoreCase))
-            return currentPath == "/" ? "page" : null;
+            return currentPath == "/" && activeFragment is null ? "page" : null;
 
         return currentPath.Equals(linkPath, StringComparison.OrdinalIgnoreCase) ? "page" : null;
+    }
+
+    private static string? NormalizeFragment(string fragment)
+    {
+        if (string.IsNullOrEmpty(fragment))
+            return null;
+
+        var normalized = fragment.TrimStart('#');
+        return string.IsNullOrEmpty(normalized) ? null : normalized.ToLowerInvariant();
+    }
+
+    private static (string Path, string? Fragment) ParseNavUrl(string url)
+    {
+        var hashIndex = url.IndexOf('#');
+        var pathPart = hashIndex >= 0 ? url[..hashIndex] : url.Split('?')[0];
+        var linkFragment = hashIndex >= 0 ? NormalizeFragment(url[hashIndex..]) : null;
+
+        var linkPath = pathPart.TrimEnd('/');
+        if (string.IsNullOrEmpty(linkPath))
+            linkPath = "/";
+
+        return (linkPath, linkFragment);
     }
 
     private void OnPagesChanged()
@@ -290,6 +338,9 @@
 
     public void Dispose()
     {
+        Nav.LocationChanged -= OnLocationChanged;
+        dotNetRef?.Dispose();
+        try { _ = Js.InvokeVoidAsync("unregisterNavLocationListener"); } catch { }
         Pages.PagesChanged -= OnPagesChanged;
         Site.SettingsChanged -= OnSettingsChanged;
     }

@@ -20,8 +20,8 @@ else
         <article>
             <header>
                 <h3>Pages</h3>
-                <small>@totalPages page(s) · @totalSections section(s)</small>
             </header>
+            <small>@totalPages page(s) · @totalSections section(s)</small>
             <footer>
                 <button class="outline" title="Manage Pages" aria-label="Manage Pages" @onclick='() => Nav.NavigateTo("/admin/pages")'><i class="site-icon" data-lucide="sliders-horizontal"></i></button>
             </footer>
@@ -30,8 +30,8 @@ else
         <article>
             <header>
                 <h3>Blog</h3>
-                <small>@totalPosts post(s)</small>
             </header>
+            <small>@totalPosts post(s)</small>
             <footer>
                 <button class="outline" title="Manage Blog" aria-label="Manage Blog" @onclick='() => Nav.NavigateTo("/admin/blog")'><i class="site-icon" data-lucide="book-open"></i></button>
             </footer>
@@ -40,15 +40,15 @@ else
         <article>
             <header>
                 <h3>Messages</h3>
-                @if (!string.IsNullOrWhiteSpace(messageError))
-                {
-                    <small><del>Counts unavailable</del></small>
-                }
-                else
-                {
-                    <small>@totalMessages total · @newMessages new</small>
-                }
             </header>
+            @if (!string.IsNullOrWhiteSpace(messageError))
+            {
+                <small><del>Counts unavailable</del></small>
+            }
+            else
+            {
+                <small>@totalMessages total · @newMessages new</small>
+            }
             <footer>
                 <button class="outline" title="Manage Messages" aria-label="Manage Messages" @onclick='() => Nav.NavigateTo("/admin/messages")'><i class="site-icon" data-lucide="inbox"></i></button>
             </footer>
@@ -58,8 +58,8 @@ else
         <article>
             <header>
                 <h3>Images</h3>
-                <small>Upload and reuse media</small>
             </header>
+            <small>Upload and reuse media</small>
             <footer>
                 <button class="outline" title="Manage Images" aria-label="Manage Images" @onclick='() => Nav.NavigateTo("/admin/images")'><i class="site-icon" data-lucide="image"></i></button>
             </footer>
@@ -68,15 +68,15 @@ else
         <article>
             <header>
                 <h3>Logs</h3>
-                @if (!string.IsNullOrWhiteSpace(logError))
-                {
-                    <small><del>Counts unavailable</del></small>
-                }
-                else
-                {
-                    <small>@totalLogs total · @totalErrors error(s)</small>
-                }
             </header>
+            @if (!string.IsNullOrWhiteSpace(logError))
+            {
+                <small><del>Counts unavailable</del></small>
+            }
+            else
+            {
+                <small>@totalLogs total · @totalErrors error(s)</small>
+            }
             <footer>
                 <button class="outline" title="View Logs" aria-label="View Logs" @onclick='() => Nav.NavigateTo("/admin/logs")'><i class="site-icon" data-lucide="scroll-text"></i></button>
             </footer>
@@ -85,8 +85,8 @@ else
         <article>
             <header>
                 <h3>Partials</h3>
-                <small>Nav links, footer, connect</small>
             </header>
+            <small>Nav links, footer, connect</small>
             <footer>
                 <button class="outline" title="Manage Partials" aria-label="Manage Partials" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="puzzle"></i></button>
             </footer>
