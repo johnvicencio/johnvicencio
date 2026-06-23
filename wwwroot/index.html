@@ -70,6 +70,24 @@
             }
         }
     </script>
+    <script>
+        const loadingBar = document.getElementById('blazor-loading-bar');
+        const loadingText = document.getElementById('blazor-loading-text');
+        if (loadingBar && loadingText) {
+            const updateProgress = () => {
+                const style = getComputedStyle(document.documentElement);
+                const percentage = style.getPropertyValue('--blazor-load-percentage').trim();
+                const text = style.getPropertyValue('--blazor-load-percentage-text').trim();
+                if (percentage) {
+                    const value = parseFloat(percentage);
+                    if (!isNaN(value)) loadingBar.value = value;
+                }
+                if (text) loadingText.textContent = text;
+            };
+            const observer = new MutationObserver(updateProgress);
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+            updateProgress();
+        }
+    </script>
 </body>
-
 </html>
