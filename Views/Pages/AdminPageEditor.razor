@@ -1,6 +1,5 @@
 @page "/admin/pages/add"
 @page "/admin/pages/edit/{PageId}"
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject PageController Pages
 
@@ -9,7 +8,7 @@
 <AdminPageLayout Title="@title">
         @if (loading)
         {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
+            <p class="loading-state">Loading...</p>
         }
         else
         {

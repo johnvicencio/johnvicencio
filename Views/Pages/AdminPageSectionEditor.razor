@@ -9,11 +9,11 @@
 <AdminPageLayout Title="@title">
         @if (loading)
         {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
+            <p class="loading-state">Loading...</p>
         }
         else if (page is null)
         {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
+            <p class="empty-state">Page not found.</p>
         }
         else
         {

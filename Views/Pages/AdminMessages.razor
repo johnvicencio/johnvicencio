@@ -12,7 +12,7 @@
 
         @if (loading)
         {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
+            <p class="loading-state">Loading...</p>
         }
         else if (!string.IsNullOrWhiteSpace(errorMessage))
         {
@@ -20,7 +20,7 @@
         }
         else if (filteredList.Count == 0)
         {
-            <p class="pagination-info" style="padding:1rem;text-align:center">@(string.IsNullOrWhiteSpace(search) ? "No messages yet." : "No messages match your search.")</p>
+            <p class="empty-state">@(string.IsNullOrWhiteSpace(search) ? "No messages yet." : "No messages match your search.")</p>
         }
         else
         {

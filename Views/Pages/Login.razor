@@ -1,8 +1,8 @@
 @page "/login"
+@inject IJSRuntime Js
 @inject VaultController Vaults
 @inject VaultSessionService Session
 @inject NavigationManager Navigation
-@inject IJSRuntime Js
 
 <PageTitle>Login — John Vicencio</PageTitle>
 
@@ -83,3 +83,4 @@
         public string Passphrase { get; set; } = string.Empty;
     }
 }
+

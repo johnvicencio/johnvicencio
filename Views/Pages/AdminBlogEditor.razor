@@ -1,6 +1,5 @@
 @page "/admin/blog/add"
 @page "/admin/blog/edit/{PostId}"
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject BlogController Blog
 @inject PageController Pages
@@ -10,7 +9,7 @@
 <AdminPageLayout Title="@title">
         @if (loading)
         {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
+            <p class="loading-state">Loading...</p>
         }
         else if (!hasBlogPage)
         {
