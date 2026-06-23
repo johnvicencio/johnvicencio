@@ -1,80 +1,58 @@
 @page "/admin/pages"
-@inject VaultSessionService Session
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject PageController Pages
 
 <PageTitle>Pages</PageTitle>
 
-<div class="login-page" style="width:100%">
+<AdminPageLayout Title="Pages">
+    <div class="flex-group-lg">
+        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        <button class="outline" title="Add Page" aria-label="Add Page" @onclick='() => Nav.NavigateTo("/admin/pages/add")'><i class="site-icon" data-lucide="plus"></i></button>
+    </div>
 
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">Pages</h2>
-            <div style="display:flex;gap:0.5rem">
-                <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
-                <button class="outline" title="Add Page" aria-label="Add Page" @onclick='() => Nav.NavigateTo("/admin/pages/add")'><i class="site-icon" data-lucide="plus"></i></button>
-            </div>
-        </div>
+    @if (pageList.Count == 0)
+    {
+        <p class="empty-state">No pages yet.</p>
+    }
 
-        @if (pageList.Count == 0)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">No pages yet.</p>
-        }
-
-        <table>
-            <thead>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Slug</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pg in pageList)
+            {
+                var orderIndex = movablePages.IndexOf(pg);
                 <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Slug</th>
-                    <th>Sections</th>
-                    <th>Order</th>
-                    <th>Actions</th>
+                    <td><strong>@pg.Title</strong></td>
+                    <td>@pg.Slug</td>
+                    <td>
+                        @if (orderIndex >= 0)
+                        {
+                            <button class="outline secondary btn-action" title="Move Up" aria-label="Move Up" disabled="@(savingOrder || orderIndex == 0)" @onclick="() => MovePageAsync(pg.Id, -1)"><i class="site-icon" data-lucide="arrow-up"></i></button>
+                            <button class="outline secondary btn-action" title="Move Down" aria-label="Move Down" disabled="@(savingOrder || orderIndex == movablePages.Count - 1)" @onclick="() => MovePageAsync(pg.Id, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
+                        }
+                        <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{pg.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
+                        @if (!IsLegalPage(pg.Slug))
+                        {
+                            <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/pages/delete/{pg.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                        }
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var pg in OrderedPages)
-                {
-                    var movablePages = OrderedPages.Where(p => !p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase) && !IsLegalPage(p.Slug)).ToList();
-                    var orderIndex = movablePages.FindIndex(p => p.Id == pg.Id);
-                    var isHome = pg.Slug.Equals("home", StringComparison.OrdinalIgnoreCase);
-                    var isLegalPage = IsLegalPage(pg.Slug);
-                    <tr>
-                        <td class="mono-text">@pg.Id</td>
-                        <td><strong>@pg.Title</strong></td>
-                        <td>@pg.Slug</td>
-                        <td>@pg.Sections.Count</td>
-                        <td>
-                            @if (isHome || isLegalPage)
-                            {
-                                <span class="pagination-info">Locked</span>
-                            }
-                            else
-                            {
-                                <div style="display:flex;gap:0.25rem;align-items:center">
-                                    <span class="mono-text">@pg.SortOrder</span>
-                                    <button class="outline secondary" title="Move Up" aria-label="Move Up" disabled="@(savingOrder || orderIndex == 0)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MovePageAsync(pg.Id, -1)"><i class="site-icon" data-lucide="arrow-up"></i></button>
-                                    <button class="outline secondary" title="Move Down" aria-label="Move Down" disabled="@(savingOrder || orderIndex == movablePages.Count - 1)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MovePageAsync(pg.Id, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
-                                </div>
-                            }
-                        </td>
-                        <td>
-                            <button class="outline" title="Edit" aria-label="Edit" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{pg.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
-                            <button class="outline danger" title="Delete" aria-label="Delete" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/pages/delete/{pg.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </article>
-
-</div>
+            }
+        </tbody>
+    </table>
+</AdminPageLayout>
 
 @code {
     private List<Page> pageList = [];
     private bool savingOrder;
-    private List<Page> OrderedPages => pageList.OrderBy(p => p.Slug.Equals("home", StringComparison.OrdinalIgnoreCase) ? -1 : p.SortOrder).ThenBy(p => p.Title).ToList();
+
+    private List<Page> movablePages => pageList.Where(p => !IsLegalPage(p.Slug)).ToList();
 
     private static bool IsLegalPage(string slug) =>
         slug.Equals("terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
@@ -82,13 +60,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         pageList = await Pages.GetPagesAsync();
     }
 
@@ -106,4 +77,3 @@
         }
     }
 }
-

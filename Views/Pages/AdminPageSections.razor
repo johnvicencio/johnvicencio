@@ -1,90 +1,68 @@
 @page "/admin/pages/{PageId}/sections"
-@inject VaultSessionService Session
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject PageController Pages
 
-<PageTitle>@(page?.Title ?? "Page") Sections</PageTitle>
+<PageTitle>@pageTitle</PageTitle>
 
-<div class="login-page" style="width:100%">
+<AdminPageLayout Title="@pageTitle">
+    <div class="flex-group-lg">
+        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        @if (page?.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase) != true)
+        {
+            <button class="outline" title="Add Section" aria-label="Add Section" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i></button>
+        }
+    </div>
 
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">@(page?.Title ?? "Page") Sections</h2>
-            <div style="display:flex;gap:0.5rem">
-                <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i></button>
-                @if (page?.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase) != true)
+    @if (loading)
+    {
+        <p class="loading-state">Loading...</p>
+    }
+    else if (page is null)
+    {
+        <p class="empty-state">Page not found.</p>
+    }
+    else if (page.Sections.Count == 0)
+    {
+        <p class="empty-state">No sections yet.</p>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <p role="alert" class="form-alert form-alert-danger">@errorMessage</p>
+        }
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Heading</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int idx = 0; idx < page.Sections.Count; idx++)
                 {
-                    <button class="outline" title="Add Section" aria-label="Add Section" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i></button>
-                }
-            </div>
-        </div>
-
-        @if (loading)
-        {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
-        }
-        else if (page is null)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
-        }
-        else if (page.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase))
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Blog pages are managed through blog posts, not page sections.</p>
-        }
-        else if (page.Sections.Count == 0)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">No sections yet.</p>
-        }
-        else
-        {
-            @if (!string.IsNullOrWhiteSpace(errorMessage))
-            {
-                <p role="alert" class="form-alert form-alert-danger">@errorMessage</p>
-            }
-            <table>
-                <thead>
+                    var sec = page.Sections[idx];
                     <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Heading</th>
-                        <th>Order</th>
-                        <th>Actions</th>
+                        <td>@SlugHelper.SectionTypeDisplayName(sec.Type)</td>
+                        <td>@sec.Heading</td>
+                        <td>
+                            <button class="outline secondary btn-action" title="Move Up" aria-label="Move Up" disabled="@(savingOrder || idx == 0)" @onclick="() => MoveSectionAsync(idx, -1)"><i class="site-icon" data-lucide="arrow-up"></i></button>
+                            <button class="outline secondary btn-action" title="Move Down" aria-label="Move Down" disabled="@(savingOrder || idx == page.Sections.Count - 1)" @onclick="() => MoveSectionAsync(idx, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
+                            <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/edit/{sec.SectionId}")'><i class="site-icon" data-lucide="pencil"></i></button>
+                            <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/delete/{sec.SectionId}")'><i class="site-icon" data-lucide="trash-2"></i></button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @for (var i = 0; i < page.Sections.Count; i++)
-                    {
-                        var sec = page.Sections[i];
-                        var index = i;
-                        <tr>
-                            <td class="mono-text">@sec.SectionId</td>
-                            <td>@sec.Type</td>
-                            <td><strong>@(string.IsNullOrWhiteSpace(sec.Heading) ? "(no heading)" : sec.Heading)</strong></td>
-                            <td>
-                                <div style="display:flex;gap:0.25rem;align-items:center">
-                                    <span class="mono-text">@(index + 1)</span>
-                                    <button class="outline secondary" title="Move Up" aria-label="Move Up" disabled="@(index == 0 || savingOrder)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MoveSectionAsync(index, -1)"><i class="site-icon" data-lucide="arrow-up"></i></button>
-                                    <button class="outline secondary" title="Move Down" aria-label="Move Down" disabled="@(index == page.Sections.Count - 1 || savingOrder)" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => MoveSectionAsync(index, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="outline" title="Edit" aria-label="Edit" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/edit/{sec.SectionId}")'><i class="site-icon" data-lucide="pencil"></i></button>
-                                <button class="outline danger" title="Delete" aria-label="Delete" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/delete/{sec.SectionId}")'><i class="site-icon" data-lucide="trash-2"></i></button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </article>
-
-</div>
+                }
+            </tbody>
+        </table>
+    }
+</AdminPageLayout>
 
 @code {
-    [Parameter]
-    public string PageId { get; set; } = "";
+    [Parameter] public string PageId { get; set; } = "";
 
+    private string pageTitle => $"{page?.Title ?? "Page"} Sections";
     private bool loading = true;
     private bool savingOrder;
     private string errorMessage = "";
@@ -92,13 +70,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         page = await Pages.GetPageByIdAsync(PageId);
         loading = false;
     }
@@ -106,13 +77,11 @@
     private async Task MoveSectionAsync(int index, int direction)
     {
         if (page is null) return;
-
         var newIndex = index + direction;
         if (newIndex < 0 || newIndex >= page.Sections.Count) return;
 
         errorMessage = "";
         savingOrder = true;
-
         var moved = page.Sections[index];
         page.Sections.RemoveAt(index);
         page.Sections.Insert(newIndex, moved);
@@ -133,4 +102,3 @@
         }
     }
 }
-

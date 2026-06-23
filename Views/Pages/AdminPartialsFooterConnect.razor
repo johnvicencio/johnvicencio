@@ -1,19 +1,14 @@
 @page "/admin/partials/footerconnect"
-@inject VaultSessionService Session
+@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject SiteController Site
-@inject IJSRuntime Js
 
 <PageTitle>Footer Connect</PageTitle>
-
-<div class="login-page" style="width:100%">
-
-    <article style="width:100%;max-width:1200px;margin:0 auto">
+<AdminPageLayout>
         <div class="table-toolbar">
             <h2 style="margin:0">Footer Connect</h2>
             <div>
                 <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
-            </div>
         </div>
 
         <p class="muted-text">
@@ -70,7 +65,6 @@
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
 
-    </article>
 
 </div>
 
@@ -86,8 +80,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
         {
             Nav.NavigateTo("/login", replace: true);
             return;
@@ -150,4 +142,5 @@
         }
     }
 }
+</AdminPageLayout>
 
