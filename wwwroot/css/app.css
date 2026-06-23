@@ -1550,38 +1550,17 @@ hr {
     border-radius: 0.75rem;
 }
 
-/* Blazor loading spinner */
-.loading-progress {
-    position: relative;
+/* Blazor loading bar (Pico CSS native progress) */
+#blazor-loading-bar {
     display: block;
-    width: 8rem;
-    height: 8rem;
+    width: min(24rem, 80%);
     margin: 20vh auto 1rem auto;
 }
 
-.loading-progress circle {
-    fill: none;
-    stroke: #e0e0e0;
-    stroke-width: 0.6rem;
-    transform-origin: 50% 50%;
-    transform: rotate(-90deg);
-}
-
-.loading-progress circle:last-child {
-    stroke: var(--pico-primary, #1b6ec2);
-    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-    transition: stroke-dasharray 0.05s ease-in-out;
-}
-
-.loading-progress-text {
-    position: absolute;
+#blazor-loading-text {
     text-align: center;
-    font-weight: bold;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
-}
-
-.loading-progress-text:after {
-    content: var(--blazor-load-percentage-text, "Loading");
+    color: var(--pico-muted-color);
+    font-size: 0.9rem;
 }
 
 /* Log viewer */

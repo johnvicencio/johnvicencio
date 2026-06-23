@@ -44,11 +44,8 @@
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <progress id="blazor-loading-bar" max="100" value="0"></progress>
+        <div id="blazor-loading-text">Loading the application...</div>
     </div>
 
     <div id="blazor-error-ui">
