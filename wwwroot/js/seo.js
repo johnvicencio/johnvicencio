@@ -24,3 +24,13 @@ window.setPageMeta = function (opts) {
     if (el) el.content = pair[1];
   });
 };
+
+window.scrollToPagination = function () {
+  var nav = document.querySelector('.table-pagination');
+  if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+window.scrollToNav = function () {
+  var nav = document.querySelector('.post-navigation');
+  if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};

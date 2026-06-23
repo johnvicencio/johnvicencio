@@ -1,5 +1,6 @@
 @page "/blog/{Slug}"
 @inject BlogController Blog
+@inject RouterController Router
 @inject IJSRuntime Js
 
 @if (post is null)
@@ -19,6 +20,35 @@ else
         }
         <div class="content-body">@((MarkupString)post.Content)</div>
     </article>
+
+    @if (prevPost is not null || nextPost is not null)
+    {
+        <nav class="post-navigation" aria-label="Post navigation">
+            @if (prevPost is not null)
+            {
+                <a href="@Router.BlogPostPath(prevPost.Slug)" class="post-nav-link prev" title="@prevPost.Title">
+                    <i class="site-icon" data-lucide="arrow-left"></i>
+                    <span>@prevPost.Title</span>
+                </a>
+            }
+            else
+            {
+                <span></span>
+            }
+            <a href="/blog" class="post-nav-all"><i class="site-icon" data-lucide="list"></i> All Posts</a>
+            @if (nextPost is not null)
+            {
+                <a href="@Router.BlogPostPath(nextPost.Slug)" class="post-nav-link next" title="@nextPost.Title">
+                    <span>@nextPost.Title</span>
+                    <i class="site-icon" data-lucide="arrow-right"></i>
+                </a>
+            }
+            else
+            {
+                <span></span>
+            }
+        </nav>
+    }
 }
 
 @code {
@@ -26,10 +56,21 @@ else
     public string Slug { get; set; } = string.Empty;
 
     private johnvicencio.Models.BlogPost? post;
+    private johnvicencio.Models.BlogPost? prevPost;
+    private johnvicencio.Models.BlogPost? nextPost;
 
     protected override async Task OnParametersSetAsync()
     {
         post = await Blog.GetPostAsync(Slug);
+        if (post is not null)
+        {
+            var allPosts = (await Blog.GetPostsAsync())
+                .OrderByDescending(p => p.PublishedOn)
+                .ToList();
+            var idx = allPosts.FindIndex(p => p.Id == post.Id);
+            prevPost = idx > 0 ? allPosts[idx - 1] : null;
+            nextPost = idx >= 0 && idx < allPosts.Count - 1 ? allPosts[idx + 1] : null;
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -44,6 +85,10 @@ else
                     : (post.Summary ?? post.Content ?? ""),
                 image = string.IsNullOrWhiteSpace(post.ImageUrl) ? null : $"https://johnvicencio.com{post.ImageUrl}"
             });
+        }
+        if (!firstRender)
+        {
+            await Js.InvokeVoidAsync("scrollToNav");
         }
     }
 }

@@ -2,14 +2,25 @@
 @inject BlogController BlogController
 @inject RouterController Router
 @inject IJSRuntime Js
+@inject NavigationManager Nav
 
 <PageTitle>Blog — John Vicencio</PageTitle>
 
-<h1>Blog</h1>
+<div class="table-toolbar" style="border-bottom:none;padding:0 0 0.75rem 0">
+    <h1 style="margin:0">Blog</h1>
+    <div class="table-search" style="display:flex;align-items:center;gap:0.5rem">
+        <span class="site-icon" data-lucide="search" style="flex-shrink:0;opacity:0.5"></span>
+        <input type="text" placeholder="Search posts..." @bind="searchQuery" @bind:event="oninput" style="margin:0;min-width:22rem" />
+        @if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            <button class="outline secondary" style="padding:0.2rem 0.5rem;min-height:auto;font-size:0.8rem" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
+        }
+    </div>
+</div>
 
-@if (posts.Count == 0)
+@if (FilteredPosts.Count == 0)
 {
-    <p>No posts published yet.</p>
+    <p>No posts found.</p>
 }
 else
 {
@@ -23,37 +34,66 @@ else
                 }
                 <h2><a href="@Router.BlogPostPath(post.Slug)">@post.Title</a></h2>
                 <p class="post-list-date"><time datetime="@post.PublishedOn.ToString("yyyy-MM-dd")">@post.PublishedOn.ToString("MMMM d, yyyy")</time></p>
-                <p>@Truncate(post.Summary, 200)</p>
+                <p>@TruncateContent(post.Content, 200)</p>
             </article>
         }
     </section>
 
-    @if (TotalPages > 1)
-    {
-        <nav class="table-pagination" aria-label="Blog pagination">
-            <button class="outline secondary pagination-btn" title="Previous Page" aria-label="Previous Page" disabled="@(currentPage == 1)" @onclick="PreviousPage"><i class="site-icon" data-lucide="chevron-left"></i></button>
-            <span class="pagination-info">Page @currentPage of @TotalPages</span>
-            <button class="outline secondary pagination-btn" title="Next Page" aria-label="Next Page" disabled="@(currentPage == TotalPages)" @onclick="NextPage"><i class="site-icon" data-lucide="chevron-right"></i></button>
-        </nav>
-    }
+    <PaginationBar CurrentPage="currentPage" TotalPages="TotalPages" PageUrl="GetPageUrl" />
 }
 
 @code {
-    private List<johnvicencio.Models.BlogPost> posts = [];
-    private int currentPage = 1;
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? page { get; set; }
+
+    private List<johnvicencio.Models.BlogPost> allPosts = [];
+    private string searchQuery = "";
+    private int prevPage = 0;
     private const int PageSize = 5;
 
-    private int TotalPages => Math.Max(1, (int)Math.Ceiling(posts.Count / (double)PageSize));
+    private int currentPage => page ?? 1;
 
-    private IEnumerable<johnvicencio.Models.BlogPost> PagedPosts => posts
+    private List<johnvicencio.Models.BlogPost> FilteredPosts
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(searchQuery)) return allPosts;
+            var q = searchQuery.Trim().ToLowerInvariant();
+            return allPosts.Where(p =>
+                (p.Title?.ToLowerInvariant().Contains(q) ?? false) ||
+                (p.Summary?.ToLowerInvariant().Contains(q) ?? false) ||
+                (p.Slug?.ToLowerInvariant().Contains(q) ?? false)
+            ).ToList();
+        }
+    }
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredPosts.Count / (double)PageSize));
+
+    private IEnumerable<johnvicencio.Models.BlogPost> PagedPosts => FilteredPosts
         .Skip((currentPage - 1) * PageSize)
         .Take(PageSize);
 
+    private string GetPageUrl(int p)
+    {
+        if (p <= 1) return "/blog";
+        return $"/blog?page={p}";
+    }
+
+    private void ClearSearch()
+    {
+        searchQuery = "";
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        posts = (await BlogController.GetPostsAsync())
+        allPosts = (await BlogController.GetPostsAsync())
             .OrderByDescending(post => post.PublishedOn)
             .ToList();
+        if (currentPage > TotalPages)
+        {
+            Nav.NavigateTo(GetPageUrl(TotalPages), replace: true);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -67,21 +107,28 @@ else
             });
         }
         await Js.InvokeVoidAsync("lucide.createIcons");
+        if (currentPage > 1 && currentPage != prevPage)
+        {
+            prevPage = currentPage;
+            await Js.InvokeVoidAsync("scrollToPagination");
+        }
+        else if (currentPage != prevPage)
+        {
+            prevPage = currentPage;
+        }
+    }
+
+    private static string TruncateContent(string html, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(html)) return "";
+        var text = System.Text.RegularExpressions.Regex.Replace(html, "<[^>]+>", " ");
+        text = System.Text.RegularExpressions.Regex.Replace(text, "\\s+", " ").Trim();
+        return text.Length <= maxLength ? text : text[..maxLength] + "...";
     }
 
     private static string Truncate(string value, int maxLength)
     {
         if (string.IsNullOrEmpty(value)) return value;
         return value.Length <= maxLength ? value : value[..maxLength] + "...";
-    }
-
-    private void PreviousPage()
-    {
-        if (currentPage > 1) currentPage--;
-    }
-
-    private void NextPage()
-    {
-        if (currentPage < TotalPages) currentPage++;
     }
 }

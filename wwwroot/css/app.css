@@ -499,10 +499,65 @@ th.sortable.desc::after {
     padding: 0;
 }
 
+.pagination-btn.current {
+    background: var(--pico-primary);
+    color: var(--pico-primary-inverse);
+    border-color: var(--pico-primary);
+    border-radius: var(--pico-border-radius);
+}
+
+.pagination-ellipsis {
+    padding: 0 0.25rem;
+    color: var(--app-muted);
+}
+
 .pagination-info {
     margin: 0 0.5rem;
     color: var(--app-muted);
     font-size: 0.85rem;
+}
+
+.post-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--app-border-soft);
+}
+
+.post-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 40%;
+    text-decoration: none;
+    color: var(--pico-primary);
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.post-nav-link:hover {
+    text-decoration: underline;
+}
+
+.post-nav-link.next {
+    text-align: right;
+}
+
+.post-nav-all {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    color: var(--app-muted);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.post-nav-all:hover {
+    color: var(--pico-primary);
 }
 
 .sort-icon {
