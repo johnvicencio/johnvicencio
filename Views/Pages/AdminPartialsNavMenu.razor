@@ -140,6 +140,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+                await Session.TryRestoreAsync(Js);
         if (!Session.IsLoggedIn)
         {
             Nav.NavigateTo("/login", replace: true);
@@ -278,3 +279,4 @@
         }
     }
 }
+

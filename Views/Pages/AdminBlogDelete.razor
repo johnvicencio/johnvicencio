@@ -1,5 +1,6 @@
 @page "/admin/blog/delete/{PostId}"
 @inject VaultSessionService Session
+@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject BlogController Blog
 
@@ -50,6 +51,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+                await Session.TryRestoreAsync(Js);
         if (!Session.IsLoggedIn)
         {
             Nav.NavigateTo("/login", replace: true);
@@ -75,3 +77,4 @@
         }
     }
 }
+

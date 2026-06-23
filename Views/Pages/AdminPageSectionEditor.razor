@@ -410,6 +410,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+                await Session.TryRestoreAsync(Js);
         if (!Session.IsLoggedIn)
         {
             Nav.NavigateTo("/login", replace: true);
@@ -693,3 +694,4 @@
 
 <ImagePicker Open="showImagePicker" Value="CurrentImagePickerValue" ValueChanged="SetImagePath" OnClose="() => showImagePicker = false" />
 <IconPicker Open="showIconPicker" Value="@_pickIconValue" ValueChanged="OnIconPicked" OnClose="() => showIconPicker = false" />
+

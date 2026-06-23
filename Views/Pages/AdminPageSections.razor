@@ -1,5 +1,6 @@
 @page "/admin/pages/{PageId}/sections"
 @inject VaultSessionService Session
+@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject PageController Pages
 
@@ -91,6 +92,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+                await Session.TryRestoreAsync(Js);
         if (!Session.IsLoggedIn)
         {
             Nav.NavigateTo("/login", replace: true);
@@ -131,3 +133,4 @@
         }
     }
 }
+

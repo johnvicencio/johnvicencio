@@ -75,8 +75,8 @@
 
         @if (previewPost is not null)
         {
-            <div class="image-picker-backdrop preview-backdrop" @onclick="ClosePreview">
-                <div class="image-picker-modal preview-modal" @onclick:stopPropagation>
+            <div class="image-picker-backdrop" @onclick="ClosePreview">
+                <div class="image-picker-modal" @onclick:stopPropagation style="max-width:720px">
                     <div class="table-toolbar">
                         <h3 style="margin:0">@previewPost.Title</h3>
                         <button class="outline secondary" title="Close" aria-label="Close" @onclick="ClosePreview"><i class="site-icon" data-lucide="x"></i></button>
@@ -128,6 +128,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+                await Session.TryRestoreAsync(Js);
         if (!Session.IsLoggedIn)
         {
             Nav.NavigateTo("/login", replace: true);
@@ -253,3 +254,4 @@
         if (next <= TotalPages) Nav.NavigateTo(GetAdminPageUrl(next));
     }
 }
+

@@ -1,5 +1,6 @@
 @page "/admin/images"
 @inject VaultSessionService Session
+@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject ImageAssetController Images
 
@@ -75,6 +76,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+                await Session.TryRestoreAsync(Js);
         if (!Session.IsLoggedIn)
         {
             Nav.NavigateTo("/login", replace: true);
@@ -108,3 +110,4 @@
     }
 
 }
+
