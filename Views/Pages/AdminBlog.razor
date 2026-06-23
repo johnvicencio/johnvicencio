@@ -3,6 +3,7 @@
 @inject NavigationManager Nav
 @inject BlogController Blog
 @inject PageController Pages
+@inject IJSRuntime Js
 
 <PageTitle>Blog Posts</PageTitle>
 
@@ -90,6 +91,7 @@
     private bool hasBlogPage;
     private string search = "";
     private int currentPage => page ?? 1;
+    private int prevPage = 0;
     private const int PageSize = 10;
     private string sortBy = "published";
     private bool sortDesc = true;
@@ -189,6 +191,20 @@
     {
         if (p <= 1) return "/admin/blog";
         return $"/admin/blog?page={p}";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("lucide.createIcons");
+        if (currentPage > 1 && currentPage != prevPage)
+        {
+            prevPage = currentPage;
+            await Js.InvokeVoidAsync("scrollToPagination");
+        }
+        else if (currentPage != prevPage)
+        {
+            prevPage = currentPage;
+        }
     }
 
     private void PreviousPage()
