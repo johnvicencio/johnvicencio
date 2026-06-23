@@ -32,10 +32,7 @@
                             <button class="outline secondary btn-action" title="Move Down" aria-label="Move Down" disabled="@(savingOrder || orderIndex == movablePages.Count - 1)" @onclick="() => MovePageAsync(pg.Id, 1)"><i class="site-icon" data-lucide="arrow-down"></i></button>
                         }
                         <button class="outline btn-action" title="Edit" aria-label="Edit" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{pg.Id}")'><i class="site-icon" data-lucide="pencil"></i></button>
-                        @if (!IsLegalPage(pg.Slug))
-                        {
-                            <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/pages/delete/{pg.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
-                        }
+                        <button class="outline danger btn-action" title="Delete" aria-label="Delete" @onclick='() => Nav.NavigateTo($"/admin/pages/delete/{pg.Id}")'><i class="site-icon" data-lucide="trash-2"></i></button>
                     </td>
                 </tr>
             }
@@ -51,8 +48,8 @@
 
     private RenderFragment PagesToolbar => __builder =>
     {
-        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
         <button class="outline" title="Add Page" aria-label="Add Page" @onclick='() => Nav.NavigateTo("/admin/pages/add")'><i class="site-icon" data-lucide="plus"></i></button>
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
 
     private static bool IsLegalPage(string slug) =>

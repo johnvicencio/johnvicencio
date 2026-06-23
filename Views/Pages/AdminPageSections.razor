@@ -58,11 +58,11 @@
 
     private RenderFragment SectionsToolbar => __builder =>
     {
-        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i></button>
         @if (page?.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase) != true)
         {
             <button class="outline" title="Add Section" aria-label="Add Section" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/add")'><i class="site-icon" data-lucide="plus"></i></button>
         }
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/edit/{PageId}")'><i class="site-icon" data-lucide="arrow-left"></i></button>
     };
 
     private bool loading = true;

@@ -4,7 +4,7 @@
 
 <PageTitle>Add @(page?.Title ?? "Page") Section</PageTitle>
 
-<AdminPageLayout Title="@pageTitle">
+<AdminPageLayout Title="@pageTitle" ToolbarItems="@SectionAddToolbar">
     @if (loading)
     {
         <p class="loading-state">Loading...</p>
@@ -59,6 +59,12 @@
     public string PageId { get; set; } = "";
 
     private string pageTitle => $"Add {page?.Title ?? "Page"} Section";
+
+    private RenderFragment SectionAddToolbar => __builder =>
+    {
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+    };
+
     private bool loading = true;
     private Page? page;
     private string sectionId = Guid.NewGuid().ToString("N")[..8];
