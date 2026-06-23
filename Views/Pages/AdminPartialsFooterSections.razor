@@ -3,12 +3,7 @@
 @inject SiteController Site
 
 <PageTitle>Footer Sections</PageTitle>
-<AdminPageLayout>
-        <div class="table-toolbar">
-            <h2>Footer Sections</h2>
-            <div>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
-        </div>
+<AdminPageLayout Title="Footer Sections">
 
         <p class="muted-text">
             Footer sections follow the Nav Bar menu order. Edit links in
@@ -39,8 +34,6 @@
                 </tbody>
             </table>
         </div>
-
-</div>
 
 @code {
     private List<CustomNavLink> footerSections = [];

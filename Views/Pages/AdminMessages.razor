@@ -44,7 +44,7 @@
                             <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.85rem;color:var(--app-muted)">@snippet</td>
                             <td style="white-space:nowrap;font-size:0.8rem">@FormatDate(message.SubmittedUtc)</td>
                             <td>
-                                <button class="outline" title="Open Message" aria-label="Open Message" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick='() => Nav.NavigateTo($"/admin/messages/{message.Id}")'><i class="site-icon" data-lucide="@(message.IsRead ? "mail-open" : "mail")"></i></button>
+                                <button class="outline btn-action" title="Open Message" aria-label="Open Message" @onclick='() => Nav.NavigateTo($"/admin/messages/{message.Id}")'><i class="site-icon" data-lucide="@(message.IsRead ? "mail-open" : "mail")"></i></button>
                             </td>
                         </tr>
                     }

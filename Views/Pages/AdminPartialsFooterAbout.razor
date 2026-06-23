@@ -3,12 +3,7 @@
 @inject SiteController Site
 
 <PageTitle>Footer About</PageTitle>
-<AdminPageLayout>
-        <div class="table-toolbar">
-            <h2>Footer About</h2>
-            <div>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo("/admin/partials")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
-        </div>
+<AdminPageLayout Title="Footer About">
 
         <p class="muted-text">
             Edit the header and about text that appear in the footer About column.
@@ -28,9 +23,6 @@
         <div style="display:flex;gap:0.5rem;margin-top:1rem">
             <button @onclick="Save" aria-busy="@saving"><i class="site-icon" data-lucide="save"></i>Save</button>
         </div>
-
-
-</div>
 
 @code {
     private bool saving;

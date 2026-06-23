@@ -66,7 +66,7 @@
                             <h5 style="margin:0">Buttons</h5>
                             @if (sec.Buttons.Count < 3)
                             {
-                                <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => AddButton()"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
+                                <button class="outline btn-action" @onclick="() => AddButton()"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
                             }
                         </div>
                         @for (var bi = 0; bi < sec.Buttons.Count; bi++)
@@ -78,7 +78,7 @@
                                     <label>Button Icon
                                         <div class="flex-group">
                                             <input @bind="btn.Icon" placeholder="icon-name" />
-                                            <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenIconPicker(localBi)"><i class="site-icon" data-lucide="search"></i></button>
+                                            <button type="button" class="outline btn-icon" @onclick="() => OpenIconPicker(localBi)"><i class="site-icon" data-lucide="search"></i></button>
                                             @if (!string.IsNullOrWhiteSpace(btn.Icon)) { <i class="site-icon" data-lucide="@btn.Icon"></i> }
                                         </div>
                                     </label>
@@ -113,7 +113,7 @@
                                     <h6 style="margin:0">Button</h6>
                                     @if (string.IsNullOrWhiteSpace(col.ActionText) && string.IsNullOrWhiteSpace(col.ActionUrl))
                                     {
-                                        <button class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="() => AddColumnButton(localCi)"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
+                                        <button class="outline btn-action" @onclick="() => AddColumnButton(localCi)"><i class="site-icon" data-lucide="plus"></i>Add Button</button>
                                     }
                                 </div>
                                 @if (!string.IsNullOrWhiteSpace(col.ActionText) || !string.IsNullOrWhiteSpace(col.ActionUrl))
@@ -122,7 +122,7 @@
                                         <label>Button Icon
                                             <div class="flex-group">
                                                 <input @bind="col.ActionIcon" placeholder="icon-name" />
-                                                <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                                <button type="button" class="outline btn-icon" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                                 @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
                                             </div>
                                         </label>
@@ -151,7 +151,7 @@
                                 <label>Icon
                                     <div class="flex-group">
                                         <input @bind="col.ActionIcon" placeholder="icon-name" />
-                                        <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                        <button type="button" class="outline btn-icon" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                         @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
                                     </div>
                                 </label>
@@ -177,7 +177,7 @@
                         <label>Section Icon
                             <div class="flex-group">
                                 <input @bind="sec.Icon" placeholder="icon-name" />
-                                <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
+                                <button type="button" class="outline btn-icon" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
                                 @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
                             </div>
                         </label>
@@ -186,7 +186,7 @@
                         </label>
                         <div class="table-toolbar">
                             <h5 style="margin:0">Grid Cards</h5>
-                            <button type="button" class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="AddGridCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
+                            <button type="button" class="outline btn-action" @onclick="AddGridCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
                         </div>
                         @for (var ci = 0; ci < sec.Columns.Count; ci++)
                         {
@@ -195,7 +195,7 @@
                             <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <div class="table-toolbar">
                                     <h5 style="margin:0">Card @(localCi + 1)</h5>
-                                    <button type="button" class="outline danger" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
+                                    <button type="button" class="outline danger btn-tiny" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
                                 <div class="grid grid-2col">
                                     <label>Image URL
@@ -250,7 +250,7 @@
                         <label>Section Icon
                             <div class="flex-group">
                                 <input @bind="sec.Icon" placeholder="icon-name" />
-                                <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
+                                <button type="button" class="outline btn-icon" @onclick="OpenSectionIconPicker"><i class="site-icon" data-lucide="search"></i></button>
                                 @if (!string.IsNullOrWhiteSpace(sec.Icon)) { <i class="site-icon" data-lucide="@sec.Icon"></i> }
                             </div>
                         </label>
@@ -259,7 +259,7 @@
                         </label>
                         <div class="table-toolbar">
                             <h5 style="margin:0">Cards</h5>
-                            <button type="button" class="outline" style="padding:0.25rem 0.5rem;font-size:0.75rem" @onclick="AddRowCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
+                            <button type="button" class="outline btn-action" @onclick="AddRowCard"><i class="site-icon" data-lucide="plus"></i>Add Card</button>
                         </div>
                         @for (var ci = 0; ci < sec.Columns.Count; ci++)
                         {
@@ -268,7 +268,7 @@
                             <div style="border:1px solid var(--pico-form-element-border-color);padding:0.5rem;border-radius:0.25rem;margin-bottom:0.5rem">
                                 <div class="table-toolbar">
                                     <h5 style="margin:0">Card @(localCi + 1)</h5>
-                                    <button type="button" class="outline danger" style="padding:0.15rem 0.4rem;font-size:0.7rem" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
+                                    <button type="button" class="outline danger btn-tiny" @onclick="() => RemoveRowCard(localCi)"><i class="site-icon" data-lucide="trash-2"></i>Remove</button>
                                 </div>
                                 <div class="grid grid-2col">
                                     <label>Avatar Image URL
@@ -308,7 +308,7 @@
                                     <label>Right Icon
                                         <div class="flex-group">
                                             <input @bind="col.ActionIcon" placeholder="icon-name" />
-                                            <button type="button" class="outline" style="padding:0.35rem 0.5rem" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
+                                            <button type="button" class="outline btn-icon" @onclick="() => OpenColumnIconPicker(localCi)"><i class="site-icon" data-lucide="search"></i></button>
                                             @if (!string.IsNullOrWhiteSpace(col.ActionIcon)) { <i class="site-icon" data-lucide="@col.ActionIcon"></i> }
                                         </div>
                                     </label>
