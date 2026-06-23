@@ -4,12 +4,7 @@
 
 <PageTitle>Pages</PageTitle>
 
-<AdminPageLayout Title="Pages">
-    <div class="flex-group-lg">
-        <button class="outline secondary" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
-        <button class="outline" title="Add Page" aria-label="Add Page" @onclick='() => Nav.NavigateTo("/admin/pages/add")'><i class="site-icon" data-lucide="plus"></i></button>
-    </div>
-
+<AdminPageLayout Title="Pages" ToolbarItems="@PagesToolbar">
     @if (pageList.Count == 0)
     {
         <p class="empty-state">No pages yet.</p>
@@ -53,6 +48,12 @@
     private bool savingOrder;
 
     private List<Page> movablePages => pageList.Where(p => !IsLegalPage(p.Slug)).ToList();
+
+    private RenderFragment PagesToolbar => __builder =>
+    {
+        <button class="outline secondary btn-action" title="Back" aria-label="Back" @onclick='() => Nav.NavigateTo("/admin")'><i class="site-icon" data-lucide="arrow-left"></i></button>
+        <button class="outline" title="Add Page" aria-label="Add Page" @onclick='() => Nav.NavigateTo("/admin/pages/add")'><i class="site-icon" data-lucide="plus"></i></button>
+    };
 
     private static bool IsLegalPage(string slug) =>
         slug.Equals("terms-and-conditions", StringComparison.OrdinalIgnoreCase) ||
