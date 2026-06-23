@@ -31,6 +31,7 @@
     [Parameter] public int CurrentPage { get; set; } = 1;
     [Parameter] public int TotalPages { get; set; } = 1;
     [Parameter] public Func<int, string>? PageUrl { get; set; }
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
 
     private IEnumerable<int> PaginationWindow
     {
@@ -40,30 +41,28 @@
             var t = TotalPages;
             var c = CurrentPage;
 
-            // Always show first page
             pages.Add(1);
-
-            // Window around current page
             int start = Math.Max(2, c - 1);
             int end = Math.Min(t - 1, c + 1);
-
-            if (start > 2) pages.Add(-1); // ellipsis
+            if (start > 2) pages.Add(-1);
             for (int i = start; i <= end; i++) pages.Add(i);
-            if (end < t - 1) pages.Add(-1); // ellipsis
-
-            // Always show last page
+            if (end < t - 1) pages.Add(-1);
             if (t > 1) pages.Add(t);
 
             return pages;
         }
     }
 
-    private void GoToPage(int page)
+    private async Task GoToPage(int page)
     {
         if (page < 1 || page > TotalPages) return;
         if (PageUrl != null)
         {
             Nav.NavigateTo(PageUrl(page));
+        }
+        else if (OnPageChanged.HasDelegate)
+        {
+            await OnPageChanged.InvokeAsync(page);
         }
     }
 }
