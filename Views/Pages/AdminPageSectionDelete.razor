@@ -1,54 +1,38 @@
 @page "/admin/pages/{PageId}/sections/delete/{SectionId}"
-@inject VaultSessionService Session
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject PageController Pages
 
 <PageTitle>@title</PageTitle>
 
-<div class="login-page" style="width:100%">
-
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">@title</h2>
-            <div>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
-            </div>
-        </div>
-
-        @if (loading)
-        {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
-        }
-        else if (page is null)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
-        }
-        else if (sec is null)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Section not found.</p>
-        }
-        else
-        {
-            <p style="padding:1rem 0">
-                Are you sure you want to delete the <strong>@sec.Type</strong> section
-                "@(string.IsNullOrWhiteSpace(sec.Heading) ? "(no heading)" : sec.Heading)"?
-            </p>
-            <p class="pagination-info">This will permanently remove this section from the page.</p>
-            <hr />
-            <button class="outline danger" @onclick="ConfirmDelete" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Yes, Delete</button>
-            <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
-        }
-    </article>
-
-</div>
+<AdminPageLayout Title="@title">
+    @if (loading)
+    {
+        <p class="loading-state">Loading...</p>
+    }
+    else if (page is null)
+    {
+        <p class="empty-state">Page not found.</p>
+    }
+    else if (sec is null)
+    {
+        <p class="empty-state">Section not found.</p>
+    }
+    else
+    {
+        <p>
+            Are you sure you want to delete the <strong>@SlugHelper.SectionTypeDisplayName(sec.Type)</strong> section
+            "@(string.IsNullOrWhiteSpace(sec.Heading) ? "(no heading)" : sec.Heading)"?
+        </p>
+        <p class="muted-sm">This will permanently remove this section from the page.</p>
+        <hr />
+        <button class="outline danger" @onclick="ConfirmDelete" aria-busy="@deleting"><i class="site-icon" data-lucide="trash-2"></i>Yes, Delete</button>
+        <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="x"></i>Cancel</button>
+    }
+</AdminPageLayout>
 
 @code {
-    [Parameter]
-    public string PageId { get; set; } = "";
-
-    [Parameter]
-    public string SectionId { get; set; } = "";
+    [Parameter] public string PageId { get; set; } = "";
+    [Parameter] public string SectionId { get; set; } = "";
 
     private bool loading = true;
     private bool deleting;
@@ -60,24 +44,15 @@
         get
         {
             var pageName = page?.Title ?? "Page";
-            var typeName = TypeDisplayName(sec?.Type);
+            var typeName = SlugHelper.SectionTypeDisplayName(sec?.Type);
             return string.IsNullOrWhiteSpace(typeName)
                 ? $"Delete {pageName} Section"
                 : $"Delete {pageName} {typeName} Section";
         }
     }
 
-    private static string TypeDisplayName(string? type) => SlugHelper.SectionTypeDisplayName(type);
-
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         page = await Pages.GetPageByIdAsync(PageId);
         sec = page?.Sections.FirstOrDefault(s => s.SectionId == SectionId);
         loading = false;
@@ -102,4 +77,3 @@
         }
     }
 }
-

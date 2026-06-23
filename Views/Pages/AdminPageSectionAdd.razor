@@ -1,89 +1,70 @@
 @page "/admin/pages/{PageId}/sections/add"
-@inject VaultSessionService Session
-@inject IJSRuntime Js
 @inject NavigationManager Nav
 @inject PageController Pages
 
 <PageTitle>Add @(page?.Title ?? "Page") Section</PageTitle>
 
-<div class="login-page" style="width:100%">
+<AdminPageLayout Title="@pageTitle">
+    @if (loading)
+    {
+        <p class="loading-state">Loading...</p>
+    }
+    else if (page is null)
+    {
+        <p class="empty-state">Page not found.</p>
+    }
+    else
+    {
+        <label>Section ID
+            <input readonly class="pagination-info" value="@sectionId" style="cursor:not-allowed" />
+        </label>
 
-    <article style="width:100%;max-width:1200px;margin:0 auto">
-        <div class="table-toolbar">
-            <h2 style="margin:0">Add @(page?.Title ?? "Page") Section</h2>
-            <div>
-                <button class="outline secondary" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections")'><i class="site-icon" data-lucide="arrow-left"></i>Back</button>
-            </div>
+        <p class="pagination-info" style="margin-bottom:1rem">Choose a section type:</p>
+
+        <div class="section-type-grid">
+            <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/hero/add")'>
+                <i class="site-icon" data-lucide="image" style="font-size:1.5rem"></i>
+                <span>Hero</span>
+            </button>
+            <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/2-col/add")'>
+                <i class="site-icon" data-lucide="columns-2" style="font-size:1.5rem"></i>
+                <span>2 Columns</span>
+            </button>
+            <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/3-col/add")'>
+                <i class="site-icon" data-lucide="columns-3" style="font-size:1.5rem"></i>
+                <span>3 Columns</span>
+            </button>
+            <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/cards/add")'>
+                <i class="site-icon" data-lucide="list" style="font-size:1.5rem"></i>
+                <span>Row Card</span>
+            </button>
+            <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/grid-card/add")'>
+                <i class="site-icon" data-lucide="layout-grid" style="font-size:1.5rem"></i>
+                <span>Grid Card</span>
+            </button>
+            <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/content/add")'>
+                <i class="site-icon" data-lucide="file-text" style="font-size:1.5rem"></i>
+                <span>Content</span>
+            </button>
+            <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/contact/add")'>
+                <i class="site-icon" data-lucide="mail" style="font-size:1.5rem"></i>
+                <span>Contact</span>
+            </button>
         </div>
-
-        @if (loading)
-        {
-            <p class="pagination-info" style="text-align:center">Loading...</p>
-        }
-        else if (page is null)
-        {
-            <p class="pagination-info" style="padding:1rem;text-align:center">Page not found.</p>
-        }
-        else
-        {
-            <label>Section ID
-                <input readonly class="pagination-info" value="@sectionId" style="cursor:not-allowed" />
-            </label>
-
-            <p class="pagination-info" style="margin-bottom:1rem">Choose a section type:</p>
-
-            <div class="section-type-grid">
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/hero/add")'>
-                    <i class="site-icon" data-lucide="image" style="font-size:1.5rem"></i>
-                    <span>Hero</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/2-col/add")'>
-                    <i class="site-icon" data-lucide="columns-2" style="font-size:1.5rem"></i>
-                    <span>2 Columns</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/3-col/add")'>
-                    <i class="site-icon" data-lucide="columns-3" style="font-size:1.5rem"></i>
-                    <span>3 Columns</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/cards/add")'>
-                    <i class="site-icon" data-lucide="list" style="font-size:1.5rem"></i>
-                    <span>Row Card</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/grid-card/add")'>
-                    <i class="site-icon" data-lucide="layout-grid" style="font-size:1.5rem"></i>
-                    <span>Grid Card</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/content/add")'>
-                    <i class="site-icon" data-lucide="file-text" style="font-size:1.5rem"></i>
-                    <span>Content</span>
-                </button>
-                <button class="outline section-type-btn" @onclick='() => Nav.NavigateTo($"/admin/pages/{PageId}/sections/{sectionId}/contact/add")'>
-                    <i class="site-icon" data-lucide="mail" style="font-size:1.5rem"></i>
-                    <span>Contact</span>
-                </button>
-            </div>
-        }
-    </article>
-
-</div>
+    }
+</AdminPageLayout>
 
 @code {
     [Parameter]
     public string PageId { get; set; } = "";
 
+    private string pageTitle => $"Add {page?.Title ?? "Page"} Section";
     private bool loading = true;
     private Page? page;
     private string sectionId = Guid.NewGuid().ToString("N")[..8];
 
     protected override async Task OnInitializedAsync()
     {
-                await Session.TryRestoreAsync(Js);
-        if (!Session.IsLoggedIn)
-        {
-            Nav.NavigateTo("/login", replace: true);
-            return;
-        }
-
         page = await Pages.GetPageByIdAsync(PageId);
         if (page is null) { loading = false; return; }
         if (page.Slug.Equals("blog", StringComparison.OrdinalIgnoreCase))
