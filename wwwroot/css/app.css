@@ -443,32 +443,6 @@ table tbody tr:hover {
 
 table th
 
-th.sortable::after {
-    content: "";
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 5px solid var(--app-muted);
-    opacity: 0.35;
-}
-
-th.sortable.asc::after {
-    border-bottom: none;
-    border-top: 5px solid var(--app-primary);
-    opacity: 1;
-}
-
-th.sortable.desc::after {
-    border-top: none;
-    border-bottom: 5px solid var(--app-primary);
-    opacity: 1;
-}
-
 .table-wrap {
     background: var(--app-surface);
     border: 1px solid var(--app-border-soft);
@@ -486,8 +460,6 @@ th.sortable.desc::after {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--app-border-soft);
 }
-
-.table-toolbar-left, 
 
 /* MDB-style rounded search input-group */
 .table-search {
@@ -1025,8 +997,6 @@ hr {
         align-items: stretch;
     }
 
-    .table-toolbar-left,
-    
 
     .table-toolbar button,
     .table-toolbar [role=button] {
@@ -1525,6 +1495,122 @@ hr {
     flex-wrap: wrap;
 }
 
+/* Rich text editor */
+.rich-editor {
+    border: 1px solid var(--pico-form-element-border-color);
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.rich-toolbar {
+    display: flex;
+    gap: 0.15rem;
+    flex-wrap: wrap;
+    padding: 0.35rem 0.5rem;
+    background: #f5f5f5;
+    border-bottom: 1px solid var(--pico-form-element-border-color);
+    align-items: center;
+}
+
+.rich-toolbar .sep {
+    width: 1px;
+    height: 1.2rem;
+    background: var(--pico-form-element-border-color);
+    margin: 0 0.25rem;
+}
+
+.rich-toolbar .sep-grow {
+    flex: 1;
+}
+
+.rich-btn {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.rich-btn-sm {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.65rem;
+    line-height: 1;
+}
+
+.rich-editor-body {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    outline: none;
+}
+
+.rich-editor-source {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    background: transparent;
+}
+
+/* Icon picker */
+.picker-heading {
+    margin: 0;
+}
+
+.picker-close {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.picker-search-gap {
+    margin-bottom: 0.75rem;
+}
+
+.picker-info {
+    text-align: center;
+}
+
+/* Image picker */
+.picker-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+/* TwoColView grid */
+.grid-col-wrap {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Honeypot */
+.sr-only-field {
+    position: absolute;
+    left: -10000px;
+}
+
+/* General utility - top space */
+.mt-1 {
+    margin-top: 1rem;
+}
+
+/* Maintenance page */
+.maintenance-block {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.maintenance-block p {
+    font-size: 1.2rem;
+    color: var(--app-muted);
+}
+
+/* Profile image border */
+.img-rounded-xl {
+    border-radius: 0.75rem;
+}
+
 /* ---- Utility classes ---- */
 .btn-action {
     padding: 0.25rem 0.5rem;
@@ -1562,10 +1648,6 @@ hr {
     grid-template-columns: 1fr 1fr;
 }
 
-.grid-3col {
-    grid-template-columns: 1fr 1fr 1fr;
-}
-
 .loading-state {
     text-align: center;
 }
@@ -1586,7 +1668,7 @@ hr {
 }
 
 @supports (display: grid) {
-    .grid-2col, .grid-3col {
+    .grid-2col {
         display: grid;
         gap: var(--grid-spacing, 0.75rem);
     }

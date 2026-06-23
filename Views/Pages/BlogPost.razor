@@ -16,10 +16,29 @@ else
         <p><time>@post.PublishedOn.ToString("MMMM d, yyyy")</time></p>
         @if (!string.IsNullOrWhiteSpace(post.ImageUrl))
         {
-            <img src="@post.ImageUrl" alt="@post.Title" class="thumbnail thumbnail-lg" style="border-radius:0.75rem" />
+            <img src="@post.ImageUrl" alt="@post.Title" class="thumbnail thumbnail-lg img-rounded-xl" />
         }
         <div class="content-body">@((MarkupString)post.Content)</div>
     </article>
+
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "BlogPosting",
+      "headline": "@RawTitle(post.Title)",
+      "url": "https://johnvicencio.com@Router.BlogPostPath(post.Slug)",
+      "datePublished": "@post.PublishedOn.ToString("yyyy-MM-dd")",
+      "author": {
+        "@@type": "Person",
+        "name": "John Vicencio",
+        "url": "https://johnvicencio.com"
+      }
+      @if (!string.IsNullOrWhiteSpace(post.ImageUrl))
+      {
+          @:,"image": "@(post.ImageUrl.StartsWith("http") ? post.ImageUrl : $"https://johnvicencio.com{post.ImageUrl}")"
+      }
+    }
+    </script>
 
     @if (prevPost is not null || nextPost is not null)
     {
@@ -52,6 +71,8 @@ else
 }
 
 @code {
+    private static string RawTitle(string title) => title.Replace("\"", "\\\"");
+
     [Parameter]
     public string Slug { get; set; } = string.Empty;
 
@@ -83,7 +104,7 @@ else
                 description = (post.Summary ?? post.Content ?? "").Length > 160
                     ? (post.Summary ?? post.Content ?? "")[..157] + "..."
                     : (post.Summary ?? post.Content ?? ""),
-                image = string.IsNullOrWhiteSpace(post.ImageUrl) ? null : $"https://johnvicencio.com{post.ImageUrl}"
+                image = string.IsNullOrWhiteSpace(post.ImageUrl) ? null : post.ImageUrl.StartsWith("http") ? post.ImageUrl : $"https://johnvicencio.com{post.ImageUrl}"
             });
         }
         if (!firstRender && post is not null)

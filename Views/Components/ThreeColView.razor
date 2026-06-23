@@ -21,7 +21,14 @@
                 }
                 @if (!string.IsNullOrWhiteSpace(col.Title))
                 {
-                    <h3>@col.Title</h3>
+                    @if (HeadingLevel == 1)
+                    {
+                        <h2>@col.Title</h2>
+                    }
+                    else
+                    {
+                        <h3>@col.Title</h3>
+                    }
                 }
                 @if (!string.IsNullOrWhiteSpace(col.Body))
                 {

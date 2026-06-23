@@ -38,7 +38,7 @@
             @foreach (var image in VisibleImages)
             {
                 <article>
-                    <img src="@image.Url" alt="@image.FileName" class="thumbnail" style="aspect-ratio:4/3" />
+                    <img src="@image.Url" alt="@image.FileName" class="thumbnail" />
                     <p class="mono-text">@image.FileName</p>
                     @if (!string.IsNullOrWhiteSpace(image.Folder))
                     {

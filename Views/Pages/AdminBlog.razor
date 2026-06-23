@@ -22,7 +22,7 @@
 
     @if (!hasBlogPage)
     {
-        <p class="muted-text" style="padding:1rem">Create a page with slug "blog" to enable blog management.</p>
+        <p class="empty-state">Create a page with slug "blog" to enable blog management.</p>
     }
 
     @if (hasBlogPage && filteredList.Count == 0)

@@ -5,7 +5,7 @@
     <div class="image-picker-backdrop" @onclick="Cancel">
         <div class="image-picker-modal" @onclick:stopPropagation>
             <div class="table-toolbar">
-                <h3 style="margin:0">Select Image</h3>
+                <h3 class="picker-heading">Select Image</h3>
                 <button class="outline secondary" title="Close" aria-label="Close" @onclick="Cancel"><i class="site-icon" data-lucide="x"></i></button>
             </div>
 
@@ -43,7 +43,7 @@
                     <input readonly value="@selectedPath" />
                 </label>
 
-                <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                <div class="picker-actions">
                     <button class="outline secondary" disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="ClearSelection"><i class="site-icon" data-lucide="image-off"></i>Clear Image</button>
                     <button class="outline secondary" @onclick="Cancel">Cancel</button>
                     <button disabled="@string.IsNullOrWhiteSpace(selectedPath)" @onclick="Confirm"><i class="site-icon" data-lucide="check"></i>OK</button>

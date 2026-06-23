@@ -23,7 +23,7 @@
     }
 
     <form class="contact-form" @onsubmit="HandleSubmit" @onsubmit:preventDefault @onkeydown="TrackKeyboard" @onpaste="TrackPaste" @oninput="TrackInput">
-        <label style="position:absolute;left:-10000px" aria-hidden="true">Website
+        <label class="sr-only-field" aria-hidden="true">Website
             <input tabindex="-1" autocomplete="off" @bind="website" />
         </label>
         <input @bind="contactName" aria-label="Your name" placeholder="Your name" />
