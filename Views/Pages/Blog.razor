@@ -8,14 +8,14 @@
 
 <div class="page-header">
     <h1>Blog</h1>
-    <fieldset role="search">
+    <div class="table-search">
         <i class="site-icon" data-lucide="search"></i>
         <input type="text" placeholder="Search posts..." @bind="searchQuery" @bind:event="oninput" />
         @if (!string.IsNullOrWhiteSpace(searchQuery))
         {
             <button class="outline secondary btn-action" @onclick="ClearSearch"><i class="site-icon" data-lucide="x"></i></button>
         }
-    </fieldset>
+    </div>
 </div>
 
 @if (FilteredPosts.Count == 0)

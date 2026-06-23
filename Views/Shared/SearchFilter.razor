@@ -1,13 +1,13 @@
 @namespace johnvicencio.Views.Shared
 
-<fieldset role="search">
+<div class="table-search">
     <i class="site-icon" data-lucide="search"></i>
     <input type="text" placeholder="@Placeholder" value="@SearchQuery" @oninput="OnInput" />
     @if (!string.IsNullOrWhiteSpace(SearchQuery))
     {
         <button class="outline secondary btn-action" @onclick="Clear"><i class="site-icon" data-lucide="x"></i></button>
     }
-</fieldset>
+</div>
 
 @code {
     [Parameter] public string SearchQuery { get; set; } = "";

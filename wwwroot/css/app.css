@@ -470,8 +470,27 @@ th.sortable.desc::after {
 
 .table-toolbar-left, 
 
+/* MDB-style rounded search input-group */
+.table-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.table-search .site-icon:first-child {
+    position: absolute;
+    left: 0.75rem;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
 .table-search input {
+    padding-left: 2.25rem;
     max-width: 18rem;
+    margin: 0;
 }
 
 .table-pagination {
