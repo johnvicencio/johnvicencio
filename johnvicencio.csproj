@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\data\" />
+    <!-- Vault seed stays in source for local function fallback; never publish to CDN. -->
+    <Content Update="wwwroot\data\users\**" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
   <Target Name="GenerateImageIndex" BeforeTargets="BeforeBuild">

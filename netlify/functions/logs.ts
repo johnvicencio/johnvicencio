@@ -1,21 +1,20 @@
 import { getStore } from "@netlify/blobs";
+import { authorizeWriteToken, corsHeaders } from "./_security";
 
 const LOG_KEY = "app-logs.json";
 const RATE_KEY = "app-log-rate-limits.json";
 const MAX_LOG_ENTRIES = 500;
 const MAX_PUBLIC_LOGS_PER_HOUR = 40;
+const METHODS = "GET,PUT,POST,OPTIONS";
 
 export default async (request: Request) => {
-  if (request.method === "OPTIONS") return empty(204);
-
-  const url = new URL(request.url);
-  const action = url.searchParams.get("action") ?? "";
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders(request, METHODS) });
+  }
 
   if (request.method === "PUT") {
-    const token = process.env.CONTENT_WRITE_TOKEN;
-    if (!token) return json({ error: "CONTENT_WRITE_TOKEN is not configured" }, 403);
-    const given = request.headers.get("x-content-token") ?? "";
-    if (given !== token) return json({ error: "Unauthorized" }, 401);
+    const auth = authorizeWriteToken(request, METHODS);
+    if (auth) return auth;
 
     const entry = await request.json();
     const store = getStore("content");
@@ -30,13 +29,13 @@ export default async (request: Request) => {
 
     const trimmed = existing.slice(0, MAX_LOG_ENTRIES);
     await store.set(LOG_KEY, JSON.stringify(trimmed, null, 2), { metadata: { updatedAt: new Date().toISOString() } });
-    return json({ ok: true });
+    return json(request, { ok: true });
   }
 
   if (request.method === "POST") {
     const store = getStore("content");
     const rate = await checkPublicRateLimit(store, request);
-    if (!rate.ok) return json({ error: "Too many log entries" }, 429);
+    if (!rate.ok) return json(request, { error: "Too many log entries" }, 429);
 
     const entry = await readRequestJson(request);
     const existing = await readLogs(store);
@@ -57,21 +56,19 @@ export default async (request: Request) => {
 
     const trimmed = existing.slice(0, MAX_LOG_ENTRIES);
     await store.set(LOG_KEY, JSON.stringify(trimmed, null, 2), { metadata: { updatedAt: new Date().toISOString() } });
-    return json({ ok: true });
+    return json(request, { ok: true });
   }
 
   if (request.method === "GET") {
-    const token = process.env.CONTENT_WRITE_TOKEN;
-    if (!token) return json({ error: "CONTENT_WRITE_TOKEN is not configured" }, 403);
-    const given = request.headers.get("x-content-token") ?? "";
-    if (given !== token) return json({ error: "Unauthorized" }, 401);
+    const auth = authorizeWriteToken(request, METHODS);
+    if (auth) return auth;
 
     const store = getStore("content");
     const logs = await readLogs(store);
-    return json(logs);
+    return json(request, logs);
   }
 
-  return json({ error: "Method not allowed" }, 405);
+  return json(request, { error: "Method not allowed" }, 405);
 };
 
 async function readRequestJson(request: Request) {
@@ -132,22 +129,12 @@ async function sha256(value: string) {
   return Buffer.from(digest).toString("hex");
 }
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), headers(status));
-}
-
-function empty(status: number) {
-  return new Response(null, headers(status));
-}
-
-function headers(status: number) {
-  return {
+function json(request: Request, body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "access-control-allow-origin": "*",
-      "access-control-allow-methods": "GET,PUT,POST,OPTIONS",
-      "access-control-allow-headers": "content-type,x-content-token",
+      ...corsHeaders(request, METHODS),
     },
-  };
+  });
 }

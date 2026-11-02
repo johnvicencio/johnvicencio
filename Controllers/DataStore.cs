@@ -6,6 +6,8 @@ namespace johnvicencio.Controllers;
 
 public sealed class DataStore
 {
+    public const string ContentTokenStorageKey = "jv_content_token";
+
     private readonly HttpClient http;
     private readonly IJSRuntime? js;
     private readonly LogService log;
@@ -82,13 +84,49 @@ public sealed class DataStore
     private static string NetlifyContentUrl(string contentName) =>
         $"/.netlify/functions/content?name={contentName}";
 
-    private async Task<string?> GetContentTokenAsync()
+    private async Task<string?> GetContentTokenAsync() =>
+        await GetContentTokenAsync(js);
+
+    /// <summary>
+    /// Content write token lives in sessionStorage (same tab lifetime as admin session / vault).
+    /// One-time migrate: copy from localStorage if present, then remove the durable copy.
+    /// </summary>
+    public static async Task<string?> GetContentTokenAsync(IJSRuntime? js)
     {
         if (js is null) return null;
+
         try
         {
-            return await js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token");
+            var fromSession = await js.InvokeAsync<string?>("sessionStorage.getItem", ContentTokenStorageKey);
+            if (!string.IsNullOrWhiteSpace(fromSession))
+                return fromSession.Trim();
+
+            var fromLocal = await js.InvokeAsync<string?>("window.localStorage.getItem", ContentTokenStorageKey);
+            if (string.IsNullOrWhiteSpace(fromLocal))
+                return null;
+
+            var trimmed = fromLocal.Trim();
+            await js.InvokeVoidAsync("sessionStorage.setItem", ContentTokenStorageKey, trimmed);
+            await js.InvokeVoidAsync("window.localStorage.removeItem", ContentTokenStorageKey);
+            return trimmed;
         }
-        catch { return null; }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static async Task SetContentTokenAsync(IJSRuntime js, string token)
+    {
+        var trimmed = token.Trim();
+        await js.InvokeVoidAsync("sessionStorage.setItem", ContentTokenStorageKey, trimmed);
+        try
+        {
+            await js.InvokeVoidAsync("window.localStorage.removeItem", ContentTokenStorageKey);
+        }
+        catch
+        {
+            // Best-effort clear of any legacy durable copy.
+        }
     }
 }

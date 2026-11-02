@@ -95,18 +95,8 @@ public sealed class LogService
         }
     }
 
-    private async Task<string?> GetContentTokenAsync()
-    {
-        if (js is null) return null;
-        try
-        {
-            return await js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token");
-        }
-        catch
-        {
-            return null;
-        }
-    }
+    private async Task<string?> GetContentTokenAsync() =>
+        await DataStore.GetContentTokenAsync(js);
 }
 
 public sealed class LogEntry

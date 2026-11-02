@@ -1,36 +1,58 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { getStore } from "@netlify/blobs";
+import { authorizeWriteToken, corsHeaders, hasWriteToken } from "./_security";
 
 const allowedNames = new Set(["pages", "posts", "settings", "messages", "contact-rate-limits"]);
+const privateNames = new Set(["messages", "contact-rate-limits"]);
+const METHODS = "GET,PUT,OPTIONS";
 
 export default async (request: Request) => {
-  if (request.method === "OPTIONS") return empty(204);
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders(request, METHODS) });
+  }
 
   const url = new URL(request.url);
   const name = url.searchParams.get("name") ?? "";
 
   if (!isAllowedName(name)) {
-    return json({ error: "Unknown content name" }, 400);
+    return json(request, { error: "Unknown content name" }, 400);
   }
 
   const store = getStore("content");
   const key = `${name}.json`;
 
   if (request.method === "GET") {
-    const body = await store.get(key, { type: "text" });
-    if (!body) return json({ error: "Content not found" }, 404);
-    if (name === "settings") {
-      return new Response(scrubSettingsForClient(body), headers(200));
+    // Messages / rate tables are private; pages/posts/settings/users stay readable for the public site + login vault.
+    if (privateNames.has(name) && !hasWriteToken(request)) {
+      return json(request, { error: "Unauthorized" }, 401);
     }
 
-    return new Response(body, headers(200));
+    let body = await store.get(key, { type: "text" });
+    if (!body) body = await readLocalUserSeed(name);
+    if (!body) return json(request, { error: "Content not found" }, 404);
+    if (name === "settings") {
+      return new Response(scrubSettingsForClient(body), {
+        status: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          ...corsHeaders(request, METHODS),
+        },
+      });
+    }
+
+    return new Response(body, {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        ...corsHeaders(request, METHODS),
+      },
+    });
   }
 
   if (request.method === "PUT") {
-    const token = process.env.CONTENT_WRITE_TOKEN;
-    if (!token) return json({ error: "CONTENT_WRITE_TOKEN is not configured" }, 403);
-
-    const given = request.headers.get("x-content-token") ?? "";
-    if (given !== token) return json({ error: "Unauthorized" }, 401);
+    const auth = authorizeWriteToken(request, METHODS);
+    if (auth) return auth;
 
     const body = await request.text();
     const storedBody = name === "settings"
@@ -38,35 +60,36 @@ export default async (request: Request) => {
       : validateJson(body);
 
     await store.set(key, storedBody, { metadata: { updatedAt: new Date().toISOString() } });
-    return json({ ok: true });
+    return json(request, { ok: true });
   }
 
-  return json({ error: "Method not allowed" }, 405);
+  return json(request, { error: "Method not allowed" }, 405);
 };
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), headers(status));
-}
-
-function empty(status: number) {
-  return new Response(null, headers(status));
-}
-
-function headers(status: number) {
-  return {
+function json(request: Request, body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "access-control-allow-origin": "*",
-      "access-control-allow-methods": "GET,PUT,OPTIONS",
-      "access-control-allow-headers": "content-type,x-content-token",
+      ...corsHeaders(request, METHODS),
     },
-  };
+  });
 }
 
 function isAllowedName(name: string) {
   if (allowedNames.has(name)) return true;
   return /^users\/[a-z0-9_-]+$/.test(name);
+}
+
+/** Local netlify dev: serve wwwroot/data/users/{user}.json when Blobs are empty. Not published to CDN. */
+async function readLocalUserSeed(name: string) {
+  const match = /^users\/([a-z0-9_-]+)$/.exec(name);
+  if (!match) return null;
+  try {
+    return await readFile(join(process.cwd(), "wwwroot/data/users", `${match[1]}.json`), "utf8");
+  } catch {
+    return null;
+  }
 }
 
 function validateJson(body: string) {

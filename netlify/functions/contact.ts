@@ -1,5 +1,6 @@
 import { getStore } from "@netlify/blobs";
 import nodemailer from "nodemailer";
+import { authorizeWriteToken, corsHeaders } from "./_security";
 
 type ContactMessage = {
   id: string;
@@ -31,9 +32,13 @@ type RateState = Record<string, number[]>;
 
 const key = "messages.json";
 const rateKey = "contact-rate-limits.json";
+const METHODS = "GET,POST,PATCH,DELETE,OPTIONS";
 
 export default async (request: Request) => {
-  if (request.method === "OPTIONS") return empty(204);
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders(request, METHODS) });
+  }
+
   const url = new URL(request.url);
 
   if (request.method === "POST") {
@@ -46,24 +51,24 @@ export default async (request: Request) => {
     const interaction = normalizeInteraction(input.interaction);
 
     if (!name || !email || !message) {
-      return json({ error: "Name, email, and message are required" }, 400);
+      return json(request, { error: "Name, email, and message are required" }, 400);
     }
 
-    if (website) return json({ error: "Submission rejected" }, 400);
-    if (!consentAccepted) return json({ error: "Terms and privacy consent is required" }, 400);
-    if ((interaction.elapsedMs ?? 0) < 2000) return json({ error: "Submission rejected" }, 400);
-    if (!isValidEmail(email)) return json({ error: "Enter a valid email address" }, 400);
+    if (website) return json(request, { error: "Submission rejected" }, 400);
+    if (!consentAccepted) return json(request, { error: "Terms and privacy consent is required" }, 400);
+    if ((interaction.elapsedMs ?? 0) < 2000) return json(request, { error: "Submission rejected" }, 400);
+    if (!isValidEmail(email)) return json(request, { error: "Enter a valid email address" }, 400);
     if (hasUnsafeContent(name) || hasUnsafeContent(email) || hasUnsafeContent(message) || hasEncodedUnsafeContent(message)) {
-      return json({ error: "Message contains unsupported content" }, 400);
+      return json(request, { error: "Message contains unsupported content" }, 400);
     }
-    if (countLinks(message) > 3) return json({ error: "Message contains too many links" }, 400);
+    if (countLinks(message) > 3) return json(request, { error: "Message contains too many links" }, 400);
 
     const store = getStore("content");
     const rateResult = await checkRateLimits(store, request, email, message);
-    if (!rateResult.ok) return json({ error: rateResult.reason }, 429);
+    if (!rateResult.ok) return json(request, { error: rateResult.reason }, 429);
 
     const spam = scoreSpam({ name, email, message, interaction });
-    if (spam.score >= 6) return json({ error: "Submission rejected" }, 400);
+    if (spam.score >= 6) return json(request, { error: "Submission rejected" }, 400);
 
     const messages = await readMessages(store);
     messages.unshift({
@@ -79,51 +84,51 @@ export default async (request: Request) => {
     await store.set(key, JSON.stringify(messages, null, 2), { metadata: { updatedAt: new Date().toISOString() } });
 
     const emailSent = await sendEmailNotification(store, savedMessage);
-    return json({ ok: true, emailSent });
+    return json(request, { ok: true, emailSent });
   }
 
   if (request.method === "GET") {
-    const auth = authorize(request);
+    const auth = authorizeWriteToken(request, METHODS);
     if (auth) return auth;
 
     const store = getStore("content");
-    return json(await readMessages(store));
+    return json(request, await readMessages(store));
   }
 
   if (request.method === "PATCH") {
-    const auth = authorize(request);
+    const auth = authorizeWriteToken(request, METHODS);
     if (auth) return auth;
 
     const id = url.searchParams.get("id") ?? "";
-    if (!id) return json({ error: "Message id is required" }, 400);
+    if (!id) return json(request, { error: "Message id is required" }, 400);
 
     const store = getStore("content");
     const messages = await readMessages(store);
     const message = messages.find((item) => item.id === id);
-    if (!message) return json({ error: "Message not found" }, 404);
+    if (!message) return json(request, { error: "Message not found" }, 404);
 
     message.isRead = true;
     await writeMessages(store, messages);
-    return json({ ok: true });
+    return json(request, { ok: true });
   }
 
   if (request.method === "DELETE") {
-    const auth = authorize(request);
+    const auth = authorizeWriteToken(request, METHODS);
     if (auth) return auth;
 
     const id = url.searchParams.get("id") ?? "";
-    if (!id) return json({ error: "Message id is required" }, 400);
+    if (!id) return json(request, { error: "Message id is required" }, 400);
 
     const store = getStore("content");
     const messages = await readMessages(store);
     const updated = messages.filter((item) => item.id !== id);
-    if (updated.length === messages.length) return json({ error: "Message not found" }, 404);
+    if (updated.length === messages.length) return json(request, { error: "Message not found" }, 404);
 
     await writeMessages(store, updated);
-    return json({ ok: true });
+    return json(request, { ok: true });
   }
 
-  return json({ error: "Method not allowed" }, 405);
+  return json(request, { error: "Method not allowed" }, 405);
 };
 
 async function readMessages(store: ReturnType<typeof getStore>) {
@@ -134,16 +139,6 @@ async function readMessages(store: ReturnType<typeof getStore>) {
 
 async function writeMessages(store: ReturnType<typeof getStore>, messages: ContactMessage[]) {
   await store.set(key, JSON.stringify(messages, null, 2), { metadata: { updatedAt: new Date().toISOString() } });
-}
-
-function authorize(request: Request) {
-  const token = process.env.CONTENT_WRITE_TOKEN;
-  if (!token) return json({ error: "CONTENT_WRITE_TOKEN is not configured" }, 403);
-
-  const given = request.headers.get("x-content-token") ?? "";
-  if (given !== token) return json({ error: "Unauthorized" }, 401);
-
-  return null;
 }
 
 function clean(value: unknown, maxLength: number) {
@@ -227,7 +222,7 @@ function scoreSpam(input: { name: string; email: string; message: string; intera
 }
 
 function uppercaseRatio(value: string) {
-  const letters = value.replace(/[^a-z]/gi, "");
+  const letters = value.replace(/[^a-zA-Z]/g, "");
   if (!letters) return 0;
   const uppercase = letters.replace(/[^A-Z]/g, "");
   return uppercase.length / letters.length;
@@ -393,22 +388,12 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#039;");
 }
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), headers(status));
-}
-
-function empty(status: number) {
-  return new Response(null, headers(status));
-}
-
-function headers(status: number) {
-  return {
+function json(request: Request, body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "access-control-allow-origin": "*",
-      "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS",
-      "access-control-allow-headers": "content-type,x-content-token",
+      ...corsHeaders(request, METHODS),
     },
-  };
+  });
 }
