@@ -1,6 +1,6 @@
 import { getStore } from "@netlify/blobs";
 import nodemailer from "nodemailer";
-import { authorizeWriteToken, corsHeaders } from "./_security";
+import { authorizeWriteToken, corsHeaders } from "./lib/security";
 
 type ContactMessage = {
   id: string;
