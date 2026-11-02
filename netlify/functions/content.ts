@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getStore } from "@netlify/blobs";
-import { authorizeWriteToken, corsHeaders, hasWriteToken } from "./_security";
+import { authorizeWriteToken, corsHeaders, hasWriteToken } from "./lib/security";
 
 const allowedNames = new Set(["pages", "posts", "settings", "messages", "contact-rate-limits"]);
 const privateNames = new Set(["messages", "contact-rate-limits"]);

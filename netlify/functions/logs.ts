@@ -1,5 +1,5 @@
 import { getStore } from "@netlify/blobs";
-import { authorizeWriteToken, corsHeaders } from "./_security";
+import { authorizeWriteToken, corsHeaders } from "./lib/security";
 
 const LOG_KEY = "app-logs.json";
 const RATE_KEY = "app-log-rate-limits.json";
