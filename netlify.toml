@@ -1,5 +1,6 @@
 [build]
-  command = "dotnet publish -c Release"
+  # Strip AppleDouble (._*) from pCloud/JV4TB before CSC; exclude vault seed via csproj.
+  command = "bash -lc 'find . -name \"._*\" -delete; export COPYFILE_DISABLE=1; dotnet publish johnvicencio.csproj -c Release'"
   publish = "bin/Release/net8.0/publish/wwwroot"
   functions = "netlify/functions"
 
@@ -36,17 +37,31 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# GUIDE §8.2a / FEAT-WEB-NETLIFY-SECURITY-DEFAULTS — match mythoslife.com baseline (JV-tuned CSP).
 [[headers]]
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self' https://johnvicencio.com; img-src 'self' data: https:; font-src 'self' data:; style-src 'self' 'unsafe-inline' https://johnvicencio.com; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://johnvicencio.com https://*.netlify.app https://api.netlify.com; connect-src 'self' https://johnvicencio.com https://*.netlify.app https://api.netlify.com; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'"
 
 [[headers]]
   for = "/"
   [headers.values]
     Link = "<https://johnvicencio.com>; rel=canonical"
+
+# Never serve vault seed crypto from the static CDN (offline crack material).
+# Keep wwwroot/data/users for local function fallback only; exclude from publish + deny here.
+[[redirects]]
+  from = "/data/users/*"
+  to = "/__denied__"
+  status = 404
+  force = true
 
 [[redirects]]
   from = "/_framework/*"

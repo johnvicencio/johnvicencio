@@ -79,15 +79,6 @@ public sealed class ContactMessageController
         return await http.SendAsync(request);
     }
 
-    private async Task<string?> GetContentTokenAsync()
-    {
-        try
-        {
-            return await js.InvokeAsync<string?>("window.localStorage.getItem", "jv_content_token");
-        }
-        catch
-        {
-            return null;
-        }
-    }
+    private async Task<string?> GetContentTokenAsync() =>
+        await DataStore.GetContentTokenAsync(js);
 }

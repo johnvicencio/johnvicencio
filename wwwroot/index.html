@@ -9,7 +9,7 @@
     <base href="/" />
     <link rel="canonical" href="https://johnvicencio.com" />
 
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://johnvicencio.com https://*.netlify.app; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://johnvicencio.com https://*.netlify.app https://api.netlify.com; style-src 'self' 'unsafe-inline' https://johnvicencio.com; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://johnvicencio.com https://*.netlify.app https://api.netlify.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https://johnvicencio.com" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self' https://johnvicencio.com; img-src 'self' data: https:; font-src 'self' data:; style-src 'self' 'unsafe-inline' https://johnvicencio.com; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://johnvicencio.com https://*.netlify.app https://api.netlify.com; connect-src 'self' https://johnvicencio.com https://*.netlify.app https://api.netlify.com; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'" />
 
     <link rel="preconnect" href="https://api.netlify.com" />
     <link rel="dns-prefetch" href="https://api.netlify.com" />
