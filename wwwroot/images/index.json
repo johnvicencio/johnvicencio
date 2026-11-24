@@ -558,5 +558,29 @@
     "ContentType": "image/jpeg",
     "Size": 124373,
     "UploadedUtc": "2026-11-24T22:52:29.556Z"
+  },
+  {
+    "FileName": "what-engine-taught-us.jpg",
+    "Url": "/images/blog/what-engine-taught-us.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 136278,
+    "UploadedUtc": "2026-11-24T23:47:55.832Z"
+  },
+  {
+    "FileName": "when-performance-budget-kept-growing.jpg",
+    "Url": "/images/blog/when-performance-budget-kept-growing.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 181153,
+    "UploadedUtc": "2026-11-24T23:49:09.243Z"
+  },
+  {
+    "FileName": "what-script-reminds.jpg",
+    "Url": "/images/blog/what-script-reminds.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 92420,
+    "UploadedUtc": "2026-11-24T23:50:27.987Z"
   }
 ]

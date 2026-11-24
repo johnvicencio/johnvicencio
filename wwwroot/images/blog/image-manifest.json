@@ -5,5 +5,26 @@
     "unsplashPage": "https://unsplash.com/photos/graphs-of-performance-analytics-on-a-laptop-screen-JKUTrJ4vK00",
     "photographer": "Luke Chesser",
     "sourceUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80"
+  },
+  {
+    "slug": "what-engine-taught-us",
+    "file": "images/blog/what-engine-taught-us.jpg",
+    "unsplashPage": "https://unsplash.com/photos/a-close-up-of-a-metal-gear-wheel-t64swVwkdN8",
+    "photographer": "Feodor Chistyakov",
+    "sourceUrl": "https://images.unsplash.com/photo-1713244433542-4c6205d09d97?w=1200&q=80"
+  },
+  {
+    "slug": "when-performance-budget-kept-growing",
+    "file": "images/blog/when-performance-budget-kept-growing.jpg",
+    "unsplashPage": "https://unsplash.com/photos/green-ruler-on-white-surface-PK6NDtsYy00",
+    "photographer": "eskay lim",
+    "sourceUrl": "https://images.unsplash.com/photo-1617118602031-1edde7582212?w=1200&q=80"
+  },
+  {
+    "slug": "what-script-reminds",
+    "file": "images/blog/what-script-reminds.jpg",
+    "unsplashPage": "https://unsplash.com/photos/six-white-sticky-notes--1_RZL8BGBM",
+    "photographer": "Kelly Sikkema",
+    "sourceUrl": "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=1200&q=80"
   }
 ]
