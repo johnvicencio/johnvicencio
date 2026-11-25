@@ -54,5 +54,89 @@
     "unsplashPage": "https://unsplash.com/photos/man-speaking-in-front-of-crowd-RfiBK6Y_upQ",
     "photographer": "Miguel Henriques",
     "sourceUrl": "https://images.unsplash.com/photo-1544531586-fde5298cdd40?w=1200&q=80"
+  },
+  {
+    "slug": "the-elegant-connection",
+    "file": "images/blog/the-elegant-connection.jpg",
+    "unsplashPage": "https://unsplash.com/photos/city-skyline-during-night-time-55D_2cNlcA4",
+    "photographer": "Toby Yang",
+    "sourceUrl": "https://images.unsplash.com/photo-1596284492453-162676931bba?w=1200&q=80"
+  },
+  {
+    "slug": "the-contested-open-source-project",
+    "file": "images/blog/the-contested-open-source-project.jpg",
+    "unsplashPage": "https://unsplash.com/photos/people-in-a-meeting-discussing-app-development-LJtfV2Dkp4U",
+    "photographer": "Mapbox",
+    "sourceUrl": "https://images.unsplash.com/photo-1622675205169-901710ac8643?w=1200&q=80"
+  },
+  {
+    "slug": "when-transition-broke-new-ground",
+    "file": "images/blog/when-transition-broke-new-ground.jpg",
+    "unsplashPage": "https://unsplash.com/photos/an-excavator-scoops-dirt-at-a-construction-site-Ky_VrUeMApE",
+    "photographer": "John Kakuk",
+    "sourceUrl": "https://images.unsplash.com/photo-1751054770504-c69daeec4721?w=1200&q=80"
+  },
+  {
+    "slug": "learning-from-the-interface",
+    "file": "images/blog/learning-from-the-interface.jpg",
+    "unsplashPage": "https://unsplash.com/photos/person-using-black-smartphone-with-gray-and-pink-case-cqFKhqv6Ong",
+    "photographer": "Rob Hampson",
+    "sourceUrl": "https://images.unsplash.com/photo-1514575110897-1253ff7b2ccb?w=1200&q=80"
+  },
+  {
+    "slug": "why-framework-connects",
+    "file": "images/blog/why-framework-connects.jpg",
+    "unsplashPage": "https://unsplash.com/photos/metal-scaffolding-tower-against-blue-sky-3j20awH5wWc",
+    "photographer": "Randol Ozoria Santana",
+    "sourceUrl": "https://images.unsplash.com/photo-1786155458351-b2c4f594b07e?w=1200&q=80"
+  },
+  {
+    "slug": "what-endpoint-evolves",
+    "file": "images/blog/what-endpoint-evolves.jpg",
+    "unsplashPage": "https://unsplash.com/photos/silhouette-of-road-signage-during-golden-hour-C7B-ExXpOIE",
+    "photographer": "Javier Allegue Barros",
+    "sourceUrl": "https://images.unsplash.com/photo-1533073526757-2c8ca1df9f1c?w=1200&q=80"
+  },
+  {
+    "slug": "beyond-the-script",
+    "file": "images/blog/beyond-the-script.jpg",
+    "unsplashPage": "https://unsplash.com/photos/a-close-up-of-a-red-curtain-with-a-white-background-TYW4YcRH3A8",
+    "photographer": "An Tran",
+    "sourceUrl": "https://images.unsplash.com/photo-1535557855581-eaff85cba178?w=1200&q=80"
+  },
+  {
+    "slug": "the-protocol-that-refused-to-separates",
+    "file": "images/blog/the-protocol-that-refused-to-separates.jpg",
+    "unsplashPage": "https://unsplash.com/photos/tilt-shift-lens-photo-of-stainless-steel-chain-PDxYfXVlK2M",
+    "photographer": "JJ Ying",
+    "sourceUrl": "https://images.unsplash.com/photo-1488272690691-2636704d6000?w=1200&q=80"
+  },
+  {
+    "slug": "the-mobile-site-that-built-bridges",
+    "file": "images/blog/the-mobile-site-that-built-bridges.jpg",
+    "unsplashPage": "https://unsplash.com/photos/lighted-bridge-during-nighttime-UcerteR6IPQ",
+    "photographer": "Joseph Barrientos",
+    "sourceUrl": "https://images.unsplash.com/photo-1431102996501-f6379b157668?w=1200&q=80"
+  },
+  {
+    "slug": "why-api-survives",
+    "file": "images/blog/why-api-survives.jpg",
+    "unsplashPage": "https://unsplash.com/photos/two-person-shaking-hands-near-white-painted-wall-9cd8qOgeNIY",
+    "photographer": "Chris Liverani",
+    "sourceUrl": "https://images.unsplash.com/photo-1518135714426-c18f5ffb6f4d?w=1200&q=80"
+  },
+  {
+    "slug": "the-developer-tool-nobody-expected",
+    "file": "images/blog/the-developer-tool-nobody-expected.jpg",
+    "unsplashPage": "https://unsplash.com/photos/red-and-silver-multi-tool--J1cTtVpj8k",
+    "photographer": "Denise Jans",
+    "sourceUrl": "https://images.unsplash.com/photo-1605468424365-bac89e69cc4a?w=1200&q=80"
+  },
+  {
+    "slug": "the-browser-extension-that-refused-to-endures",
+    "file": "images/blog/the-browser-extension-that-refused-to-endures.jpg",
+    "unsplashPage": "https://unsplash.com/photos/a-person-holding-two-pieces-of-a-puzzle-JzE1dHEaAew",
+    "photographer": "Vardan Papikyan",
+    "sourceUrl": "https://images.unsplash.com/photo-1637094408647-0d81d08f81b5?w=1200&q=80"
   }
 ]

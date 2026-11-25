@@ -614,5 +614,101 @@
     "ContentType": "image/jpeg",
     "Size": 142358,
     "UploadedUtc": "2026-11-25T00:06:32.124Z"
+  },
+  {
+    "FileName": "the-elegant-connection.jpg",
+    "Url": "/images/blog/the-elegant-connection.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 183721,
+    "UploadedUtc": "2026-11-25T00:30:19.874Z"
+  },
+  {
+    "FileName": "the-contested-open-source-project.jpg",
+    "Url": "/images/blog/the-contested-open-source-project.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 128250,
+    "UploadedUtc": "2026-11-25T00:30:21.100Z"
+  },
+  {
+    "FileName": "when-transition-broke-new-ground.jpg",
+    "Url": "/images/blog/when-transition-broke-new-ground.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 357637,
+    "UploadedUtc": "2026-11-25T00:30:22.344Z"
+  },
+  {
+    "FileName": "learning-from-the-interface.jpg",
+    "Url": "/images/blog/learning-from-the-interface.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 89600,
+    "UploadedUtc": "2026-11-25T00:30:23.881Z"
+  },
+  {
+    "FileName": "why-framework-connects.jpg",
+    "Url": "/images/blog/why-framework-connects.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 468638,
+    "UploadedUtc": "2026-11-25T00:30:25.307Z"
+  },
+  {
+    "FileName": "what-endpoint-evolves.jpg",
+    "Url": "/images/blog/what-endpoint-evolves.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 44975,
+    "UploadedUtc": "2026-11-25T00:30:26.576Z"
+  },
+  {
+    "FileName": "beyond-the-script.jpg",
+    "Url": "/images/blog/beyond-the-script.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 52302,
+    "UploadedUtc": "2026-11-25T00:30:27.795Z"
+  },
+  {
+    "FileName": "the-protocol-that-refused-to-separates.jpg",
+    "Url": "/images/blog/the-protocol-that-refused-to-separates.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 82162,
+    "UploadedUtc": "2026-11-25T00:30:29.451Z"
+  },
+  {
+    "FileName": "the-mobile-site-that-built-bridges.jpg",
+    "Url": "/images/blog/the-mobile-site-that-built-bridges.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 88356,
+    "UploadedUtc": "2026-11-25T00:30:30.815Z"
+  },
+  {
+    "FileName": "why-api-survives.jpg",
+    "Url": "/images/blog/why-api-survives.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 75254,
+    "UploadedUtc": "2026-11-25T00:30:32.246Z"
+  },
+  {
+    "FileName": "the-developer-tool-nobody-expected.jpg",
+    "Url": "/images/blog/the-developer-tool-nobody-expected.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 131214,
+    "UploadedUtc": "2026-11-25T00:30:33.537Z"
+  },
+  {
+    "FileName": "the-browser-extension-that-refused-to-endures.jpg",
+    "Url": "/images/blog/the-browser-extension-that-refused-to-endures.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 88181,
+    "UploadedUtc": "2026-11-25T00:30:34.832Z"
   }
 ]
