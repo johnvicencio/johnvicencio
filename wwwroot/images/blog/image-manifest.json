@@ -26,5 +26,33 @@
     "unsplashPage": "https://unsplash.com/photos/six-white-sticky-notes--1_RZL8BGBM",
     "photographer": "Kelly Sikkema",
     "sourceUrl": "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=1200&q=80"
+  },
+  {
+    "slug": "what-protocol-survives",
+    "file": "images/blog/what-protocol-survives.jpg",
+    "unsplashPage": "https://unsplash.com/photos/a-bunch-of-blue-wires-connected-to-each-other-PSpf_XgOM5w",
+    "photographer": "Scott Rodgerson",
+    "sourceUrl": "https://images.unsplash.com/photo-1683322499436-f4383dd59f5a?w=1200&q=80"
+  },
+  {
+    "slug": "inside-the-design-system",
+    "file": "images/blog/inside-the-design-system.jpg",
+    "unsplashPage": "https://unsplash.com/photos/BzqETBK7SgA",
+    "photographer": "Amélie Mourichon",
+    "sourceUrl": "https://images.unsplash.com/photo-1586275198313-cc05a6722058?w=1200&q=80"
+  },
+  {
+    "slug": "what-library-challenges",
+    "file": "images/blog/what-library-challenges.jpg",
+    "unsplashPage": "https://unsplash.com/photos/a-bookshelf-filled-with-lots-of-books-next-to-a-wall-kf2O4Rvlq9Q",
+    "photographer": "Eden Constantino",
+    "sourceUrl": "https://images.unsplash.com/photo-1636499447962-1e4674d738aa?w=1200&q=80"
+  },
+  {
+    "slug": "the-conference-talk-nobody-expected",
+    "file": "images/blog/the-conference-talk-nobody-expected.jpg",
+    "unsplashPage": "https://unsplash.com/photos/man-speaking-in-front-of-crowd-RfiBK6Y_upQ",
+    "photographer": "Miguel Henriques",
+    "sourceUrl": "https://images.unsplash.com/photo-1544531586-fde5298cdd40?w=1200&q=80"
   }
 ]

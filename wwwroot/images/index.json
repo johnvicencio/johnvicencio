@@ -582,5 +582,37 @@
     "ContentType": "image/jpeg",
     "Size": 92420,
     "UploadedUtc": "2026-11-24T23:50:27.987Z"
+  },
+  {
+    "FileName": "what-protocol-survives.jpg",
+    "Url": "/images/blog/what-protocol-survives.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 120135,
+    "UploadedUtc": "2026-11-25T00:06:28.074Z"
+  },
+  {
+    "FileName": "inside-the-design-system.jpg",
+    "Url": "/images/blog/inside-the-design-system.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 165497,
+    "UploadedUtc": "2026-11-25T00:06:29.250Z"
+  },
+  {
+    "FileName": "what-library-challenges.jpg",
+    "Url": "/images/blog/what-library-challenges.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 96870,
+    "UploadedUtc": "2026-11-25T00:06:30.591Z"
+  },
+  {
+    "FileName": "the-conference-talk-nobody-expected.jpg",
+    "Url": "/images/blog/the-conference-talk-nobody-expected.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 142358,
+    "UploadedUtc": "2026-11-25T00:06:32.124Z"
   }
 ]
