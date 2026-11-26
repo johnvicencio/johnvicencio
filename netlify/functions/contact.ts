@@ -323,13 +323,93 @@ async function sendEmailNotification(store: ReturnType<typeof getStore>, message
       },
     });
 
+    const submittedFormatted = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short",
+    }).format(new Date(message.submittedUtc));
+    const escapedName = escapeHtml(message.name);
+    const escapedEmail = escapeHtml(message.email);
+    const escapedSubmitted = escapeHtml(submittedFormatted);
+    const escapedMessageHtml = escapeHtml(message.message).replaceAll("\n", "<br>");
+
+    const text = [
+      "New message — John Vicencio | Contact",
+      "",
+      "New website message",
+      "",
+      `Name: ${message.name}`,
+      `Email: ${message.email}`,
+      `Submitted: ${submittedFormatted}`,
+      "",
+      "Message",
+      "",
+      message.message,
+      "",
+      `Reply directly to this email to respond to ${message.name}.`,
+      "johnvicencio.com contact form · Pacific Time",
+    ].join("\n");
+
+    const html = `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7fa;margin:0;padding:0;">
+  <tr>
+    <td style="padding:24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;margin:0 auto;background:#ffffff;border:1px solid #e0e5ec;border-radius:8px;font-family:Georgia,'Times New Roman',serif;color:#1e2025;">
+        <tr>
+          <td style="padding:20px 24px 8px 24px;font-size:11px;letter-spacing:2px;color:#6c757e;">NEW MESSAGE</td>
+        </tr>
+        <tr>
+          <td style="background:#1e6df2;color:#ffffff;font-size:20px;padding:16px 24px;">John Vicencio | Contact</td>
+        </tr>
+        <tr>
+          <td style="padding:20px 24px 8px 24px;font-size:15px;color:#1e2025;">New website message</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 24px 16px 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Georgia,'Times New Roman',serif;">
+              <tr>
+                <td style="padding:6px 0;border-bottom:1px solid #e0e5ec;font-size:13px;color:#6c757e;width:110px;vertical-align:top;">Name</td>
+                <td style="padding:6px 0;border-bottom:1px solid #e0e5ec;font-size:15px;color:#1e2025;">${escapedName}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;border-bottom:1px solid #e0e5ec;font-size:13px;color:#6c757e;width:110px;vertical-align:top;">Email</td>
+                <td style="padding:6px 0;border-bottom:1px solid #e0e5ec;font-size:15px;color:#1e2025;">${escapedEmail}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;border-bottom:1px solid #e0e5ec;font-size:13px;color:#6c757e;width:110px;vertical-align:top;">Submitted</td>
+                <td style="padding:6px 0;border-bottom:1px solid #e0e5ec;font-size:15px;color:#1e2025;">${escapedSubmitted}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 24px 4px 24px;font-size:13px;letter-spacing:1px;color:#6c757e;">MESSAGE</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 24px 20px 24px;font-size:15px;line-height:1.6;color:#1e2025;">${escapedMessageHtml}</td>
+        </tr>
+        <tr>
+          <td style="padding:16px 24px 24px 24px;border-top:1px solid #e0e5ec;font-size:13px;color:#6c757e;">
+            Reply directly to this email to respond to ${escapedName}.<br>
+            johnvicencio.com contact form · Pacific Time
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`.trim();
+
     await transporter.sendMail({
       from: `"${escapeHeader(fromName)}" <${fromEmail}>`,
       to: settings.ToEmail,
       replyTo: message.email,
-      subject: `New contact message from ${message.name}, ticket number ${Date.parse(message.submittedUtc)}`,
-      text: `Name: ${message.name}\nEmail: ${message.email}\nSubmitted: ${message.submittedUtc}\n\n${message.message}`,
-      html: `<p><strong>Name:</strong> ${escapeHtml(message.name)}</p><p><strong>Email:</strong> ${escapeHtml(message.email)}</p><p><strong>Submitted:</strong> ${escapeHtml(message.submittedUtc)}</p><hr><p>${escapeHtml(message.message).replaceAll("\n", "<br>")}</p>`,
+      subject: `New contact from ${message.name}, ticket ${Date.parse(message.submittedUtc)}`,
+      text,
+      html,
     });
 
     return true;
