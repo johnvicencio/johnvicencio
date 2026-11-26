@@ -742,5 +742,85 @@
     "ContentType": "image/jpeg",
     "Size": 230252,
     "UploadedUtc": "2026-11-25T01:36:18.408Z"
+  },
+  {
+    "FileName": "smcoogle.jpg",
+    "Url": "/images/blog/smcoogle.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 120170,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "the-learning-trail.jpg",
+    "Url": "/images/blog/the-learning-trail.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 474774,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "xmlcrud.jpg",
+    "Url": "/images/blog/xmlcrud.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 62899,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "quicknote.jpg",
+    "Url": "/images/blog/quicknote.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 80230,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "futurist.jpg",
+    "Url": "/images/blog/futurist.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 324056,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "notatez.jpg",
+    "Url": "/images/blog/notatez.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 182961,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "pyfinprojection.jpg",
+    "Url": "/images/blog/pyfinprojection.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 124583,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "spacex-data-science-capstone.jpg",
+    "Url": "/images/blog/spacex-data-science-capstone.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 137460,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "2013-top-tech-exec-awards-finalist.jpg",
+    "Url": "/images/blog/2013-top-tech-exec-awards-finalist.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 58849,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
+  },
+  {
+    "FileName": "code-a-thon-2026.jpg",
+    "Url": "/images/blog/code-a-thon-2026.jpg",
+    "Folder": "blog",
+    "ContentType": "image/jpeg",
+    "Size": 152869,
+    "UploadedUtc": "2026-11-26T17:32:10.034Z"
   }
 ]

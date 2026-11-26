@@ -166,5 +166,75 @@
     "photographer": "Release cover art (SoundOn)",
     "unsplashPage": "https://sndo.ffm.to/kpor0z4",
     "sourceUrl": "https://sndo.ffm.to/kpor0z4"
+  },
+  {
+    "slug": "smcoogle",
+    "file": "images/blog/smcoogle.jpg",
+    "unsplashPage": "https://unsplash.com/photos/white-and-orange-magnifying-glass-on-brown-wooden-table-72BTeQn3uX8",
+    "photographer": "Jonas Elia",
+    "sourceUrl": "https://images.unsplash.com/photo-1619948219791-009eba40ae45?w=1200&q=80"
+  },
+  {
+    "slug": "the-learning-trail",
+    "file": "images/blog/the-learning-trail.jpg",
+    "unsplashPage": "https://unsplash.com/photos/a-winding-path-through-a-lush-green-forest-ulSsNRo_Z1o",
+    "photographer": "Muhammad Adil Shahzad",
+    "sourceUrl": "https://images.unsplash.com/photo-1754831833550-af0ddd3a20f0?w=1200&q=80"
+  },
+  {
+    "slug": "xmlcrud",
+    "file": "images/blog/xmlcrud.jpg",
+    "unsplashPage": "https://unsplash.com/photos/a-stack-of-thick-folders-on-a-white-surface-XN4T2PVUUgk",
+    "photographer": "Beatriz Pérez Moya",
+    "sourceUrl": "https://images.unsplash.com/photo-1468779036391-52341f60b55d?w=1200&q=80"
+  },
+  {
+    "slug": "quicknote",
+    "file": "images/blog/quicknote.jpg",
+    "unsplashPage": "https://unsplash.com/photos/colorful-sticky-notes-scattered-on-a-white-board-OBOoohXBrD8",
+    "photographer": "Akinyemi Gbadamosi",
+    "sourceUrl": "https://images.unsplash.com/photo-1759868937753-34859b641bc1?w=1200&q=80"
+  },
+  {
+    "slug": "futurist",
+    "file": "images/blog/futurist.jpg",
+    "unsplashPage": "https://unsplash.com/photos/blue-and-purple-galaxy-digital-wallpaper-E0AHdsENmDg",
+    "photographer": "Jeremy Thomas",
+    "sourceUrl": "https://images.unsplash.com/photo-1464802686167-b939a6910659?w=1200&q=80"
+  },
+  {
+    "slug": "notatez",
+    "file": "images/blog/notatez.jpg",
+    "unsplashPage": "https://unsplash.com/photos/turned-off-laptop-computer-with-near-wall-mY3_bvR74fI",
+    "photographer": "Dillon Shook",
+    "sourceUrl": "https://images.unsplash.com/photo-1526657782461-9fe13402a841?w=1200&q=80"
+  },
+  {
+    "slug": "pyfinprojection",
+    "file": "images/blog/pyfinprojection.jpg",
+    "unsplashPage": "https://unsplash.com/photos/laptop-computer-on-glass-top-table-hpjSkU2UYSU",
+    "photographer": "Carlos Muza",
+    "sourceUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80"
+  },
+  {
+    "slug": "spacex-data-science-capstone",
+    "file": "images/blog/spacex-data-science-capstone.jpg",
+    "unsplashPage": "https://unsplash.com/photos/gray-spacecraft-taking-off-during-daytime-OHOU-5UVIYQ",
+    "photographer": "SpaceX",
+    "sourceUrl": "https://images.unsplash.com/photo-1517976487492-5750f3195933?w=1200&q=80"
+  },
+  {
+    "slug": "2013-top-tech-exec-awards-finalist",
+    "file": "images/blog/2013-top-tech-exec-awards-finalist.jpg",
+    "unsplashPage": "https://unsplash.com/photos/yellow-and-white-trophy-_XTY6lD8jgM",
+    "photographer": "Giorgio Trovato",
+    "sourceUrl": "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=1200&q=80"
+  },
+  {
+    "slug": "code-a-thon-2026",
+    "file": "images/blog/code-a-thon-2026.jpg",
+    "unsplashPage": "https://unsplash.com/photos/group-of-people-using-laptop-computer-QckxruozjRg",
+    "photographer": "Annie Spratt",
+    "sourceUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80"
   }
 ]
